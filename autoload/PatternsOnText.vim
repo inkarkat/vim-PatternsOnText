@@ -1,6 +1,7 @@
 " PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - ingocmdargs.vim autoload script
 "   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
@@ -55,12 +56,7 @@ function! PatternsOnText#SubstituteExcept( range, arguments )
     call s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags)
 endfunction
 function! PatternsOnText#DeleteExcept( range, arguments )
-    let l:match = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)$')
-    if empty(l:match)
-	let [l:separator, l:pattern, l:flags] = ['/', escape(a:arguments, '/'), '']
-    else
-	let [l:separator, l:pattern, l:flags] = l:match[1:3]
-    endif
+    let [l:separator, l:pattern, l:flags] = ingocmdargs#ParsePatternArgument(a:arguments, '\(.*\)')
 
     call s:InvertedSubstitute(a:range, l:separator, l:pattern, '', 'g' . l:flags)
     call histdel('search', -1)
@@ -169,35 +165,18 @@ endfunction
 
 
 
-function! s:ParsePatternArgument( arguments, ... )
-    let l:match = matchlist(a:arguments, '^\(\i\@!\S\)\(.\{-}\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1' . (a:0 ? a:1 : '') . '$')
-    if empty(l:match)
-	return ['/', escape(a:arguments, '/')] + (a:0 ? [''] : [])
-    else
-	return l:match[1: (a:0 ? 3 : 2)]
-    endif
-endfunction
-function! s:UnescapePatternArgument( arguments )
-    if empty(a:arguments)
-	return ''
-    else
-	let [l:separator, l:pattern] = s:ParsePatternArgument(a:arguments)
-	" We don't need the /.../ separation here.
-	return substitute(l:pattern, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\V\C' . l:separator, l:separator, 'g')
-    endif
-endfunction
 function! PatternsOnText#PatternOrCurrentLine( arguments )
     if empty(a:arguments)
 	return '\V\C\^' . escape(getline('.'), '\') . '\$'
     else
-	return s:UnescapePatternArgument(a:arguments)
+	return ingocmdargs#UnescapePatternArgument(a:arguments)
     endif
 endfunction
 function! s:FilterDuplicateLines( accumulator )
     call filter(a:accumulator, 'len(v:val) > 1')
 endfunction
 function! PatternsOnText#ProcessDuplicateLines( startLnum, endLnum, ignorePattern, acceptPattern, Action )
-    let l:ignorePattern = s:UnescapePatternArgument(a:ignorePattern)
+    let l:ignorePattern = ingocmdargs#UnescapePatternArgument(a:ignorePattern)
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
     let l:accumulator = {}
     for l:lnum in range(a:startLnum, a:endLnum)
@@ -285,7 +264,7 @@ function! PatternsOnText#ProcessDuplicates( startLnum, endLnum, arguments, OnDup
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
     else
-	let [l:separator, l:pattern] = s:ParsePatternArgument(a:arguments)
+	let [l:separator, l:pattern] = ingocmdargs#ParsePatternArgument(a:arguments)
     endif
 
     let l:accumulator = {}
