@@ -1,0 +1,10 @@
+foo
+bar
+baz
+spaz
+spaz
+fooxy
+bar
+foox
+bar
+eof
