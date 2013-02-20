@@ -31,13 +31,8 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags )
 endfunction
 let s:SubstituteExcept_PreviousFlags = ''
 function! PatternsOnText#Substitute( range, arguments )
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)')
-    if empty(l:matches)
-	let [l:separator, l:pattern, l:replacement, l:flags] = ['/', '', '~', s:SubstituteExcept_PreviousFlags]
-    else
-	let [l:separator, l:pattern, l:replacement, l:flags, l:count] = l:matches[1:5]
-	let s:SubstituteExcept_PreviousFlags = l:flags
-    endif
+    let [l:separator, l:pattern, l:replacement, l:flags] = ingocmdargs#ParseSubstituteArgument(a:arguments, '~', s:SubstituteExcept_PreviousFlags, '\(\S*\)')
+    let s:SubstituteExcept_PreviousFlags = l:flags
 "****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags])
     call s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags)
 endfunction
