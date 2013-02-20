@@ -10,20 +10,24 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
+"				take the result of
+"				ingocmdargs#ParsePatternArgument() instead of
+"				invoking that function itself.
 "	001	22-Jan-2013	file creation
 
 function! PatternsOnText#DuplicateLines#PatternOrCurrentLine( arguments )
     if empty(a:arguments)
 	return '\V\C\^' . escape(getline('.'), '\') . '\$'
     else
-	return ingocmdargs#UnescapePatternArgument(a:arguments)
+	return ingocmdargs#UnescapePatternArgument(ingocmdargs#ParsePatternArgument(a:arguments))
     endif
 endfunction
 function! s:FilterDuplicateLines( accumulator )
     call filter(a:accumulator, 'len(v:val) > 1')
 endfunction
 function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Action )
-    let l:ignorePattern = ingocmdargs#UnescapePatternArgument(a:ignorePattern)
+    let l:ignorePattern = ingocmdargs#UnescapePatternArgument(ingocmdargs#ParsePatternArgument(a:ignorePattern))
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
     let l:accumulator = {}
     for l:lnum in range(a:startLnum, a:endLnum)
