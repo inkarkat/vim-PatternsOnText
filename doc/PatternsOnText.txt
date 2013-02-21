@@ -20,9 +20,13 @@ HOW IT WORKS								     *
 SOURCE									     *
 
 |:DeleteExcept|
-   http://stackoverflow.com/questions/6249172/vim-delete-anything-other-than-pattern
+    http://stackoverflow.com/questions/6249172/vim-delete-anything-other-than-pattern
 |:SubstituteInSearch| inspired by
-   http://stackoverflow.com/questions/13763880/in-vim-how-can-i-search-and-replace-every-other-match
+    http://stackoverflow.com/questions/13763880/in-vim-how-can-i-search-and-replace-every-other-match
+|:DeleteDuplicateLinesOf| inspired by
+    http://stackoverflow.com/questions/14236226/hanging-only-to-the-first-instance-of-the-line-and-deleting-all-further-copies
+|:DeleteDuplicateLinesIgnoring| inspired by
+    http://stackoverflow.com/questions/1896793/remove-duplicate-line-in-vim
 
 SEE ALSO								     *
 (Plugins offering complementary functionality, or plugins using this library.)
