@@ -2,8 +2,8 @@
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
-"   - ingocmdargs.vim autoload script
-"   - ingocollections.vim autoload script
+"   - ingo/cmdargs.vim autoload script
+"   - ingo/collections.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002     21-Feb-2013     Move to ingo-library.
 "	001	22-Jan-2013	file creation
 
 function! s:FilterDuplicates( accumulator )
@@ -20,7 +21,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
     else
-	let [l:separator, l:pattern] = ingocmdargs#ParsePatternArgument(a:arguments)
+	let [l:separator, l:pattern] = ingo#cmdargs#ParsePatternArgument(a:arguments)
     endif
 
     let l:accumulator = {}
@@ -90,7 +91,7 @@ function! PatternsOnText#Duplicates#PrintMatches( accumulator, startLnum, endLnu
 	    endif
 	endfor
 "****D echomsg '****' string(l:byFirstOccurrence)
-	for l:lnum in sort(keys(l:byFirstOccurrence), 'ingocollections#numsort')
+	for l:lnum in sort(keys(l:byFirstOccurrence), 'ingo#collections#numsort')
 	    for l:what in sort(l:byFirstOccurrence[l:lnum])
 		echohl LineNr
 		echo l:lnum
@@ -107,10 +108,10 @@ function! PatternsOnText#Duplicates#PrintMatches( accumulator, startLnum, endLnu
 		    " summary.
 		    echon printf(' in %d lines', len(a:accumulator[l:what].lnum))
 		elseif len(a:accumulator[l:what].lnum) > 1
-		    " We have duplicates over a few lines; list the all.
+		    " We have duplicates over a few lines; list them all.
 		    echon ' in '
 		    echohl LineNr
-		    echon join(sort(keys(a:accumulator[l:what].lnum), 'ingocollections#numsort'), ', ')
+		    echon join(sort(keys(a:accumulator[l:what].lnum), 'ingo#collections#numsort'), ', ')
 		    echohl None
 		endif
 	    endfor
