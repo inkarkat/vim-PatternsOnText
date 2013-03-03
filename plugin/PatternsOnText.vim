@@ -10,6 +10,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	002	22-Jan-2013	Separate each functionality part into a separate
+"				autoload module.
 "	001	21-Jan-2013	file creation
 
 " Avoid installing twice or when in unsupported Vim version.
@@ -20,39 +22,39 @@ let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -bar -range -nargs=? SubstituteExcept call PatternsOnText#SubstituteExcept('<line1>,<line2>', <q-args>)
-command! -bar -range -nargs=? DeleteExcept call PatternsOnText#DeleteExcept('<line1>,<line2>', <q-args>)
+command! -bar -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>)
+command! -bar -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>)
 
-command! -bar -range -nargs=1 SubstituteSelected call PatternsOnText#SubstituteSelected('<line1>,<line2>', <q-args>)
+command! -bar -range -nargs=1 SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>)
 
-command! -range -nargs=? SubstituteInSearch call PatternsOnText#SubstituteInSearch(<line1>, <line2>, <q-args>)
+command! -range -nargs=? SubstituteInSearch call PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>)
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
-\   if ! PatternsOnText#ProcessDuplicateLines(<line1>, <line2>, '', PatternsOnText#PatternOrCurrentLine(<q-args>), function('PatternsOnText#PrintLines'))  && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#PrintLines'))  && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#ProcessDuplicateLines(<line1>, <line2>, '', PatternsOnText#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DeleteLines')) && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#DeleteLines')) && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintDuplicateLinesIgnoring
-\   if ! PatternsOnText#ProcessDuplicateLines(<line1>, <line2>, <q-args>, '', function('PatternsOnText#PrintLines')) && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DuplicateLines#PrintLines')) && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#ProcessDuplicateLines(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DeleteLines')) && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DuplicateLines#DeleteLines')) && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 
 command! -bar -bang -range -nargs=? PrintDuplicates
-\   if ! PatternsOnText#ProcessDuplicates(<line1>, <line2>, <q-args>, '', function('PatternsOnText#PrintMatches')) && <bang>1 |
+\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#Duplicates#PrintMatches')) && <bang>1 |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bar -bang -range -nargs=? DeleteDuplicates
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#ProcessDuplicates(<line1>, <line2>, <q-args>, function('PatternsOnText#DeleteMatches'), '') && <bang>1 |
+\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, function('PatternsOnText#Duplicates#DeleteMatches'), '') && <bang>1 |
 \       echoerr 'No duplicates' |
 \   endif
 
