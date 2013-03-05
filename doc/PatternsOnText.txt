@@ -13,9 +13,12 @@ history				|PatternsOnText-history|
 ==============================================================================
 DESCRIPTION					  *PatternsOnText-description*
 
-This plugin ...
-
-HOW IT WORKS								     *
+This plugin provides a toolbox of commands to delete, substitute, or
+de-duplicate text based on a passed regular expression (or the last used
+search pattern), something which would otherwise require multiple steps, a
+complex |sub-replace-expression| or a macro. One way or the other, all
+commands here are extensions of the |:substitute| command. Use them whenever
+the general built-in doesn't suffice.
 
 SOURCE									     *
 
@@ -92,8 +95,8 @@ USAGE							*PatternsOnText-usage*
 :[range]DeleteDuplicateLinesOf[!] [{pattern}]
 :[range]DeleteDuplicateLinesOf[!] /{pattern}/
 			Delete all subsequent occurrences of lines matching
-			{pattern} (or the current line, if .; or the last
-			search pattern, if omitted).
+			{pattern} (with . the current line; if omitted: the
+			last search pattern).
 
 						*:PrintDuplicateLinesIgnoring*
 :[range]PrintDuplicateLinesIgnoring[!] [{pattern}]
@@ -111,8 +114,8 @@ USAGE							*PatternsOnText-usage*
 							    *:PrintDuplicates*
 :[range]PrintDuplicates[!] [{pattern}]
 :[range]PrintDuplicates[!] /{pattern}/
-			Print all matches of {pattern} (or the last search
-			pattern, if omitted) that appear multiple times.
+			Print all matches of {pattern} (if omitted: the last
+			search pattern) that appear multiple times.
 			To print all duplicate matches of {pattern} within a
 			single line, processing a [range] or the entire
 			buffer, use: >
