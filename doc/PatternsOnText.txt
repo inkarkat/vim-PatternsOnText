@@ -74,8 +74,10 @@ USAGE							*PatternsOnText-usage*
 <			~ is replaced with the {string} of the previous
 			:SubstituteInSearch.
 			[flags] and [count] apply to the outer matching of the
-			last search pattern. To replace only the first
-			occurrence of {pattern}, pass the special flag 'f'.
+			last search pattern. The [e] |s_flags| also suppresses
+			the error message when {pattern} never matches.
+			To replace only the first occurrence of {pattern},
+			pass the special flag [f].
 			For a case-insensitive substitution, prepend '\c' to
 			{pattern}.
 :[range]SubstituteInSearch [flags] [count]
@@ -115,7 +117,8 @@ USAGE							*PatternsOnText-usage*
 :[range]PrintDuplicates[!] [{pattern}]
 :[range]PrintDuplicates[!] /{pattern}/
 			Print all matches of {pattern} (if omitted: the last
-			search pattern) that appear multiple times.
+			search pattern) that appear multiple times in the
+			current line / [range].
 			To print all duplicate matches of {pattern} within a
 			single line, processing a [range] or the entire
 			buffer, use: >
