@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	004	28-May-2013	Add the pattern to the search history, like
+"				:substitute, :global, etc. Because we're not
+"				invoking :substitute here, we have to do this
+"				explicitly.
 "	003	21-Feb-2013	Move to ingo-library.
 "	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
 "				take the result of
@@ -30,6 +34,11 @@ endfunction
 function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Action )
     let l:ignorePattern = ingo#cmdargs#UnescapePatternArgument(ingo#cmdargs#ParsePatternArgument(a:ignorePattern))
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
+    " Add the pattern to the search history, like :substitute, :global, etc.
+    for l:pattern in filter([l:ignorePattern, a:acceptPattern], '! empty(v:val)')
+	call histadd('search', l:pattern)
+    endfor
+
     let l:accumulator = {}
     for l:lnum in range(a:startLnum, a:endLnum)
 	let l:line = getline(l:lnum)
