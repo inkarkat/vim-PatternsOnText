@@ -11,8 +11,13 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
+"				deletion via
+"				PatternsOnText#Duplicates#ReportDeletedMatches().
 "	002     21-Feb-2013     Move to ingo-library.
 "	001	22-Jan-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:FilterDuplicates( accumulator )
     call filter(a:accumulator, 'v:val.cnt > 1')
@@ -57,7 +62,7 @@ function! s:Collect( accumulator, ... )
 	let a:accumulator[l:match] = {'cnt': 1, 'lnum': {line('.') : 1}, 'first': line('.')}
     else
 	let a:accumulator[l:match].cnt += 1
-	let a:accumulator[l:match].lnum[line('.')] = 1
+	let a:accumulator[l:match].lnum[line('.')] = get(a:accumulator[l:match].lnum, line('.'), 0) + 1
 
 	if a:0
 	    let l:match = call(a:1, [a:accumulator, l:match])
@@ -121,5 +126,38 @@ endfunction
 function! PatternsOnText#Duplicates#DeleteMatches( accumulator, match )
     return ''
 endfunction
+function! PatternsOnText#Duplicates#ReportDeletedMatches( accumulator, startLnum, endLnum )
+    let l:lines = {}
+    let l:cnt = 0
+    for l:what in keys(a:accumulator)
+	let l:cnt += a:accumulator[l:what].cnt - 1
+	for l:lnum in keys(a:accumulator[l:what].lnum)
+	    if a:accumulator[l:what].first == l:lnum && a:accumulator[l:what].lnum[l:lnum] == 1
+		" Don't count a line when it contains the first instance and no
+		" more instances.
+		continue
+	    endif
+	    let l:lines[l:lnum] = 1
+	endfor
+    endfor
 
+    let l:deletedLines = len(keys(l:lines))
+    if l:deletedLines >= &report
+	if len(keys(a:accumulator)) > 1
+	    echomsg printf('Deleted %d instance%s of %d duplicates in %d line%s',
+	    \   l:cnt, (l:cnt == 1 ? '' : 's'),
+	    \   len(keys(a:accumulator)),
+	    \   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
+	    \)
+	else
+	    echomsg printf('Deleted %d duplicate instance%s in %d line%s',
+	    \   l:cnt, (l:cnt == 1 ? '' : 's'),
+	    \   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
+	    \)
+	endif
+    endif
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
