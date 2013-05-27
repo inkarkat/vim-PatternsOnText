@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	28-May-2013	FIX: Forgot to adapt function names after move.
 "	002	21-Feb-2013	Use ingo-library.
 "	001	22-Jan-2013	file creation
 
@@ -31,13 +32,13 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags )
     endtry
 endfunction
 let s:SubstituteExcept_PreviousFlags = ''
-function! PatternsOnText#Substitute( range, arguments )
+function! PatternsOnText#Except#Substitute( range, arguments )
     let [l:separator, l:pattern, l:replacement, l:flags] = ingo#cmdargs#ParseSubstituteArgument(a:arguments, '~', s:SubstituteExcept_PreviousFlags, '\(\S*\)')
     let s:SubstituteExcept_PreviousFlags = l:flags
 "****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags])
     call s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags)
 endfunction
-function! PatternsOnText#Delete( range, arguments )
+function! PatternsOnText#Except#Delete( range, arguments )
     let [l:separator, l:pattern, l:flags] = ingo#cmdargs#ParsePatternArgument(a:arguments, '\(.*\)')
 
     call s:InvertedSubstitute(a:range, l:separator, l:pattern, '', 'g' . l:flags)
