@@ -1,7 +1,9 @@
-" PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
+" PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
+"   - ingocmdargs.vim autoload script
+"   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,7 +11,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.00.003	28-May-2013	Use ingo#msg#StatusMsg().
 "   1.00.002	06-Mar-2013	Print :substitute-like summary for the inner
 "				substitutions instead of the rather meaningless
 "				default summary from the outer :substitute
@@ -88,10 +89,10 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, substitutionA
 
 	let l:innerSubstitutionLines = len(keys(s:innerSubstitutionLnums))
 	if l:innerSubstitutionLines >= &report
-	    call ingo#msg#StatusMsg(printf('%d substitution%s on %d line%s',
+	    echomsg printf('%d substitution%s on %d line%s',
 	    \   s:innerSubstitutionCnt, (s:innerSubstitutionCnt == 1 ? '' : 's'),
 	    \   l:innerSubstitutionLines, (l:innerSubstitutionLines == 1 ? '' : 's')
-	    \))
+	    \)
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#msg#VimExceptionMsg()
