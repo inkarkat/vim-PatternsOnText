@@ -1,8 +1,8 @@
 " PatternsOnText/DuplicateLines.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - ingocmdargs.vim autoload script
-"   - ingocollections.vim autoload script
+"   - ingo/cmdargs.vim autoload script
+"   - ingo/collections.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"	003	21-Feb-2013	Move to ingo-library.
 "	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
 "				take the result of
 "				ingocmdargs#ParsePatternArgument() instead of
@@ -20,14 +21,14 @@ function! PatternsOnText#DuplicateLines#PatternOrCurrentLine( arguments )
     if empty(a:arguments)
 	return '\V\C\^' . escape(getline('.'), '\') . '\$'
     else
-	return ingocmdargs#UnescapePatternArgument(ingocmdargs#ParsePatternArgument(a:arguments))
+	return ingo#cmdargs#UnescapePatternArgument(ingo#cmdargs#ParsePatternArgument(a:arguments))
     endif
 endfunction
 function! s:FilterDuplicateLines( accumulator )
     call filter(a:accumulator, 'len(v:val) > 1')
 endfunction
 function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Action )
-    let l:ignorePattern = ingocmdargs#UnescapePatternArgument(ingocmdargs#ParsePatternArgument(a:ignorePattern))
+    let l:ignorePattern = ingo#cmdargs#UnescapePatternArgument(ingo#cmdargs#ParsePatternArgument(a:ignorePattern))
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
     let l:accumulator = {}
     for l:lnum in range(a:startLnum, a:endLnum)
@@ -98,7 +99,7 @@ function! PatternsOnText#DuplicateLines#DeleteLines( accumulator )
     endfor
 
     " Sort from last to first line to avoid adapting the line numbers.
-    for l:lnum in reverse(sort(l:deleteLnums, 'ingocollections#numsort'))
+    for l:lnum in reverse(sort(l:deleteLnums, 'ingo#collections#numsort'))
 	execute 'keepjumps' l:lnum . 'delete _'
     endfor
 
