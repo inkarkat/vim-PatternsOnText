@@ -43,11 +43,15 @@ USAGE							*PatternsOnText-usage*
 :[range]SubstituteExcept/{pattern}/{string}/[flags]
 			Replace instances of text in the current line /
 			[range] that do not match {pattern} / the last used
-			search pattern with {string}.
+			search pattern with {string}. Empty lines (without any
+			whitespace) are kept empty.
+			In {string}, & refers to the text that does not match,
+			whereas \1 etc. refer to the previous match of a
+			sub-expression in {pattern}.
 :[range]SubstituteExcept
 			Repeat the last :SubstituteExcept with the last used
 			search pattern, last used replacement string, and last
-			used flags for this command.
+			used |:s_flags|.
 							       *:DeleteExcept*
 :[range]DeleteExcept [{pattern}]
 :[range]DeleteExcept /{pattern}/[flags]
