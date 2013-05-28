@@ -10,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
+"				deletion via
+"				PatternsOnText#Duplicates#ReportDeletedMatches().
 "	002	22-Jan-2013	Separate each functionality part into a separate
 "				autoload module.
 "	001	21-Jan-2013	file creation
@@ -54,7 +57,7 @@ command! -bar -bang -range -nargs=? PrintDuplicates
 \   endif
 command! -bar -bang -range -nargs=? DeleteDuplicates
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, function('PatternsOnText#Duplicates#DeleteMatches'), '') && <bang>1 |
+\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, function('PatternsOnText#Duplicates#DeleteMatches'), function('PatternsOnText#Duplicates#ReportDeletedMatches')) && <bang>1 |
 \       echoerr 'No duplicates' |
 \   endif
 
