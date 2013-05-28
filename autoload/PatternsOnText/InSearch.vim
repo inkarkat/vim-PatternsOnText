@@ -1,9 +1,7 @@
-" PatternsOnText.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
-"   - ingocmdargs.vim autoload script
-"   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +9,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.003	28-May-2013	Use ingo#msg#StatusMsg().
+"				Replace the custom parsing with the (extended
+"				new) parsing of
+"				ingo#cmdargs#ParseSubstituteArgument().
 "   1.00.002	06-Mar-2013	Print :substitute-like summary for the inner
 "				substitutions instead of the rather meaningless
 "				default summary from the outer :substitute
@@ -28,32 +30,20 @@ function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
     endif
     return l:replacement
 endfunction
-let s:previousArgs = []
-function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, substitutionArgs ) range
-    let l:matches = matchlist(a:substitutionArgs, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)\(\s\+\S.*\)\?')
-    if empty(l:matches)
-	if empty(s:previousArgs)
-	    call ingo#msg#ErrorMsg('No previous substitute in search')
-	    return
-	endif
-
-	let [l:separator, l:pattern, l:replacement] = s:previousArgs
-	let l:matches = matchlist(a:substitutionArgs, '\(\S*\)\(\s\+\S.*\)\?')
-	let [l:flags, l:count] = l:matches[1:2]
-    else
-	let [l:separator, l:pattern, l:replacement, l:flags, l:count] = l:matches[1:5]
-    endif
-"****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:count])
+let s:previousPattern = ''
+let s:previousReplacement = ''
+function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) range
+    let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
+    \   ingo#cmdargs#ParseSubstituteArgument(a:arguments, '\(\S*\)\(\s\+\S.*\)\?', {'flagsMatchCount': 2, 'emptyPattern': s:previousPattern})
 
     " substitute() doesn't support the ~ special character to recall the last
     " substitution text; emulate this from our own history.
     let l:previousReplacementExpr = (&magic ? '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\~' : '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\~')
     if l:replacement =~# l:previousReplacementExpr
-	let l:replacement = substitute(l:replacement, l:previousReplacementExpr, escape(get(s:previousArgs, -1, ''), '\'), 'g')
+	let l:replacement = substitute(l:replacement, l:previousReplacementExpr, escape(s:previousReplacement, '\'), 'g')
     endif
-
-    " Save substitution arguments for recall.
-    let s:previousArgs = [l:separator, l:pattern, l:replacement]
+    let s:previousPattern = l:pattern
+    let s:previousReplacement = l:replacement
 
     " Handle custom substitution flags.
     let l:substFlags = 'g'
@@ -89,10 +79,10 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, substitutionA
 
 	let l:innerSubstitutionLines = len(keys(s:innerSubstitutionLnums))
 	if l:innerSubstitutionLines >= &report
-	    echomsg printf('%d substitution%s on %d line%s',
+	    call ingo#msg#StatusMsg(printf('%d substitution%s on %d line%s',
 	    \   s:innerSubstitutionCnt, (s:innerSubstitutionCnt == 1 ? '' : 's'),
 	    \   l:innerSubstitutionLines, (l:innerSubstitutionLines == 1 ? '' : 's')
-	    \)
+	    \))
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#msg#VimExceptionMsg()
