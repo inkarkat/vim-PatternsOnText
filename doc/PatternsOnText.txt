@@ -32,10 +32,9 @@ SOURCE									     *
     http://stackoverflow.com/questions/1896793/remove-duplicate-line-in-vim
 
 SEE ALSO								     *
-(Plugins offering complementary functionality, or plugins using this library.)
 
-RELATED WORKS								     *
-(Alternatives from other authors, other approaches, references not used here.)
+- The |ExtractMatches.vim| plugin (vimscript #0000) provides commands to yank
+  matches into a register, optionally only unique matches without duplicates.
 
 ==============================================================================
 USAGE							*PatternsOnText-usage*
@@ -43,21 +42,22 @@ USAGE							*PatternsOnText-usage*
 :[range]SubstituteExcept/{pattern}/{string}/[flags]
 			Replace instances of text in the current line /
 			[range] that do not match {pattern} / the last used
-			search pattern with {string}. Empty lines (without any
-			whitespace) are kept empty.
+			search pattern with {string}; "g" is implicit. Empty
+			lines (without any whitespace) are kept empty.
 			In {string}, & refers to the text that does not match,
 			whereas \1 etc. refer to the previous match of a
 			sub-expression in {pattern}.
 :[range]SubstituteExcept
 			Repeat the last :SubstituteExcept with the last used
-			search pattern, last used replacement string, and last
-			used |:s_flags|.
+			search pattern, last used replacement string (also
+			from a |:substitute|), and last used |:s_flags|; "g"
+			is implicit.
 							       *:DeleteExcept*
 :[range]DeleteExcept [{pattern}]
 :[range]DeleteExcept /{pattern}/[flags]
 			Delete all text in the current line / [range] except
 			for the text matching {pattern} / the last used search
-			pattern. [flags] are from |:s_flags|; "g" is implicit.
+			pattern. For [flags], see |:s_flags|; "g" is implicit.
 
 
 							 *:SubstituteSelected*
@@ -65,9 +65,9 @@ USAGE							*PatternsOnText-usage*
 			Replace matches of {pattern} in the current line /
 			[range] with {string}, determining whether a
 			particular match should be replaced on the sequence of
-			"y" or "n" in {answers}. I.e. with "ynn", the first
-			match is replaced, the second and third are not, the
-			fourth is again replaced, ...
+			"y" or "n" in {answers}. For example with "ynn", the
+			first match is replaced, the second and third are not,
+			the fourth is again replaced, ...
 			Handles & and \0, \1 .. \9 in {string}.
 
 							 *:SubstituteInSearch*
@@ -78,8 +78,9 @@ USAGE							*PatternsOnText-usage*
 <			~ is replaced with the {string} of the previous
 			:SubstituteInSearch.
 			[flags] and [count] apply to the outer matching of the
-			last search pattern. The [e] |s_flags| also suppresses
-			the error message when {pattern} never matches.
+			last search pattern. The [e] from |:s_flags| also
+			suppresses the error message when {pattern} never
+			matches.
 			To replace only the first occurrence of {pattern},
 			pass the special flag [f].
 			For a case-insensitive substitution, prepend '\c' to
@@ -152,6 +153,8 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *PatternsOnText-dependencies*
 
 - Requires Vim 7.0 or higher.
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.006 or
+  higher.
 
 ==============================================================================
 LIMITATIONS					  *PatternsOnText-limitations*
