@@ -2,7 +2,6 @@
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
-"   - ingocollections.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
