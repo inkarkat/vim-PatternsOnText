@@ -10,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.004	29-May-2013	Adapt to changed
+"				ingo#cmdargs#ParseSubstituteArgument() interface
+"				in ingo-library version 1.006.
 "   1.00.003	28-May-2013	FIX: Forgot to adapt function names after move.
 "				Also re-use the previous (:substitute or
 "				:SubstituteExcept) flags by replacing
@@ -23,7 +26,7 @@
 "	002	21-Feb-2013	Use ingo-library.
 "	001	22-Jan-2013	file creation
 
-function! s:InvertedSubstitute( range, separator, pattern, replacement, flags )
+function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
     if empty(a:pattern)
 	let l:separator = '/'
 	let l:pattern = @/
@@ -33,23 +36,22 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags )
     endif
 
     try
-	execute printf('%ssubstitute %s\%%(^\|%s\)\zs\%%(%s\)\@!.\{-1,}\ze\%%(%s\|$\)%s%s%s%s',
+	execute printf('%ssubstitute %s\%%(^\|%s\)\zs\%%(%s\)\@!.\{-1,}\ze\%%(%s\|$\)%s%s%s%s%s',
 	\   a:range, l:separator, l:pattern, l:pattern, l:pattern, l:separator, a:replacement, l:separator,
-	\   a:flags . (&gdefault || a:flags =~# '^&\|g' ? '' : 'g')
+	\   a:flags . (&gdefault || a:flags =~# '^&\|g' ? '' : 'g'), a:count
 	\)
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#msg#VimExceptionMsg()
     endtry
 endfunction
 function! PatternsOnText#Except#Substitute( range, arguments )
-    let [l:separator, l:pattern, l:replacement, l:flags] = ingo#cmdargs#ParseSubstituteArgument(a:arguments, '\(\S*\)')
-echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags])
-    call s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags)
+    let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#ParseSubstituteArgument(a:arguments)
+    call s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags, l:count)
 endfunction
 function! PatternsOnText#Except#Delete( range, arguments )
     let [l:separator, l:pattern, l:flags] = ingo#cmdargs#ParsePatternArgument(a:arguments, '\(.*\)')
 
-    call s:InvertedSubstitute(a:range, l:separator, l:pattern, '', l:flags)
+    call s:InvertedSubstitute(a:range, l:separator, l:pattern, '', l:flags, '')
     call histdel('search', -1)
 endfunction
 
