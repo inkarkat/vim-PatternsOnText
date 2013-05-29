@@ -39,7 +39,7 @@ SEE ALSO								     *
 ==============================================================================
 USAGE							*PatternsOnText-usage*
 							   *:SubstituteExcept*
-:[range]SubstituteExcept/{pattern}/{string}/[flags]
+:[range]SubstituteExcept/{pattern}/{string}/[flags] [count]
 			Replace instances of text in the current line /
 			[range] that do not match {pattern} / the last used
 			search pattern with {string}; "g" is implicit. Empty
@@ -137,8 +137,6 @@ USAGE							*PatternsOnText-usage*
 			Delete all subsequent matches of {pattern} (or the
 			last search pattern, if omitted) except the first.
 
-EXAMPLE						      *PatternsOnText-example*
-
 ==============================================================================
 INSTALLATION					 *PatternsOnText-installation*
 
@@ -168,7 +166,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-GOAL
+1.00	29-May-2013
 First published version.
 
 0.01	12-Sep-2011
