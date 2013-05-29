@@ -9,6 +9,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.004	29-May-2013	Adapt to changed
+"				ingo#cmdargs#ParseSubstituteArgument() interface
+"				in ingo-library version 1.006.
 "   1.00.003	28-May-2013	Use ingo#msg#StatusMsg().
 "				Replace the custom parsing with the (extended
 "				new) parsing of
@@ -34,7 +37,7 @@ let s:previousPattern = ''
 let s:previousReplacement = ''
 function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
-    \   ingo#cmdargs#ParseSubstituteArgument(a:arguments, '\(\S*\)\(\s\+\S.*\)\?', {'flagsMatchCount': 2, 'emptyPattern': s:previousPattern})
+    \   ingo#cmdargs#ParseSubstituteArgument(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
 
     " substitute() doesn't support the ~ special character to recall the last
     " substitution text; emulate this from our own history.
