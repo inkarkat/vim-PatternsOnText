@@ -9,7 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	001	22-Jan-2013	file creation
+"   1.00.001	22-Jan-2013	file creation
 
 function! PatternsOnText#Selected#CountedReplace()
     let l:index = s:SubstituteSelected.count % len(s:SubstituteSelected.answers)
