@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cmdargs.vim autoload script
 "   - ingo/collections.vim autoload script
+"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,10 +11,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"	004	28-May-2013	Add the pattern to the search history, like
+"   1.00.004	28-May-2013	Add the pattern to the search history, like
 "				:substitute, :global, etc. Because we're not
 "				invoking :substitute here, we have to do this
 "				explicitly.
+"				ENH: Print the customary summary when deleting
+"				duplicate lines.
 "	003	21-Feb-2013	Move to ingo-library.
 "	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
 "				take the result of
@@ -116,6 +119,11 @@ function! PatternsOnText#DuplicateLines#DeleteLines( accumulator )
     " :g/.../delete does.
     execute (l:deleteLnums[0] - len(l:deleteLnums) + 1)
     normal! ^
+
+    " Print a summary.
+    if len(l:deleteLnums) > &report
+	call ingo#msg#StatusMsg(printf('%d fewer line%s', len(l:deleteLnums), (len(l:deleteLnums) == 1 ? '' : 's')))
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
