@@ -1,6 +1,7 @@
 " PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.005	30-May-2013	Implement abort on error.
 "   1.00.004	29-May-2013	Adapt to changed
 "				ingo#cmdargs#ParseSubstituteArgument() interface
 "				in ingo-library version 1.006.
@@ -76,8 +78,8 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
 	\)
 
 	if s:didInnerSubstitution && s:innerSubstitutionCnt == 0 && l:flags !~# 'e'
-	    call ingo#msg#ErrorMsg('Pattern not found: ' . l:pattern)
-	    return
+	    call ingo#err#Set('Pattern not found: ' . l:pattern)
+	    return 0
 	endif
 
 	let l:innerSubstitutionLines = len(keys(s:innerSubstitutionLnums))
@@ -87,8 +89,11 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
 	    \   l:innerSubstitutionLines, (l:innerSubstitutionLines == 1 ? '' : 's')
 	    \))
 	endif
+
+	return 1
     catch /^Vim\%((\a\+)\)\=:E/
-	call ingo#msg#VimExceptionMsg()
+	call ingo#err#SetVimException()
+	return 0
     finally
 	unlet! s:didInnerSubstitution s:innerSubstitutionCnt s:innerSubstitutionLnums
     endtry
