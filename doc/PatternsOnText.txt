@@ -166,6 +166,10 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+1.01	30-May-2013
+Implement abort on error for :SubstituteExcept, :DeleteExcept,
+:SubstituteSelected, and :SubstituteInSearch, too.
+
 1.00	29-May-2013
 First published version.
 
