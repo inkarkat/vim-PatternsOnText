@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.00.004	28-May-2013	Remove a suspect duplicate :echomsg.
+"				Use ingo#msg#StatusMsg().
 "   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
 "				deletion via
 "				PatternsOnText#Duplicates#ReportDeletedMatches().
@@ -45,7 +47,6 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
 	    call call(a:ReportAction, [l:accumulator, a:startLnum, a:endLnum])
 	endif
     catch /^Vim\%((\a\+)\)\=:E/
-	echomsg v:exception
 	call ingo#msg#VimExceptionMsg()
     endtry
 
@@ -144,16 +145,16 @@ function! PatternsOnText#Duplicates#ReportDeletedMatches( accumulator, startLnum
     let l:deletedLines = len(keys(l:lines))
     if l:deletedLines >= &report
 	if len(keys(a:accumulator)) > 1
-	    echomsg printf('Deleted %d instance%s of %d duplicates in %d line%s',
+	    call ingo#msg#StatusMsg(printf('Deleted %d instance%s of %d duplicates in %d line%s',
 	    \   l:cnt, (l:cnt == 1 ? '' : 's'),
 	    \   len(keys(a:accumulator)),
 	    \   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
-	    \)
+	    \))
 	else
-	    echomsg printf('Deleted %d duplicate instance%s in %d line%s',
+	    call ingo#msg#StatusMsg(printf('Deleted %d duplicate instance%s in %d line%s',
 	    \   l:cnt, (l:cnt == 1 ? '' : 's'),
 	    \   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
-	    \)
+	    \))
 	endif
     endif
 endfunction
