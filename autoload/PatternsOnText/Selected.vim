@@ -1,7 +1,7 @@
 " PatternsOnText/Selected.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - ingo/msg.vim autoload script
+"   - ingo/err.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +9,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.002	30-May-2013	Implement abort on error.
 "   1.00.001	22-Jan-2013	file creation
 
 function! PatternsOnText#Selected#CountedReplace()
@@ -43,8 +44,8 @@ endfunction
 function! PatternsOnText#Selected#Substitute( range, arguments )
     let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)\s\+\([yn]\+\)$')
     if empty(l:matches)
-	call ingo#msg#ErrorMsg('Invalid arguments')
-	return
+	call ingo#err#Set('Invalid arguments')
+	return 0
     endif
     let s:SubstituteSelected = {'count': 0}
     let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, s:SubstituteSelected.answers] = l:matches[1:5]
@@ -53,8 +54,10 @@ function! PatternsOnText#Selected#Substitute( range, arguments )
 	execute printf('%ssubstitute %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
 	\   a:range, l:separator, l:pattern, l:separator, l:separator, l:flags
 	\)
+	return 1
     catch /^Vim\%((\a\+)\)\=:E/
-	call ingo#msg#VimExceptionMsg()
+	call ingo#err#SetVimException()
+	return 0
     endtry
 endfunction
 
