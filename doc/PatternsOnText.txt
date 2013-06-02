@@ -151,7 +151,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *PatternsOnText-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.006 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.007 or
   higher.
 
 ==============================================================================
@@ -165,6 +165,10 @@ IDEAS							*PatternsOnText-ideas*
 
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
+
+1.02	RELEASEME
+- Refactoring: Move functions from ingo/cmdargs.vim to
+  ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
 
 1.01	30-May-2013
 Implement abort on error for :SubstituteExcept, :DeleteExcept,
