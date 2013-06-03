@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
+"   - ingo/err.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.01.004	30-May-2013	Implement abort on error for :SubstituteExcept,
+"				:DeleteExcept, :SubstituteSelected, and
+"				:SubstituteInSearch, too.
 "   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
 "				deletion via
 "				PatternsOnText#Duplicates#ReportDeletedMatches().
@@ -24,12 +28,12 @@ let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -bar -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>)
-command! -bar -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>)
+command! -bar -range -nargs=? SubstituteExcept if ! PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -bar -range -nargs=? DeleteExcept if ! PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -bar -range -nargs=1 SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>)
+command! -bar -range -nargs=1 SubstituteSelected if ! PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? SubstituteInSearch call PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>)
+command! -range -nargs=? SubstituteInSearch if ! PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#PrintLines'))  && <bang>1 |
