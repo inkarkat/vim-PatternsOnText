@@ -9,14 +9,28 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.10.003	03-Jun-2013	Factor out
+"				PatternsOnText#Selected#CreateAnswers() and
+"				PatternsOnText#Selected#GetAnswer().
 "   1.01.002	30-May-2013	Implement abort on error.
 "   1.00.001	22-Jan-2013	file creation
 
-function! PatternsOnText#Selected#CountedReplace()
-    let l:index = s:SubstituteSelected.count % len(s:SubstituteSelected.answers)
-    let s:SubstituteSelected.count += 1
+function! PatternsOnText#Selected#CreateAnswers( argument )
+    if a:argument !~# '^[yn]\+$'
+	throw 'ASSERT: Invalid answer in: ' . string(a:argument)
+    endif
+    return a:argument
+endfunction
+function! PatternsOnText#Selected#GetAnswer( answers, count )
+    let l:index = (a:count - 1) % len(a:answers)
+    return (a:answers[l:index] ==# 'y')
+endfunction
 
-    if s:SubstituteSelected.answers[l:index] ==# 'y'
+function! PatternsOnText#Selected#CountedReplace()
+    let s:SubstituteSelected.count += 1
+    let l:isSelected = PatternsOnText#Selected#GetAnswer(s:SubstituteSelected.answers, s:SubstituteSelected.count)
+
+    if l:isSelected
 	if s:SubstituteSelected.replacement =~# '^\\='
 	    " Handle sub-replace-special.
 	    return eval(s:SubstituteSelected.replacement[2:])
@@ -35,10 +49,8 @@ function! PatternsOnText#Selected#CountedReplace()
 	    endfor
 	    return l:replacement
 	endif
-    elseif s:SubstituteSelected.answers[l:index] ==# 'n'
-	return submatch(0)
     else
-	throw 'ASSERT: Invalid answer: ' . string(s:SubstituteSelected.answers[l:index])
+	return submatch(0)
     endif
 endfunction
 function! PatternsOnText#Selected#Substitute( range, arguments )
@@ -48,7 +60,8 @@ function! PatternsOnText#Selected#Substitute( range, arguments )
 	return 0
     endif
     let s:SubstituteSelected = {'count': 0}
-    let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, s:SubstituteSelected.answers] = l:matches[1:5]
+    let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags] = l:matches[1:4]
+    let s:SubstituteSelected.answers = PatternsOnText#Selected#CreateAnswers(l:matches[5])
 "****D echomsg '****' string([l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, s:SubstituteSelected.answers])
     try
 	execute printf('%ssubstitute %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
