@@ -2,6 +2,8 @@
 "
 " DEPENDENCIES:
 "   - ingo/err.vim autoload script
+"   - ingo/cmdargs/pattern.vim autoload script
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/cmdargs.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
@@ -10,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
+"				ingo/cmdargs/pattern.vim and
+"				ingo/cmdargs/substitute.vim.
 "   1.01.005	30-May-2013	Implement abort on error.
 "   1.00.004	29-May-2013	Adapt to changed
 "				ingo#cmdargs#ParseSubstituteArgument() interface
@@ -48,11 +53,11 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, c
     endtry
 endfunction
 function! PatternsOnText#Except#Substitute( range, arguments )
-    let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#ParseSubstituteArgument(a:arguments)
+    let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#substitute#Parse(a:arguments)
     return s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags, l:count)
 endfunction
 function! PatternsOnText#Except#Delete( range, arguments )
-    let [l:separator, l:pattern, l:flags] = ingo#cmdargs#ParsePatternArgument(a:arguments, '\(.*\)')
+    let [l:separator, l:pattern, l:flags] = ingo#cmdargs#pattern#Parse(a:arguments, '\(.*\)')
 
     let l:success = s:InvertedSubstitute(a:range, l:separator, l:pattern, '', l:flags, '')
     call histdel('search', -1)
