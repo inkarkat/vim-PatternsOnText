@@ -65,9 +65,12 @@ USAGE							*PatternsOnText-usage*
 			Replace matches of {pattern} in the current line /
 			[range] with {string}, determining whether a
 			particular match should be replaced on the sequence of
-			"y" or "n" in {answers}. For example with "ynn", the
-			first match is replaced, the second and third are not,
-			the fourth is again replaced, ...
+			"y" or "n" (a count can be prefixed, e.g. "3y4n2y" or
+			numeric positions "2,5" or ranges "3-5" in {answers}.
+			If no numeric positions are included, the choices
+			repeat for further matches. For example with "ynn",
+			the first match is replaced, the second and third are
+			not, the fourth is again replaced, ...
 			Handles & and \0, \1 .. \9 in {string}.
 
 							 *:SubstituteInSearch*
