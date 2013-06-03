@@ -12,18 +12,78 @@
 "   1.10.003	03-Jun-2013	Factor out
 "				PatternsOnText#Selected#CreateAnswers() and
 "				PatternsOnText#Selected#GetAnswer().
+"				ENH: Handle count before "y" and "n" answers,
+"				numeric positions "2,5", and ranges "3-5".
 "   1.01.002	30-May-2013	Implement abort on error.
 "   1.00.001	22-Jan-2013	file creation
 
 function! PatternsOnText#Selected#CreateAnswers( argument )
-    if a:argument !~# '^[yn]\+$'
-	throw 'ASSERT: Invalid answer in: ' . string(a:argument)
-    endif
-    return a:argument
+    let [l:cnt, l:answers, l:repeatedAnswers] = [0, '', '']
+
+    for l:item in split(a:argument, ',\|[yn]\zs')
+	if empty(l:item)
+	    continue
+	elseif l:item =~# '^[yn]$'
+	    let l:answers .= l:item
+	    let l:repeatedAnswers .= l:item
+	    let l:cnt += 1
+	elseif l:item =~# '^\d\+[yn]$'
+	    let l:repeat = str2nr(l:item[0:-2])
+	    let l:answers .= repeat(l:item[-1:-1], l:repeat)
+	    let l:repeatedAnswers .= repeat(l:item[-1:-1], l:repeat)
+	    let l:cnt += l:repeat
+	elseif l:item =~# '^\d\+$' && l:item !~# '^0\+$'
+	    if l:item <= l:cnt
+		throw printf('PatternsOnText: Preceding position %s after position %d', l:item, l:cnt)
+	    endif
+	    let l:repeat = l:item - l:cnt - 1
+	    let l:answers .= repeat('n', l:repeat) . 'y'
+	    let l:repeatedAnswers = ''
+	    let l:cnt = l:item
+	elseif l:item =~# '^\d\+-\d\+$'
+	    let [l:start, l:end] = matchlist(l:item, '^\(\d\+\)-\(\d\+\)$')[1:2]
+	    if l:start > l:end
+		throw printf('PatternsOnText: Invalid position range "%s"', l:item)
+	    elseif l:start <= l:cnt
+		throw printf('PatternsOnText: Preceding position %s after position %d', l:item, l:cnt)
+	    endif
+	    let l:repeat = l:start - l:cnt - 1
+	    let l:answers .= repeat('n', l:repeat) . repeat('y', l:end - l:start + 1)
+	    let l:repeatedAnswers = ''
+	    let l:cnt = l:end
+	elseif l:item =~# '^-\d\+$'
+	    let l:end = l:item[1:]
+	    if l:end <= l:cnt
+		throw printf('PatternsOnText: Preceding position %s after position %d', l:end, l:cnt)
+	    endif
+	    let l:answers .= repeat('y', l:end - l:cnt)
+	    let l:repeatedAnswers = ''
+	    let l:cnt = l:end
+	elseif l:item =~# '^\d\+-$'
+	    let l:start = l:item[0:-2]
+	    if l:start <= l:cnt
+		throw printf('PatternsOnText: Preceding position %s after position %d', l:start, l:cnt)
+	    endif
+	    let l:repeat = l:start - l:cnt - 1
+	    let l:answers .= repeat('n', l:repeat) . repeat('y', 999)
+	    let l:repeatedAnswers = 'y'
+	    let l:cnt = 999
+	else
+	    throw printf('PatternsOnText: Invalid position "%s"', l:item)
+	endif
+    endfor
+    return [l:answers, l:repeatedAnswers]
 endfunction
 function! PatternsOnText#Selected#GetAnswer( answers, count )
-    let l:index = (a:count - 1) % len(a:answers)
-    return (a:answers[l:index] ==# 'y')
+    let l:index = a:count - 1
+    let [l:answers, l:repeatedAnswers] = a:answers
+
+    if empty(l:repeatedAnswers) || l:index < len(l:answers)
+	return (l:answers[l:index] ==# 'y')
+    else
+	let l:repeatIndex = (l:index - len(l:answers)) % len(l:repeatedAnswers)
+	return (l:repeatedAnswers[l:repeatIndex] ==# 'y')
+    endif
 endfunction
 
 function! PatternsOnText#Selected#CountedReplace()
@@ -54,7 +114,7 @@ function! PatternsOnText#Selected#CountedReplace()
     endif
 endfunction
 function! PatternsOnText#Selected#Substitute( range, arguments )
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)\s\+\([yn]\+\)$')
+    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)\s\+\([-,[:digit:]yn]\+\)$')
     if empty(l:matches)
 	call ingo#err#Set('Invalid arguments')
 	return 0
