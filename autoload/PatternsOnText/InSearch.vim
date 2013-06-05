@@ -1,6 +1,7 @@
 " PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
 "
@@ -10,6 +11,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
+"				ingo/cmdargs/pattern.vim and
+"				ingo/cmdargs/substitute.vim.
 "   1.01.005	30-May-2013	Implement abort on error.
 "   1.00.004	29-May-2013	Adapt to changed
 "				ingo#cmdargs#ParseSubstituteArgument() interface
@@ -39,7 +43,7 @@ let s:previousPattern = ''
 let s:previousReplacement = ''
 function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
-    \   ingo#cmdargs#ParseSubstituteArgument(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
 
     " substitute() doesn't support the ~ special character to recall the last
     " substitution text; emulate this from our own history.
