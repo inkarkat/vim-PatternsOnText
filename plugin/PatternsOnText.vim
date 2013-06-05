@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.10.005	04-Jun-2013	The commands that take a {pattern}, i.e.
+"				:SubstituteExcept, :DeleteExcept,
+"				:SubstituteSelected now consistently set that as
+"				the last search pattern.
 "   1.01.004	30-May-2013	Implement abort on error for :SubstituteExcept,
 "				:DeleteExcept, :SubstituteSelected, and
 "				:SubstituteInSearch, too.
@@ -28,10 +32,10 @@ let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -bar -range -nargs=? SubstituteExcept if ! PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -bar -range -nargs=? DeleteExcept if ! PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -bar -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -bar -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
-command! -bar -range -nargs=1 SubstituteSelected if ! PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -bar -range -nargs=1 SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteInSearch if ! PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
