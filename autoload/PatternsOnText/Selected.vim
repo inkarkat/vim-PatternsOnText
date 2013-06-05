@@ -1,6 +1,7 @@
 " PatternsOnText/Selected.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "
 " Copyright: (C) 2011-2013 Ingo Karkat
@@ -14,6 +15,10 @@
 "				PatternsOnText#Selected#GetAnswer().
 "				ENH: Handle count before "y" and "n" answers,
 "				numeric positions "2,5", and ranges "3-5".
+"				Use ingo#cmdargs#substitute#Parse() here, too.
+"				This just requires a little bit of additional
+"				parsing to separate the :s_flags from the
+"				answers.
 "   1.01.002	30-May-2013	Implement abort on error.
 "   1.00.001	22-Jan-2013	file creation
 
@@ -114,22 +119,30 @@ function! PatternsOnText#Selected#CountedReplace()
     endif
 endfunction
 function! PatternsOnText#Selected#Substitute( range, arguments )
-    let l:matches = matchlist(a:arguments, '^\(\i\@!\S\)\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(.*\)\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\1\(\S*\)\s\+\([-,[:digit:]yn]\+\)$')
-    if empty(l:matches)
+    call ingo#err#Clear()
+    let s:SubstituteSelected = {'count': 0}
+    let l:answersExpr = '\-,[:space:][:digit:]yn'
+    let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, l:count] =
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': l:answersExpr})
+    " Note: l:count is always empty, as whitespace + digits are already matched
+    " by our additional flags, and that takes precedence.
+    let [l:substituteFlags, l:answers] = matchlist(l:flags, '^\(&\?[cegiInp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
+    if empty(l:answers)
 	call ingo#err#Set('Invalid arguments')
 	return 0
     endif
-    let s:SubstituteSelected = {'count': 0}
-    let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags] = l:matches[1:4]
-    let s:SubstituteSelected.answers = PatternsOnText#Selected#CreateAnswers(l:matches[5])
-"****D echomsg '****' string([l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, s:SubstituteSelected.answers])
     try
+	let s:SubstituteSelected.answers = PatternsOnText#Selected#CreateAnswers(l:answers)
+"****D echomsg '****' string([l:separator, l:pattern, s:SubstituteSelected.replacement, l:substituteFlags, l:answers, s:SubstituteSelected.answers])
 	execute printf('%ssubstitute %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
-	\   a:range, l:separator, l:pattern, l:separator, l:separator, l:flags
+	\   a:range, l:separator, l:pattern, l:separator, l:separator, l:substituteFlags
 	\)
 	return 1
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#err#SetVimException()
+	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
 	return 0
     endtry
 endfunction
