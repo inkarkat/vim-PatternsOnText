@@ -1,0 +1,7 @@
+autoload/PatternsOnText/DuplicateLines.vim
+autoload/PatternsOnText/Duplicates.vim
+autoload/PatternsOnText/Except.vim
+autoload/PatternsOnText/InSearch.vim
+autoload/PatternsOnText/Selected.vim
+plugin/PatternsOnText.vim
+doc/PatternsOnText.txt
