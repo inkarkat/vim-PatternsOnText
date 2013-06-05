@@ -47,11 +47,10 @@ USAGE							*PatternsOnText-usage*
 			In {string}, & refers to the text that does not match,
 			whereas \1 etc. refer to the previous match of a
 			sub-expression in {pattern}.
-:[range]SubstituteExcept
-			Repeat the last :SubstituteExcept with the last used
-			search pattern, last used replacement string (also
-			from a |:substitute|), and last used |:s_flags|; "g"
-			is implicit.
+:[range]SubstituteExcept [flags] [count]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement string, and last used
+			|:s_flags|; "g" is implicit.
 							       *:DeleteExcept*
 :[range]DeleteExcept [{pattern}]
 :[range]DeleteExcept /{pattern}/[flags]
@@ -65,13 +64,17 @@ USAGE							*PatternsOnText-usage*
 			Replace matches of {pattern} in the current line /
 			[range] with {string}, determining whether a
 			particular match should be replaced on the sequence of
-			"y" or "n" (a count can be prefixed, e.g. "3y4n2y" or
-			numeric positions "2,5" or ranges "3-5" in {answers}.
-			If no numeric positions are included, the choices
-			repeat for further matches. For example with "ynn",
-			the first match is replaced, the second and third are
-			not, the fourth is again replaced, ...
+			"y" or "n" (a count can be prefixed, e.g. "3y4n2y") or
+			numeric positions "2,5", or ranges "3-5" in {answers}.
+			If no numeric positions follow, the last "y" / "n"
+			sequence repeats for further matches. For example with
+			"ynn", the first match is replaced, the second and
+			third are not, the fourth is again replaced, ...
 			Handles & and \0, \1 .. \9 in {string}.
+:[range]SubstituteSelected [flags] {answers}
+			Repeat the last substitution with the last used search
+			pattern, last used replacement string, and last used
+			|:s_flags|.
 
 							 *:SubstituteInSearch*
 :[range]SubstituteInSearch/{pattern}/{string}/[flags] [count]
@@ -88,6 +91,7 @@ USAGE							*PatternsOnText-usage*
 			pass the special flag [f].
 			For a case-insensitive substitution, prepend '\c' to
 			{pattern}.
+			Does not modify the last search pattern |quote/|.
 :[range]SubstituteInSearch [flags] [count]
 			Repeat last :SubstituteInSearch with same search
 			pattern and substitute string, but without the same
