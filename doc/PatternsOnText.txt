@@ -71,10 +71,10 @@ USAGE							*PatternsOnText-usage*
 			"ynn", the first match is replaced, the second and
 			third are not, the fourth is again replaced, ...
 			Handles & and \0, \1 .. \9 in {string}.
-:[range]SubstituteSelected [flags] {answers}
+:[range]SubstituteSelected [flags] [answers]
 			Repeat the last substitution with the last used search
-			pattern, last used replacement string, and last used
-			|:s_flags|.
+			pattern, last used replacement string, last used
+			|:s_flags|, and last used answers.
 
 							 *:SubstituteInSearch*
 :[range]SubstituteInSearch/{pattern}/{string}/[flags] [count]
@@ -173,9 +173,19 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.02	RELEASEME
+1.11	RELEASEME
+- FIX: Remove -bar from all commands to correctly handle patterns like
+  foo\|bar without escaping as foo\\|bar.
+
+1.10	06-Jun-2013
+- ENH: :SubstituteSelected handles count before "y" and "n" answers, numeric
+  positions "2,5", and ranges "3-5".
+- Also recall previous answers in a bare :SubstituteSelected command.
+- The commands that take a {pattern}, i.e. :SubstituteExcept, :DeleteExcept,
+  :SubstituteSelected now consistently set that as the last search pattern.
 - Refactoring: Move functions from ingo/cmdargs.vim to
   ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
+  *** You need to update to ingo-library (vimscript #4433) version 1.007! ***
 
 1.01	30-May-2013
 Implement abort on error for :SubstituteExcept, :DeleteExcept,
