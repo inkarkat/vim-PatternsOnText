@@ -11,9 +11,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.11.005	11-Jun-2013	:SubstituteSelected now positions the cursor on
-"				the line where the last selected replacement
-"				happened, to behave like :substitute.
 "   1.10.004	06-Jun-2013	BUG: Because of substitute(), we have to handle
 "				"&" ourselves. Remember the last replacement and
 "				use factored out
@@ -115,7 +112,6 @@ function! PatternsOnText#Selected#CountedReplace()
     let l:isSelected = PatternsOnText#Selected#GetAnswer(s:SubstituteSelected.answers, s:SubstituteSelected.count)
 
     if l:isSelected
-	let s:SubstituteSelected.lastLnum = line('.')
 	if s:SubstituteSelected.replacement =~# '^\\='
 	    " Handle sub-replace-special.
 	    return eval(s:SubstituteSelected.replacement[2:])
@@ -142,7 +138,7 @@ let s:previousReplacement = ''
 let s:previousAnswers = ''
 function! PatternsOnText#Selected#Substitute( range, arguments )
     call ingo#err#Clear()
-    let s:SubstituteSelected = {'count': 0, 'lastLnum': 0}
+    let s:SubstituteSelected = {'count': 0}
     let l:answersExpr = '\-,[:space:][:digit:]yn'
     let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': l:answersExpr, 'emptyFlags': ['', '']})  " Because of the more complex defaulting of the two different :s_flags and answers, we handle this ourselves.
@@ -177,11 +173,6 @@ function! PatternsOnText#Selected#Substitute( range, arguments )
 	execute printf('%ssubstitute %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
 	\   a:range, l:separator, l:pattern, l:separator, l:separator, l:substituteFlags
 	\)
-
-	" :substitute has visited all further matches, but the last replacement
-	" may have happened before that. Position the cursor on the last
-	" actually selected match.
-	execute s:SubstituteSelected.lastLnum . 'normal! ^'
 	return 1
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#err#SetVimException()
