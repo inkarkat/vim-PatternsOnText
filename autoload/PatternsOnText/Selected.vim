@@ -1,6 +1,7 @@
 " PatternsOnText/Selected.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "
@@ -10,6 +11,24 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.11.005	11-Jun-2013	:SubstituteSelected now positions the cursor on
+"				the line where the last selected replacement
+"				happened, to behave like :substitute.
+"   1.10.004	06-Jun-2013	BUG: Because of substitute(), we have to handle
+"				"&" ourselves. Remember the last replacement and
+"				use factored out
+"				PatternsOnText#EmulatePreviousReplacement().
+"				BUG: Repeat :SubstituteSelected doesn't properly
+"				pick up the default "&" flag, because our flags
+"				are two-part. Let the parser default to empty
+"				flags, and handle the defaulting (and recall of
+"				previous answers) ourselves.
+"				Also recall previous answers in a bare
+"				:SubstituteSelected command.
+"				Parsing must not include the built-in :s_n flag,
+"				as this is one of the possible answers, and must
+"				be included there.
+"				More precise error message.
 "   1.10.003	03-Jun-2013	Factor out
 "				PatternsOnText#Selected#CreateAnswers() and
 "				PatternsOnText#Selected#GetAnswer().
@@ -96,6 +115,7 @@ function! PatternsOnText#Selected#CountedReplace()
     let l:isSelected = PatternsOnText#Selected#GetAnswer(s:SubstituteSelected.answers, s:SubstituteSelected.count)
 
     if l:isSelected
+	let s:SubstituteSelected.lastLnum = line('.')
 	if s:SubstituteSelected.replacement =~# '^\\='
 	    " Handle sub-replace-special.
 	    return eval(s:SubstituteSelected.replacement[2:])
@@ -118,25 +138,50 @@ function! PatternsOnText#Selected#CountedReplace()
 	return submatch(0)
     endif
 endfunction
+let s:previousReplacement = ''
+let s:previousAnswers = ''
 function! PatternsOnText#Selected#Substitute( range, arguments )
     call ingo#err#Clear()
-    let s:SubstituteSelected = {'count': 0}
+    let s:SubstituteSelected = {'count': 0, 'lastLnum': 0}
     let l:answersExpr = '\-,[:space:][:digit:]yn'
     let [l:separator, l:pattern, s:SubstituteSelected.replacement, l:flags, l:count] =
-    \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': l:answersExpr})
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': l:answersExpr, 'emptyFlags': ['', '']})  " Because of the more complex defaulting of the two different :s_flags and answers, we handle this ourselves.
     " Note: l:count is always empty, as whitespace + digits are already matched
     " by our additional flags, and that takes precedence.
-    let [l:substituteFlags, l:answers] = matchlist(l:flags, '^\(&\?[cegiInp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
+    " Note: Must not include the built-in :s_n flag, as this is one of the
+    " possible answers, and must be included there.
+    let [l:substituteFlags, l:parsedAnswers] = matchlist(l:flags, '^\(&\?[cegiIp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
+    " Use previous answers only for the :SubstituteSelected [flags] [answers]
+    " form, not when a /{pattern} is passed; it's too easy to forget the
+    " required answers and then be surprised when the ones from the previous
+    " unrelated :SubstituteSelected are used.
+    let l:answers = (empty(l:parsedAnswers) && a:arguments ==# l:substituteFlags ? s:previousAnswers : l:parsedAnswers)
     if empty(l:answers)
-	call ingo#err#Set('Invalid arguments')
+	call ingo#err#Set('Missing or invalid answers')
 	return 0
     endif
+    let s:previousAnswers = l:answers
+
+    if a:arguments ==# l:parsedAnswers
+	" Only {answers} are given on this command repeat. Use the :s_flags from
+	" the previous :substitute.
+	let l:substituteFlags = '&'
+    endif
+
+    let s:SubstituteSelected.replacement = PatternsOnText#EmulatePreviousReplacement(s:SubstituteSelected.replacement, s:previousReplacement)
+    let s:previousReplacement = s:SubstituteSelected.replacement
+
     try
 	let s:SubstituteSelected.answers = PatternsOnText#Selected#CreateAnswers(l:answers)
 "****D echomsg '****' string([l:separator, l:pattern, s:SubstituteSelected.replacement, l:substituteFlags, l:answers, s:SubstituteSelected.answers])
 	execute printf('%ssubstitute %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
 	\   a:range, l:separator, l:pattern, l:separator, l:separator, l:substituteFlags
 	\)
+
+	" :substitute has visited all further matches, but the last replacement
+	" may have happened before that. Position the cursor on the last
+	" actually selected match.
+	execute s:SubstituteSelected.lastLnum . 'normal! ^'
 	return 1
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#err#SetVimException()
