@@ -173,7 +173,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.11	RELEASEME
+1.11	13-Jun-2013
 - FIX: Remove -bar from all commands to correctly handle patterns like
   foo\|bar without escaping as foo\\|bar.
 - :SubstituteSelected now positions the cursor on the line where the last
