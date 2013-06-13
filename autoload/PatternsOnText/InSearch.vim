@@ -1,6 +1,7 @@
 " PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
@@ -11,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.10.004	06-Jun-2013	Factor out
+"				PatternsOnText#EmulatePreviousReplacement(); it
+"				is also needed by PatternsOnText/Selected.vim.
 "   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
 "				ingo/cmdargs/pattern.vim and
 "				ingo/cmdargs/substitute.vim.
@@ -45,12 +49,7 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
 
-    " substitute() doesn't support the ~ special character to recall the last
-    " substitution text; emulate this from our own history.
-    let l:previousReplacementExpr = (&magic ? '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\~' : '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\~')
-    if l:replacement =~# l:previousReplacementExpr
-	let l:replacement = substitute(l:replacement, l:previousReplacementExpr, escape(s:previousReplacement, '\'), 'g')
-    endif
+    let l:replacement = PatternsOnText#EmulatePreviousReplacement(l:replacement, s:previousReplacement)
     let s:previousPattern = l:pattern
     let s:previousReplacement = l:replacement
 
