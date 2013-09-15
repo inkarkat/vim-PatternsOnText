@@ -12,6 +12,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.10.006	04-Jun-2013	Refactoring: Perform the defaulting to @/
+"				outside s:InvertedSubstitute(), partly through
+"				ingo#cmdargs#substitute#Parse().
+"				Don't remember the convoluted inverted pattern
+"				in the history, but rather what was passed to
+"				the command.
 "   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
 "				ingo/cmdargs/pattern.vim and
 "				ingo/cmdargs/substitute.vim.
@@ -33,35 +39,34 @@
 "	001	22-Jan-2013	file creation
 
 function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
-    if empty(a:pattern)
-	let l:separator = '/'
-	let l:pattern = @/
-    else
-	let l:separator = a:separator
-	let l:pattern = a:pattern
-    endif
-
+    call ingo#err#Clear()
+    if empty(a:pattern) | throw 'ASSERT: Passed pattern must not be empty' | endif
     try
 	execute printf('%ssubstitute %s\%%(^\|%s\)\zs\%%(%s\)\@!.\{-1,}\ze\%%(%s\|$\)%s%s%s%s%s',
-	\   a:range, l:separator, l:pattern, l:pattern, l:pattern, l:separator, a:replacement, l:separator,
+	\   a:range, a:separator, a:pattern, a:pattern, a:pattern, a:separator, a:replacement, a:separator,
 	\   a:flags . (&gdefault || a:flags =~# '^&\|g' ? '' : 'g'), a:count
 	\)
+
 	return 1
     catch /^Vim\%((\a\+)\)\=:E/
 	call ingo#err#SetVimException()
 	return 0
+    finally
+	" Don't remember the convoluted inverted pattern, but rather what was passed
+	" to the :SubstituteExcept command.
+	call histdel('search', -1)
+	call histadd('search', a:pattern)
     endtry
 endfunction
 function! PatternsOnText#Except#Substitute( range, arguments )
-    let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#substitute#Parse(a:arguments)
+    let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#substitute#Parse(a:arguments, {'emptyPattern': @/})
+"****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:count])
     return s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags, l:count)
 endfunction
 function! PatternsOnText#Except#Delete( range, arguments )
     let [l:separator, l:pattern, l:flags] = ingo#cmdargs#pattern#Parse(a:arguments, '\(.*\)')
 
-    let l:success = s:InvertedSubstitute(a:range, l:separator, l:pattern, '', l:flags, '')
-    call histdel('search', -1)
-    return l:success
+    return s:InvertedSubstitute(a:range, (empty(l:pattern) ? '/' : l:separator), (empty(l:pattern) ? @/ : l:pattern), '', l:flags, '')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
