@@ -173,6 +173,9 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+1.12	RELEASEME
+- Minor: Make substitute() and matchlist() robust against 'ignorecase'.
+
 1.11	13-Jun-2013
 - FIX: Remove -bar from all commands to correctly handle patterns like
   foo\|bar without escaping as foo\\|bar.
