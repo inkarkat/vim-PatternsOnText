@@ -175,6 +175,13 @@ HISTORY						      *PatternsOnText-history*
 
 1.12	RELEASEME
 - Minor: Make substitute() and matchlist() robust against 'ignorecase'.
+- FIX: Use of \v and \V magicness atoms in the pattern for :DeleteExcept and
+  :SubstituteExcept cause errors like "E54: Unmatched (" and "E486: Pattern
+  not found". Revert to the default 'magic' mode after each pattern insertion
+  to the workhorse regular expression.
+- FIX: Abort :DeleteExcept / :SubstituteExcept commands when the pattern
+  contains the set start / end match patterns \zs / \ze, as these interfere
+  with the internal implemenation.
 
 1.11	13-Jun-2013
 - FIX: Remove -bar from all commands to correctly handle patterns like
