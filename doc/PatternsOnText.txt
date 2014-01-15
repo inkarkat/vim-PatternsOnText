@@ -173,7 +173,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.12	RELEASEME
+1.12	21-Nov-2013
 - FIX: Use of \v and \V magicness atoms in the pattern for :DeleteExcept and
   :SubstituteExcept cause errors like "E54: Unmatched (" and "E486: Pattern
   not found". Revert to the default 'magic' mode after each pattern insertion
