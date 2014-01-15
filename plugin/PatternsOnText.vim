@@ -1,15 +1,21 @@
 " PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
+"   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.20.008	16-Jan-2014	Add :SubstituteTuples command.
+"   1.11.007	10-Jun-2013	FIX: Remove -bar from all commands to correctly
+"				handle patterns like foo\|bar without escaping
+"				as foo\\|bar.
+"   1.10.006	06-Jun-2013	Also recall previous answers in a bare
+"				:SubstituteSelected command.
 "   1.10.005	04-Jun-2013	The commands that take a {pattern}, i.e.
 "				:SubstituteExcept, :DeleteExcept,
 "				:SubstituteSelected now consistently set that as
@@ -32,12 +38,14 @@ let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -bar -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
-command! -bar -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
-command! -bar -range -nargs=1 SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteInSearch if ! PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+
+command! -range -nargs=+ SubstituteTuples if ! PatternsOnText#Tuples#Substitute('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#PrintLines'))  && <bang>1 |
@@ -58,11 +66,11 @@ command! -bang -range=% -nargs=? DeleteDuplicateLinesIgnoring
 \       echoerr 'No duplicate lines' |
 \   endif
 
-command! -bar -bang -range -nargs=? PrintDuplicates
+command! -bang -range -nargs=? PrintDuplicates
 \   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#Duplicates#PrintMatches')) && <bang>1 |
 \       echoerr 'No duplicates' |
 \   endif
-command! -bar -bang -range -nargs=? DeleteDuplicates
+command! -bang -range -nargs=? DeleteDuplicates
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>, function('PatternsOnText#Duplicates#DeleteMatches'), function('PatternsOnText#Duplicates#ReportDeletedMatches')) && <bang>1 |
 \       echoerr 'No duplicates' |
