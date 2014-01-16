@@ -33,8 +33,11 @@ SOURCE									     *
 
 SEE ALSO								     *
 
-- The |ExtractMatches.vim| plugin (vimscript #0000) provides commands to yank
+- The |ExtractMatches.vim| plugin (vimscript #4795) provides commands to yank
   matches into a register, optionally only unique matches without duplicates.
+- The |EditSimilar.vim| plugin (vimscript #2544) uses the same
+  {wildcard}={string} replacement pairs of |:SubstituteWildcard|, but for
+  editing a similar file, e.g. via |:EditSubstitute|.
 
 ==============================================================================
 USAGE							*PatternsOnText-usage*
@@ -97,6 +100,20 @@ USAGE							*PatternsOnText-usage*
 			pattern and substitute string, but without the same
 			flags.
 
+							 *:SubstituteMultiple*
+:[range]SubstituteMultiple /{pattern}/{string}/ [...] [flags] [count]
+			Change any of the {pattern} given to the corresponding
+			{string}. As this is done in a single |:substitute|,
+			this can have different (better) semantics than
+			sequential :s/new/old/ | s/older/newer/ commands. For
+			example, you can swap texts with this.
+			Note: You cannot use capturing groups |/\(| here!
+							 *:SubstituteWildcard*
+:[range]SubstituteWildcard {wildcard}={string} [...] [flags] [count]
+			Change (first in the line, with "g" flag all) matches
+			of |wildcard| to {string}. Modeled after the Korn
+			shell's "cd {old} {new}" command.
+
 
 						      *:PrintDuplicateLinesOf*
 :[range]PrintDuplicateLinesOf[!] [{pattern}]
@@ -158,7 +175,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *PatternsOnText-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.007 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.016 or
   higher.
 
 ==============================================================================
@@ -172,6 +189,11 @@ IDEAS							*PatternsOnText-ideas*
 
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
+
+1.20	RELEASEME
+- ENH: Add :SubstituteWildcard {wildcard}={string} and
+  :SubstituteMultiple /{pattern}/{string}/ commands. *** You need to update to
+  ingo-library (vimscript #4433) version 1.016! ***
 
 1.12	21-Nov-2013
 - FIX: Use of \v and \V magicness atoms in the pattern for :DeleteExcept and
@@ -210,7 +232,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2013 Ingo Karkat
+Copyright: (C) 2011-2014 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
