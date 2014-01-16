@@ -11,6 +11,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.12.007	14-Jun-2013	Minor: Make matchlist() robust against
+"				'ignorecase'.
 "   1.11.006	12-Jun-2013	Factor out PatternsOnText#Selected#Parse().
 "   1.11.005	11-Jun-2013	:SubstituteSelected now positions the cursor on
 "				the line where the last selected replacement
@@ -152,7 +154,7 @@ function! PatternsOnText#Selected#Parse( arguments, previousAnswers )
     " by our additional flags, and that takes precedence.
     " Note: Must not include the built-in :s_n flag, as this is one of the
     " possible answers, and must be included there.
-    let [l:substituteFlags, l:parsedAnswers] = matchlist(l:flags, '^\(&\?[cegiIp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
+    let [l:substituteFlags, l:parsedAnswers] = matchlist(l:flags, '\C^\(&\?[cegiIp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
     " Use previous answers only for the :SubstituteSelected [flags] [answers]
     " form, not when a /{pattern} is passed; it's too easy to forget the
     " required answers and then be surprised when the ones from the previous
