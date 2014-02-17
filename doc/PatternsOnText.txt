@@ -73,7 +73,8 @@ USAGE							*PatternsOnText-usage*
 			sequence repeats for further matches. For example with
 			"ynn", the first match is replaced, the second and
 			third are not, the fourth is again replaced, ...
-			Handles & and \0, \1 .. \9 in {string}.
+			Handles & and \0, \1 .. \9 in {string}, also \=
+			|sub-replace-expression|.
 :[range]SubstituteSelected [flags] [answers]
 			Repeat the last substitution with the last used search
 			pattern, last used replacement string, last used
@@ -108,11 +109,19 @@ USAGE							*PatternsOnText-usage*
 			sequential :s/new/old/ | s/older/newer/ commands. For
 			example, you can swap texts with this.
 			Note: You cannot use capturing groups |/\(| here!
+			Handles & in {string}. Whitespace in the substitution
+			pairs must be escaped; for a literal backslash search
+			/ replace, use \\\\:
+			    /C:\\\\/my\ drive\\\\/ ~
 							 *:SubstituteWildcard*
 :[range]SubstituteWildcard {wildcard}={string} [...] [flags] [count]
 			Change (first in the line, with "g" flag all) matches
 			of |wildcard| to {string}. Modeled after the Korn
 			shell's "cd {old} {new}" command.
+			Handles & in {string}. Whitespace in the substitution
+			pairs must be escaped; for a literal backslash search
+			/ replace, use \\:
+			    C:\\=my\ drive ~
 
 
 						      *:PrintDuplicateLinesOf*
