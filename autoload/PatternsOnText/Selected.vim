@@ -5,12 +5,17 @@
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.20.008	17-Jan-2014	Replace the sequential expansion of &, \0, \1,
+"				... with a single iteration, implemented in new
+"				PatternsOnText#ReplaceSpecial(). Now, when \1
+"				expands to \2, it is not mistakenly re-expanded
+"				any more.
 "   1.12.007	14-Jun-2013	Minor: Make matchlist() robust against
 "				'ignorecase'.
 "   1.11.006	12-Jun-2013	Factor out PatternsOnText#Selected#Parse().
@@ -127,22 +132,17 @@ function! PatternsOnText#Selected#CountedReplace()
 	    return eval(s:SubstituteSelected.replacement[2:])
 	else
 	    " Handle & and \0, \1 .. \9 (but not \u, \U, \n, etc.)
-	    let l:replacement = s:SubstituteSelected.replacement
-	    for l:submatch in range(0, 9)
-		let l:replacement = substitute(l:replacement,
-		\   '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' .
-		\       (l:submatch == 0 ?
-		\           '\%(&\|\\'.l:submatch.'\)' :
-		\           '\\' . l:submatch
-		\       ),
-		\   submatch(l:submatch), 'g'
-		\)
-	    endfor
-	    return l:replacement
+	    return PatternsOnText#ReplaceSpecial('', s:SubstituteSelected.replacement, '\%(&\|\\[0-9]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
 	endif
     else
 	return submatch(0)
     endif
+endfunction
+function! PatternsOnText#Selected#ReplaceSpecial( expr, match, replacement )
+    if a:replacement =~# '^' . a:expr . '$'
+	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
+    endif
+    return ingo#escape#Unescape(a:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\' . a:expr)
 endfunction
 let s:previousReplacement = ''
 let s:previousAnswers = ''
