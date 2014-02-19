@@ -1,8 +1,9 @@
 " PatternsOnText/Pairs.vim: Advanced commands to apply pairs.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
 "   - ingo/err.vim autoload script
-"   - ingo/subst/tuples.vim autoload script
+"   - ingo/subst/pairs.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.20.002	17-Jan-2014	Implement replacement with special "&" symbol.
 "   1.20.001	16-Jan-2014	file creation
 let s:save_cpo = &cpo
 set cpo&vim
@@ -99,13 +101,19 @@ endfunction
 function! s:Replacement()
     for l:i in range(len(s:replacements))
 	if ! empty(submatch(l:i + 1))
-	    return s:replacements[l:i]
+	    return PatternsOnText#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
 	endif
     endfor
 
     " Should never happen; one branch always matches, and branches shouldn't be
     " empty.
     return ''
+endfunction
+function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
+    if a:replacement =~# '^' . a:expr . '$'
+	return a:match
+    endif
+    return ingo#escape#Unescape(a:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\' . a:expr)
 endfunction
 
 let &cpo = s:save_cpo
