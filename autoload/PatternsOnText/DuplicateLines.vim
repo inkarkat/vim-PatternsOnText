@@ -5,7 +5,7 @@
 "   - ingo/collections.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -102,14 +102,15 @@ function! PatternsOnText#DuplicateLines#PrintLines( accumulator )
 	let &foldenable = l:save_foldenable
     endtry
 endfunction
-function! s:DeleteLines( accumulator, isDeleteFirstLine )
+function! PatternsOnText#DuplicateLines#DeleteLines( accumulator )
     " Set a jump on the original position.
     normal! m'
 
     let l:deleteLnums = []
 
+    " All but the first occurrence shall be deleted.
     for l:slotLnums in values(a:accumulator)
-	call extend(l:deleteLnums, (a:isDeleteFirstLine ? l:slotLnums : l:slotLnums[1:]))
+	call extend(l:deleteLnums, l:slotLnums[1:])
     endfor
 
     " Sort from last to first line to avoid adapting the line numbers.
@@ -126,12 +127,6 @@ function! s:DeleteLines( accumulator, isDeleteFirstLine )
     if len(l:deleteLnums) > &report
 	call ingo#msg#StatusMsg(printf('%d fewer line%s', len(l:deleteLnums), (len(l:deleteLnums) == 1 ? '' : 's')))
     endif
-endfunction
-function! PatternsOnText#DuplicateLines#DeleteSubsequentLines( accumulator )
-    call s:DeleteLines(a:accumulator, 0)
-endfunction
-function! PatternsOnText#DuplicateLines#DeleteAllLines( accumulator )
-    call s:DeleteLines(a:accumulator, 1)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
