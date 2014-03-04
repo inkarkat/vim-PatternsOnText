@@ -4,6 +4,7 @@
 "   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
+"   - ingo/escape.vim autoload script
 "
 " Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +12,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
+"				to unescape the \& or \\1 (to & or \1) via
+"				substitute(), as the library function does not
+"				take an expression.
 "   1.20.008	17-Jan-2014	Replace the sequential expansion of &, \0, \1,
 "				... with a single iteration, implemented in new
 "				PatternsOnText#ReplaceSpecial(). Now, when \1
@@ -142,7 +147,7 @@ function! PatternsOnText#Selected#ReplaceSpecial( expr, match, replacement )
     if a:replacement =~# '^' . a:expr . '$'
 	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
     endif
-    return ingo#escape#Unescape(a:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\' . a:expr)
+    return ingo#escape#UnescapeExpr(a:replacement, a:expr)
 endfunction
 let s:previousReplacement = ''
 let s:previousAnswers = ''
