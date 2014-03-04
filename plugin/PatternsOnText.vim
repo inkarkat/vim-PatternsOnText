@@ -1,15 +1,17 @@
 " PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
+"   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.20.008	16-Jan-2014	Add :SubstituteWildcard and :SubstituteMultiple
+"				commands.
 "   1.11.007	10-Jun-2013	FIX: Remove -bar from all commands to correctly
 "				handle patterns like foo\|bar without escaping
 "				as foo\\|bar.
@@ -43,6 +45,9 @@ command! -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>
 command! -range -nargs=? SubstituteSelected call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteInSearch if ! PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+
+command! -range -nargs=+ SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=+ SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#PrintLines'))  && <bang>1 |
