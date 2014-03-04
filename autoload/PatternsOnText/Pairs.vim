@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
 "   - ingo/err.vim autoload script
+"   - ingo/escape.vim autoload script
 "   - ingo/subst/pairs.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
@@ -11,6 +12,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
+"				to unescape the \& or \\1 (to & or \1) via
+"				substitute(), as the library function does not
+"				take an expression.
 "   1.20.002	17-Jan-2014	Implement replacement with special "&" symbol.
 "   1.20.001	16-Jan-2014	file creation
 let s:save_cpo = &cpo
@@ -113,7 +118,7 @@ function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
     if a:replacement =~# '^' . a:expr . '$'
 	return a:match
     endif
-    return ingo#escape#Unescape(a:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\' . a:expr)
+    return ingo#escape#UnescapeExpr(a:replacement, a:expr)
 endfunction
 
 let &cpo = s:save_cpo
