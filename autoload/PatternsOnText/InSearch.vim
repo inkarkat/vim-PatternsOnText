@@ -6,12 +6,15 @@
 "   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.006	07-Mar-2014	Emulate use of \= sub-replace-expression.
+"   1.12.005	14-Jun-2013	Minor: Make substitute() robust against
+"				'ignorecase'.
 "   1.10.004	06-Jun-2013	Factor out
 "				PatternsOnText#EmulatePreviousReplacement(); it
 "				is also needed by PatternsOnText/Selected.vim.
@@ -34,9 +37,47 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:Submatch( idx )
+    return get(s:submatches, a:idx, '')
+endfunction
+function! s:EmulateSubmatch( expr, pat, sub )
+    let s:submatches = matchlist(a:expr, a:pat)
+	let l:innerReplacement = eval(a:sub)
+    unlet s:submatches
+    return l:innerReplacement
+endfunction
 function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
     let s:didInnerSubstitution = 1
-    let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
+    if a:sub =~# '^\\='
+	" Recursive use of \= is not allowed, so we need to emulate it:
+	" matchlist() will get us the list of (sub-)matches, which we'll inject
+	" into the passed expression via a s:Submatch() surrogate function for
+	" submatch().
+	let l:emulatedSub = substitute(a:sub[2:], '\w\@<!submatch\s*(', 's:Submatch(', 'g')
+
+	if a:flags ==# 'g'
+	    " For a global replacement, we need to separate the pattern matches
+	    " from the surrounding text, and process each match in turn.
+	    let l:innerParts = ingo#collections#SplitKeepSeparators(a:expr, a:pat, 1)
+	    let l:replacement = ''
+	    while ! empty(l:innerParts)
+		let l:innerSurroundingText = remove(l:innerParts, 0)
+		if empty(l:innerParts)
+		    let l:replacement .= l:innerSurroundingText
+		else
+		    let l:innerExpr = remove(l:innerParts, 0)
+		    let l:replacement .= l:innerSurroundingText . s:EmulateSubmatch(l:innerExpr, a:pat, l:emulatedSub)
+		endif
+	    endwhile
+	else
+	    " For a first-only replacement, just match and replace once.
+	    let s:submatches = matchlist(a:expr, a:pat)
+	    let l:innerReplacement = s:EmulateSubmatch(a:expr, a:pat, l:emulatedSub)
+	    let l:replacement = substitute(a:expr, a:pat, escape(l:innerReplacement, '\&'), '')
+	endif
+    else
+	let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
+    endif
     if a:expr !=# l:replacement
 	let s:innerSubstitutionCnt += 1
 	let s:innerSubstitutionLnums[line('.')] = 1
@@ -57,7 +98,7 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
     let l:substFlags = 'g'
     if l:flags =~# 'f'
 	let l:substFlags = ''
-	let l:flags = substitute(l:flags, 'f', '', 'g')
+	let l:flags = substitute(l:flags, '\Cf', '', 'g')
     endif
 
     let s:didInnerSubstitution = 0
