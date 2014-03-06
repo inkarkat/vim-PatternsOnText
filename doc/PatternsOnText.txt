@@ -30,6 +30,8 @@ SOURCE									     *
     http://stackoverflow.com/questions/14236226/hanging-only-to-the-first-instance-of-the-line-and-deleting-all-further-copies
 |:DeleteDuplicateLinesIgnoring| inspired by
     http://stackoverflow.com/questions/1896793/remove-duplicate-line-in-vim
+|:DeleteAllDuplicateLinesIgnoring| inspired by
+    http://stackoverflow.com/questions/22193596/in-vim-how-to-remove-all-lines-that-are-duplicate-somewhere
 
 SEE ALSO								     *
 
@@ -124,6 +126,8 @@ USAGE							*PatternsOnText-usage*
 			    C:\\=my\ drive ~
 
 
+			For all following commands, the [!] suppresses the
+			error when there are no duplicates.
 						      *:PrintDuplicateLinesOf*
 :[range]PrintDuplicateLinesOf[!] [{pattern}]
 :[range]PrintDuplicateLinesOf[!] /{pattern}/
@@ -142,15 +146,22 @@ USAGE							*PatternsOnText-usage*
 :[range]PrintDuplicateLinesIgnoring[!] [{pattern}]
 :[range]PrintDuplicateLinesIgnoring[!] /{pattern}/
 			Print all occurrences of a line whose text (ignoring
-			any text matched by {pattern} appears multiple times.
+			any text matched by {pattern}) appears multiple times.
+			To ignore empty lines, use a {pattern} of ^$ (strict)
+			or ^\s*$ (lenient).
 			All matching lines are added to the |jumplist|, so you
 			can use |CTRL-O| to revisit the locations.
 					       *:DeleteDuplicateLinesIgnoring*
 :[range]DeleteDuplicateLinesIgnoring[!] [{pattern}]
 :[range]DeleteDuplicateLinesIgnoring[!] /{pattern}/
 			Delete all subsequent occurrences of a line (ignoring
-			any text matched by {pattern}.
-
+			any text matched by {pattern}).
+					    *:DeleteAllDuplicateLinesIgnoring*
+:[range]DeleteAllDuplicateLinesIgnoring[!] [{pattern}]
+:[range]DeleteAllDuplicateLinesIgnoring[!] /{pattern}/
+			Delete all (including the very first) occurrences of a
+			duplicate line (ignoring any text matched by
+			{pattern}).
 							    *:PrintDuplicates*
 :[range]PrintDuplicates[!] [{pattern}]
 :[range]PrintDuplicates[!] /{pattern}/
@@ -199,7 +210,11 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.21	RELEASEME
+1.30	RELEASEME
+- Add :DeleteAllDuplicateLinesIgnoring command.
+- CHG: The :[Print|Delete]DuplicateLines[ Of|Ignoring] commands do not
+  automatically ignore empty lines any more. Use a {pattern} like ^$ to ignore
+  them explicitly.
 - FIX: Wrong use of ingo#escape#Unescape().
 *** You need to update to ingo-library (vimscript #4433) version 1.017! ***
 
