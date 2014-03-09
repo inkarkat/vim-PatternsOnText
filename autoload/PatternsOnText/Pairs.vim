@@ -12,6 +12,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
+"				passed a:expr (after the previous fix).
 "   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
 "				to unescape the \& or \\1 (to & or \1) via
 "				substitute(), as the library function does not
@@ -118,7 +120,7 @@ function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
     if a:replacement =~# '^' . a:expr . '$'
 	return a:match
     endif
-    return ingo#escape#UnescapeExpr(a:replacement, a:expr)
+    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
 
 let &cpo = s:save_cpo
