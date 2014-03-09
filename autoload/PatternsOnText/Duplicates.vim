@@ -2,7 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
-"   - ingo/cmdargs.vim autoload script
+"   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
 "
 " Copyright: (C) 2013 Ingo Karkat
@@ -11,6 +11,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
+"				ingo/cmdargs/pattern.vim and
+"				ingo/cmdargs/substitute.vim.
 "   1.00.004	28-May-2013	Remove a suspect duplicate :echomsg.
 "				Use ingo#msg#StatusMsg().
 "   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
@@ -28,7 +31,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
     else
-	let [l:separator, l:pattern] = ingo#cmdargs#ParsePatternArgument(a:arguments)
+	let [l:separator, l:pattern] = ingo#cmdargs#pattern#Parse(a:arguments)
     endif
 
     let l:accumulator = {}
