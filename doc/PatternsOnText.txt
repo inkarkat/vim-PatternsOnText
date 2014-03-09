@@ -89,7 +89,10 @@ USAGE							*PatternsOnText-usage*
 			:%s//\=substitute(submatch(0), "foo", "bar", "g")/gc
 <			~ is replaced with the {string} of the previous
 			:SubstituteInSearch.
-			[flags] and [count] apply to the outer matching of the
+			Handles \= |sub-replace-expression| in {string}, which
+			can't be used recursively in the above built-in >
+			:%s//\=...
+<			[flags] and [count] apply to the outer matching of the
 			last search pattern. The [e] from |:s_flags| also
 			suppresses the error message when {pattern} never
 			matches.
@@ -216,6 +219,10 @@ HISTORY						      *PatternsOnText-history*
   automatically ignore empty lines any more. Use a {pattern} like ^$ to ignore
   them explicitly.
 - FIX: Wrong use of ingo#escape#Unescape().
+- ENH: Enable use of \= sub-replace-expression in :SubstituteInSearch through
+  emulation, as the command implementation itself uses \=, Vim doesn't allow
+  recursive use inside it. This has been inspired by
+  http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
 *** You need to update to ingo-library (vimscript #4433) version 1.017! ***
 
 1.20	18-Feb-2014
