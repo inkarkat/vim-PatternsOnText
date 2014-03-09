@@ -84,6 +84,12 @@ command! -bang -range -nargs=? DeleteDuplicates
 \       echoerr 'No duplicates' |
 \   endif
 
+command! -bang -range=% -nargs=+ DeleteRanges
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Ranges#Delete(<line1>, <line2>, <bang>0, <q-args>) |
+\       echoerr 'No matching ranges' |
+\   endif
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
