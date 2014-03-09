@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.009	05-Mar-2014	Add :DeleteAllDuplicateLinesIgnoring command.
 "   1.20.008	16-Jan-2014	Add :SubstituteWildcard and :SubstituteMultiple
 "				commands.
 "   1.11.007	10-Jun-2013	FIX: Remove -bar from all commands to correctly
@@ -55,7 +56,7 @@ command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#DeleteLines')) && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '', PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')) && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintDuplicateLinesIgnoring
@@ -64,7 +65,12 @@ command! -bang -range=% -nargs=? PrintDuplicateLinesIgnoring
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DuplicateLines#DeleteLines')) && <bang>1 |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')) && <bang>1 |
+\       echoerr 'No duplicate lines' |
+\   endif
+command! -bang -range=% -nargs=? DeleteAllDuplicateLinesIgnoring
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '', function('PatternsOnText#DuplicateLines#DeleteAllLines')) && <bang>1 |
 \       echoerr 'No duplicate lines' |
 \   endif
 
