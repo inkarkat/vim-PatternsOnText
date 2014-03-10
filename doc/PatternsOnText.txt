@@ -81,6 +81,21 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			pattern, last used replacement string, last used
 			|:s_flags|, and last used answers.
+						       *:SubstituteSubsequent*
+:[range]SubstituteSubsequent/{pattern}/{string}/[flags]
+			Replace all matches of {pattern} on or after the current
+			cursor position in [range] with {string}.
+:[range]SubstituteSubsequent/{pattern}/{string}/[flags] {answers}
+			Replace all matches of {pattern} on or after the current
+			cursor position in [range] with {string}, determining
+			whether a particular match should be replaced on the
+			sequence of "y" or "n" (a count can be prefixed, e.g.
+			"3y4n2y") or numeric positions "2,5", or ranges "3-5" in
+			{answers}, as with |:SubstituteSelected|.
+:[range]SubstituteSubsequent [flags] [answers]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement string, last used
+			|:s_flags|, and last used answers.
 
 							 *:SubstituteInSearch*
 :[range]SubstituteInSearch/{pattern}/{string}/[flags] [count]
@@ -184,6 +199,19 @@ USAGE							*PatternsOnText-usage*
 			Delete all subsequent matches of {pattern} (or the
 			last search pattern, if omitted) except the first.
 
+:[range]DeleteRanges[!] {range} [x]
+:[range]YankRanges[!] {range} [x]
+			Within the entire buffer / passed [range], delete /
+			yank all lines that fall within {range} (with [!]: do
+			not fall within) into register [x] (or the unnamed
+			register).
+:[range]PrintRanges[!] {range}
+			Within the entire buffer / passed [range], print all
+			lines that fall within {range} (with [!]: do not fall
+			within).
+			Each start of a block is added to the |jumplist|, so
+			you can use |CTRL-O| to revisit the locations.
+
 ==============================================================================
 INSTALLATION					 *PatternsOnText-installation*
 
@@ -223,6 +251,7 @@ HISTORY						      *PatternsOnText-history*
   emulation, as the command implementation itself uses \=, Vim doesn't allow
   recursive use inside it. This has been inspired by
   http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
+- Add :DeleteRanges, :YankRanges, :PrintRanges commands.
 *** You need to update to ingo-library (vimscript #4433) version 1.017! ***
 
 1.20	18-Feb-2014
