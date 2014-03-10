@@ -1,4 +1,4 @@
-" PatternsOnText/Selected.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/Selected.vim: Commands to substitute only selected matches.
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
