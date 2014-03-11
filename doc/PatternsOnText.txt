@@ -84,7 +84,11 @@ USAGE							*PatternsOnText-usage*
 						       *:SubstituteSubsequent*
 :[range]SubstituteSubsequent/{pattern}/{string}/[flags]
 			Replace all matches of {pattern} on or after the current
-			cursor position in [range] with {string}.
+			cursor position (and in all entire following lines) in
+			[range] with {string}.
+			For a "blockwise to end" replacement that is
+			restricted to positions on and after the current
+			column in all lines, pass the special flag [b].
 :[range]SubstituteSubsequent/{pattern}/{string}/[flags] {answers}
 			Replace all matches of {pattern} on or after the current
 			cursor position in [range] with {string}, determining
