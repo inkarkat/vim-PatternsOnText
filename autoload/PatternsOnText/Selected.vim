@@ -12,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.011	11-Mar-2014	Allow to pass additional substitute flags to
+"				PatternsOnText#Selected#Parse(), used by
+"				PatternsOnText/Subsequent.vim
 "   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
 "				passed a:expr (after the previous fix).
 "   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
@@ -153,15 +156,16 @@ function! PatternsOnText#Selected#ReplaceSpecial( expr, match, replacement )
 endfunction
 let s:previousReplacement = ''
 let s:previousAnswers = ''
-function! PatternsOnText#Selected#Parse( arguments, previousAnswers )
-    let l:answersExpr = '\-,[:space:][:digit:]yn'
+function! PatternsOnText#Selected#Parse( arguments, previousAnswers, ... )
+    let l:additionalFlags = (a:0 ? a:1 : '')
+    let l:answersExpr = '\-,[:space:][:digit:]yn' . l:additionalFlags
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': l:answersExpr, 'emptyFlags': ['', '']})  " Because of the more complex defaulting of the two different :s_flags and answers, we handle this ourselves.
     " Note: l:count is always empty, as whitespace + digits are already matched
     " by our additional flags, and that takes precedence.
     " Note: Must not include the built-in :s_n flag, as this is one of the
     " possible answers, and must be included there.
-    let [l:substituteFlags, l:parsedAnswers] = matchlist(l:flags, '\C^\(&\?[cegiIp#lr]*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
+    let [l:substituteFlags, l:parsedAnswers] = matchlist(l:flags, '\C^\(&\?[cegiIp#lr' . l:additionalFlags . ']*\)\s*\([' . l:answersExpr . ']*\)$')[1:2]
     " Use previous answers only for the :SubstituteSelected [flags] [answers]
     " form, not when a /{pattern} is passed; it's too easy to forget the
     " required answers and then be surprised when the ones from the previous
