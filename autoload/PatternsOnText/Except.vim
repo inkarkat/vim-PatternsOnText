@@ -1,4 +1,4 @@
-" PatternsOnText/Except.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/Except.vim: Commands to substitute where the pattern does not match.
 "
 " DEPENDENCIES:
 "   - ingo/err.vim autoload script
