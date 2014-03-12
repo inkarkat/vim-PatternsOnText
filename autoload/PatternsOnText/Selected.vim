@@ -12,6 +12,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.012	12-Mar-2014	Handle \r, \n, \t, \b in replacement, too.
 "   1.30.011	11-Mar-2014	Allow to pass additional substitute flags to
 "				PatternsOnText#Selected#Parse(), used by
 "				PatternsOnText/Subsequent.vim
@@ -141,15 +142,23 @@ function! PatternsOnText#Selected#CountedReplace()
 	    " Handle sub-replace-special.
 	    return eval(s:SubstituteSelected.replacement[2:])
 	else
-	    " Handle & and \0, \1 .. \9 (but not \u, \U, \n, etc.)
-	    return PatternsOnText#ReplaceSpecial('', s:SubstituteSelected.replacement, '\%(&\|\\[0-9]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
+	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
+	    return PatternsOnText#ReplaceSpecial('', s:SubstituteSelected.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
 	endif
     else
 	return submatch(0)
     endif
 endfunction
 function! PatternsOnText#Selected#ReplaceSpecial( expr, match, replacement )
-    if a:replacement =~# '^' . a:expr . '$'
+    if a:replacement ==# '\n'
+	return "\n"
+    elseif a:replacement ==# '\r'
+	return "\r"
+    elseif a:replacement ==# '\t'
+	return "\t"
+    elseif a:replacement ==# '\b'
+	return "\<BS>"
+    elseif a:replacement =~# '^' . a:expr . '$'
 	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
     endif
     return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
