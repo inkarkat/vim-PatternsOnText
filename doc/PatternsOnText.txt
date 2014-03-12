@@ -76,7 +76,7 @@ USAGE							*PatternsOnText-usage*
 			"ynn", the first match is replaced, the second and
 			third are not, the fourth is again replaced, ...
 			Handles & and \0, \1 .. \9 in {string}, also \=
-			|sub-replace-expression|.
+			|sub-replace-expression| and \r, \n, \t, \b.
 :[range]SubstituteSelected [flags] [answers]
 			Repeat the last substitution with the last used search
 			pattern, last used replacement string, last used
@@ -256,6 +256,7 @@ HISTORY						      *PatternsOnText-history*
   recursive use inside it. This has been inspired by
   http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
 - Add :DeleteRanges, :YankRanges, :PrintRanges commands.
+- Handle \r, \n, \t, \b in {string}, too.
 *** You need to update to ingo-library (vimscript #4433) version 1.017! ***
 
 1.20	18-Feb-2014
