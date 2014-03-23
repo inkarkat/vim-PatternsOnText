@@ -7,7 +7,7 @@ edit duplicateLines.txt
 1
 try
     PrintDuplicateLinesOf
-    call vimtap#Fail()
+    call vimtap#Fail('expected error')
 catch
     call vimtap#err#Thrown('No duplicate lines', 'error shown')
 endtry
