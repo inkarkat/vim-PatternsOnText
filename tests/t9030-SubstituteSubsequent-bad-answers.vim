@@ -5,8 +5,18 @@ call vimtap#Plan(2)
 
 edit duplicates.txt
 7normal! 6W
-call vimtap#err#Errors('E488: Trailing characters', '.,$SubstituteSubsequent/\<...\>/XXX/g bad?!', 'error on very invalid answers')
+try
+    .,$SubstituteSubsequent/\<...\>/XXX/g bad?!
+    call vimtap#Fail('expected error on very invalid answers')
+catch
+    call vimtap#err#Thrown('E488: Trailing characters', 'error on very invalid answers')
+endtry
 
-call vimtap#err#Errors('E488: Trailing characters', '.,$SubstituteSubsequent/\<...\>/XXX/ynyn,2;3', 'error on barely invalid answers')
+try
+    .,$SubstituteSubsequent/\<...\>/XXX/ynyn,2;3
+    call vimtap#Fail('expected error on barely invalid answers')
+catch
+    call vimtap#err#Thrown('E488: Trailing characters', 'error on barely invalid answers')
+endtry
 
 call vimtest#Quit()
