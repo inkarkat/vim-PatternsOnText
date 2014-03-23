@@ -8,7 +8,7 @@ call setline(2, 'bar')
 1
 try
     PrintDuplicateLinesIgnoring
-    call vimtap#Fail()
+    call vimtap#Fail('expected error')
 catch
     call vimtap#err#Thrown('No duplicate lines', 'error shown')
 endtry
