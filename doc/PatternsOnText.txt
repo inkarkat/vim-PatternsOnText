@@ -203,12 +203,13 @@ USAGE							*PatternsOnText-usage*
 			Delete all subsequent matches of {pattern} (or the
 			last search pattern, if omitted) except the first.
 
+						 *:DeleteRanges* *:YankRanges*
 :[range]DeleteRanges[!] {range} [x]
 :[range]YankRanges[!] {range} [x]
 			Within the entire buffer / passed [range], delete /
 			yank all lines that fall within {range} (with [!]: do
 			not fall within) into register [x] (or the unnamed
-			register).
+			register).				*:PrintRanges*
 :[range]PrintRanges[!] {range}
 			Within the entire buffer / passed [range], print all
 			lines that fall within {range} (with [!]: do not fall
