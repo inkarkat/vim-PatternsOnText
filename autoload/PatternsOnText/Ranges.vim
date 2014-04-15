@@ -1,6 +1,9 @@
 " PatternsOnText/Ranges.vim: Commands to work on sub-ranges of the buffer.
 "
 " DEPENDENCIES:
+"   - ingo/cmdargs/register.vim autoload script
+"   - ingo/collections.vim autoload script
+"   - ingo/print.vim autoload script
 "   - PatternsOnText.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
@@ -48,8 +51,29 @@ function! s:YankLines( lnums, register )
 
     call setreg(a:register, join(l:lines, "\n"), 'V')
 endfunction
-function! PatternsOnText#Ranges#Delete( startLnum, endLnum, isNonMatchingLines, arguments )
-    let [l:range, l:register] = ingo#cmdargs#register#ParseAppendedWritableRegister(a:arguments, '[-+[:alnum:][:space:]\\"|]\@![\x00-\xFF]')
+function! s:PrintLines( lnums )
+    let l:previousLnum = -1
+
+    for l:lnum in sort(a:lnums, 'ingo#collections#numsort')
+	call ingo#print#Number(l:lnum)
+	if l:lnum > l:previousLnum + 1
+	    " Add every non-contiguous start of a range to the jump list.
+	    call cursor(l:lnum, 1)
+	    normal! m'
+	endif
+	let l:previousLnum = l:lnum
+    endfor
+
+    " Position the cursor on the last line of the last range.
+    call cursor(l:lnum, 1)
+endfunction
+function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatchingLines, arguments )
+    if a:command ==# 'print'
+	let l:range = a:arguments
+    else
+	let [l:range, l:register] = ingo#cmdargs#register#ParseAppendedWritableRegister(a:arguments, '[-+[:alnum:][:space:]\\"|]\@![\x00-\xFF]')
+    endif
+
     let l:lnumsInRange = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
 
     let l:lnums = (a:isNonMatchingLines ?
@@ -59,11 +83,16 @@ function! PatternsOnText#Ranges#Delete( startLnum, endLnum, isNonMatchingLines, 
 
     if empty(l:lnums)
 	return 0
+    elseif a:command ==# 'print'
+	call s:PrintLines(l:lnums)
     else
 	call s:YankLines(l:lnums, (empty(l:register) ? '"' : l:register))
-	call PatternsOnText#DeleteLines(l:lnums)
-	return 1
+	if a:command ==# 'delete'
+	    call PatternsOnText#DeleteLines(l:lnums)
+	endif
     endif
+
+    return 1
 endfunction
 
 let &cpo = s:save_cpo
