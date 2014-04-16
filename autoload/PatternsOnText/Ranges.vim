@@ -1,6 +1,7 @@
 " PatternsOnText/Ranges.vim: Commands to work on sub-ranges of the buffer.
 "
 " DEPENDENCIES:
+"   - ingo/cmdargs/range.vim autoload script
 "   - ingo/cmdargs/register.vim autoload script
 "   - ingo/collections.vim autoload script
 "   - ingo/print.vim autoload script
@@ -12,13 +13,20 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.002	16-Apr-2014	ENH: Allow to pass multiple ranges to the
+"				:*Ranges commands.
+"				FIX: The *Ranges commands only handled
+"				/{pattern}/,... ranges, not line numbers or
+"				marks. Only use :global for patterns; for
+"				everything else, there's only a single range, so
+"				we can just prepend it to :call directly.
 "   1.30.001	10-Mar-2014	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:RecordLine( records, endLnum )
+function! s:RecordLine( records, startLnum, endLnum )
     let l:lnum = line('.')
-    if l:lnum > a:endLnum
+    if l:lnum < a:startLnum || l:lnum > a:endLnum
 	return
     endif
 
@@ -26,11 +34,24 @@ function! s:RecordLine( records, endLnum )
 endfunction
 function! s:GetLinesInRange( startLnum, endLnum, range )
     let l:recordedLines = {}
-    execute printf('silent! %d,%dglobal %s call <SID>RecordLine(l:recordedLines, %d)',
-    \  a:startLnum, a:endLnum,
-    \  a:range,
-    \  a:endLnum,
-    \)
+
+    if a:range =~# '^[/?]'
+	" For patterns, we need :global to find _all_ (not just the first)
+	" matching ranges.
+	execute printf('silent! %d,%dglobal %s call <SID>RecordLine(l:recordedLines, %d, %d)',
+	\  a:startLnum, a:endLnum,
+	\  a:range,
+	\  a:startLnum, a:endLnum
+	\)
+    else
+	" For line number, marks, etc., we can just record them (limited to
+	" those that fall into the command's range).
+	execute printf('silent! %s call <SID>RecordLine(l:recordedLines, %d, %d)',
+	\  a:range,
+	\  a:startLnum, a:endLnum
+	\)
+    endif
+
     return l:recordedLines
 endfunction
 function! s:Invert( startLnum, endLnum, lnums )
@@ -69,16 +90,21 @@ function! s:PrintLines( lnums )
 endfunction
 function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatchingLines, arguments )
     if a:command ==# 'print'
-	let l:range = a:arguments
+	let l:ranges = a:arguments
     else
-	let [l:range, l:register] = ingo#cmdargs#register#ParseAppendedWritableRegister(a:arguments, '[-+[:alnum:][:space:]\\"|]\@![\x00-\xFF]')
+	let [l:ranges, l:register] = ingo#cmdargs#register#ParseAppendedWritableRegister(a:arguments, '[-+,;''[:alnum:][:space:]\\"|]\@![\x00-\xFF]')
     endif
 
-    let l:lnumsInRange = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
+    let l:lnumsInRanges = {}
+    for l:range in split(l:ranges, '\%(' .ingo#cmdargs#range#RangeExpr() . '\)\zs\s\+')
+	let l:lnumsInThisRange = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
+"****D echomsg '****' string(l:range) string(l:lnumsInThisRange)
+	call extend(l:lnumsInRanges, l:lnumsInThisRange)
+    endfor
 
     let l:lnums = (a:isNonMatchingLines ?
-    \   s:Invert(a:startLnum, a:endLnum, l:lnumsInRange) :
-    \   keys(l:lnumsInRange)
+    \   s:Invert(a:startLnum, a:endLnum, l:lnumsInRanges) :
+    \   keys(l:lnumsInRanges)
     \)
 
     if empty(l:lnums)
