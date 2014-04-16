@@ -13,7 +13,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.40.002	16-Apr-2014	ENH: Allow to pass multiple ranges to the
+"   1.35.003	17-Apr-2014	Don't clobber the search history with the
+"				:*Ranges commands (through using :global).
+"   1.35.002	16-Apr-2014	ENH: Allow to pass multiple ranges to the
 "				:*Ranges commands.
 "				FIX: The *Ranges commands only handled
 "				/{pattern}/,... ranges, not line numbers or
@@ -43,6 +45,7 @@ function! s:GetLinesInRange( startLnum, endLnum, range )
 	\  a:range,
 	\  a:startLnum, a:endLnum
 	\)
+	let l:didClobberSearchHistory = 1
     else
 	" For line number, marks, etc., we can just record them (limited to
 	" those that fall into the command's range).
@@ -50,9 +53,10 @@ function! s:GetLinesInRange( startLnum, endLnum, range )
 	\  a:range,
 	\  a:startLnum, a:endLnum
 	\)
+	let l:didClobberSearchHistory = 0
     endif
 
-    return l:recordedLines
+    return [l:recordedLines, l:didClobberSearchHistory]
 endfunction
 function! s:Invert( startLnum, endLnum, lnums )
     return filter(
@@ -96,10 +100,12 @@ function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatch
     endif
 
     let l:lnumsInRanges = {}
+    let l:isClearSearchHistory = 0
     for l:range in split(l:ranges, '\%(' .ingo#cmdargs#range#RangeExpr() . '\)\zs\s\+')
-	let l:lnumsInThisRange = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
+	let [l:lnumsInThisRange, l:didClobberSearchHistory] = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
 "****D echomsg '****' string(l:range) string(l:lnumsInThisRange)
 	call extend(l:lnumsInRanges, l:lnumsInThisRange)
+	let l:isClearSearchHistory = l:isClearSearchHistory || l:didClobberSearchHistory
     endfor
 
     let l:lnums = (a:isNonMatchingLines ?
@@ -107,8 +113,9 @@ function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatch
     \   keys(l:lnumsInRanges)
     \)
 
+    let l:isSuccess = 1
     if empty(l:lnums)
-	return 0
+	let l:isSuccess = 0
     elseif a:command ==# 'print'
 	call s:PrintLines(l:lnums)
     else
@@ -118,7 +125,11 @@ function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatch
 	endif
     endif
 
-    return 1
+    if l:isClearSearchHistory
+	call histdel('search', -1)
+    endif
+
+    return l:isSuccess
 endfunction
 
 let &cpo = s:save_cpo
