@@ -204,13 +204,15 @@ USAGE							*PatternsOnText-usage*
 			last search pattern, if omitted) except the first.
 
 						 *:DeleteRanges* *:YankRanges*
-:[range]DeleteRanges[!] {range} [x]
-:[range]YankRanges[!] {range} [x]
+:[range]DeleteRanges[!] {range} [range] [...] [x]
+:[range]YankRanges[!] {range} [range] [...] [x]
 			Within the entire buffer / passed [range], delete /
 			yank all lines that fall within {range} (with [!]: do
 			not fall within) into register [x] (or the unnamed
-			register).				*:PrintRanges*
-:[range]PrintRanges[!] {range}
+			register). When multiple [range]s are given, each line
+			is yanked only once (in ascending order).
+								*:PrintRanges*
+:[range]PrintRanges[!] {range} [range] [...]
 			Within the entire buffer / passed [range], print all
 			lines that fall within {range} (with [!]: do not fall
 			within).
@@ -245,6 +247,12 @@ IDEAS							*PatternsOnText-ideas*
 
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
+
+1.40	RELEASEME
+- ENH: Allow to pass multiple ranges to the :*Ranges commands.
+- FIX: The *Ranges commands only handled /{pattern}/,... ranges, not line
+  numbers or marks. Only use :global for patterns; for everything else,
+  there's only a single range, so we can just prepend it to :call directly.
 
 1.30	13-Mar-2014
 - Add :DeleteAllDuplicateLinesIgnoring command.
