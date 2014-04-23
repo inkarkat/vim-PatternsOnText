@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
+"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.003	10-Mar-2014	Add PatternsOnText#DeleteLines().
 "   1.20.002	17-Jan-2014	Add PatternsOnText#ReplaceSpecial().
 "   1.10.001	06-Jun-2013	file creation
 
@@ -33,4 +35,27 @@ function! PatternsOnText#ReplaceSpecial( match, replacement, specialExpr, Specia
     \)
 endfunction
 
+function! PatternsOnText#DeleteLines( lnums )
+    if len(a:lnums) == 0
+	return
+    endif
+
+    " Set a jump on the original position.
+    normal! m'
+
+    " Sort from last to first line to avoid adapting the line numbers.
+    for l:lnum in reverse(sort(a:lnums, 'ingo#collections#numsort'))
+	execute 'keepjumps' l:lnum . 'delete _'
+    endfor
+
+    " Position the cursor on the line after the last deletion, like
+    " :g/.../delete does.
+    execute (a:lnums[0] - len(a:lnums) + 1)
+    normal! ^
+
+    " Print a summary.
+    if len(a:lnums) > &report
+	call ingo#msg#StatusMsg(printf('%d fewer line%s', len(a:lnums), (len(a:lnums) == 1 ? '' : 's')))
+    endif
+endfunction
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
