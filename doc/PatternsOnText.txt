@@ -218,6 +218,22 @@ USAGE							*PatternsOnText-usage*
 			within).
 			Each start of a block is added to the |jumplist|, so
 			you can use |CTRL-O| to revisit the locations.
+								    *:RangeDo*
+:[range]RangeDo[!] {range} [range] [...] {command}
+			Within the entire buffer / passed [range], execute the
+			Ex command {cmd} on each line that falls within
+			{range} (with [!]: does not fall within). When
+			multiple [range]s are given, each line is processed
+			only once (in ascending order).
+			Note: {command} must be separated by whitespace from
+			the preceding ranges!
+			Works like >
+			    :global/apples/,/peaches/ {cmd}
+<			but:
+			- processes each line only once when the ranges are
+			  overlapping
+			- supports multiple ranges (which are joined) and
+			  inversion with [!]
 
 ==============================================================================
 INSTALLATION					 *PatternsOnText-installation*
@@ -248,11 +264,14 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.40	RELEASEME
+1.35	RELEASEME
 - ENH: Allow to pass multiple ranges to the :*Ranges commands.
 - FIX: The *Ranges commands only handled /{pattern}/,... ranges, not line
   numbers or marks. Only use :global for patterns; for everything else,
   there's only a single range, so we can just prepend it to :call directly.
+- Don't clobber the search history with the :*Ranges commands (through using
+  :global).
+- Add :RangeDo command.
 
 1.30	13-Mar-2014
 - Add :DeleteAllDuplicateLinesIgnoring command.
