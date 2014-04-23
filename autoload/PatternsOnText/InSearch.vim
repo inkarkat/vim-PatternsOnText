@@ -1,17 +1,19 @@
-" PatternsOnText/InSearch.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/InSearch.vim: Commands to substitute only within search matches.
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
+"   - ingo/subst/expr/emulation.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.006	07-Mar-2014	Emulate use of \= sub-replace-expression.
 "   1.12.005	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
 "   1.10.004	06-Jun-2013	Factor out
@@ -38,7 +40,12 @@ set cpo&vim
 
 function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
     let s:didInnerSubstitution = 1
-    let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
+    if a:sub =~# '^\\='
+	" Recursive use of \= is not allowed, so we need to emulate it:
+	let l:replacement = ingo#subst#expr#emulation#Substitute(a:expr, a:pat, a:sub, a:flags)
+    else
+	let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
+    endif
     if a:expr !=# l:replacement
 	let s:innerSubstitutionCnt += 1
 	let s:innerSubstitutionLnums[line('.')] = 1
