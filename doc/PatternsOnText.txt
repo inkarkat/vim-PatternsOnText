@@ -120,10 +120,14 @@ USAGE							*PatternsOnText-usage*
 			For a case-insensitive substitution, prepend '\c' to
 			{pattern}.
 			Does not modify the last search pattern |quote/|.
+:[range]SubstituteInSearch/{search}/{pattern}/{string}/[flags] [count]
+			Like above, but additionally specifies the {search}
+			pattern instead of using |quote/| (which again isn't
+			modified).
 :[range]SubstituteInSearch [flags] [count]
 			Repeat last :SubstituteInSearch with same search
-			pattern and substitute string, but without the same
-			flags.
+			{pattern} and substitute {string}, but without the
+			same flags or given {search} pattern.
 
 							 *:SubstituteMultiple*
 :[range]SubstituteMultiple /{pattern}/{string}/ [...] [flags] [count]
@@ -272,6 +276,9 @@ HISTORY						      *PatternsOnText-history*
 - Don't clobber the search history with the :*Ranges commands (through using
   :global).
 - Add :RangeDo command.
+- ENH: Also support passing the search pattern inline with
+  :SubstituteInSearch/{search}/{pattern}/{string}/[flags] instead of using the
+  last search pattern.
 
 1.30	13-Mar-2014
 - Add :DeleteAllDuplicateLinesIgnoring command.
