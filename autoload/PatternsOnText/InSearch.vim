@@ -13,6 +13,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.35.007	24-Apr-2014	ENH: Also support passing the search pattern
+"				inline with
+"				:SubstituteInSearch/{search}/{pattern}/{string}/[flags]
+"				instead of using the last search pattern.
 "   1.30.006	07-Mar-2014	Emulate use of \= sub-replace-expression.
 "   1.12.005	14-Jun-2013	Minor: Make substitute() robust against
 "				'ignorecase'.
@@ -57,6 +61,18 @@ let s:previousReplacement = ''
 function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
+    let l:parts = matchlist(l:replacement,
+    \   '\C^\(.*\)'.'\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator . '\m\(.*\)$'
+    \)
+    if empty(l:parts)
+	let l:search = ''
+    else
+	" When the search pattern is inlined as
+	" :SubstituteInSearch/{search}/{pattern}/{string}/[flags]
+	" the original parsing groups {pattern}/{string} into l:replacement.
+	let l:search = l:pattern
+	let [l:pattern, l:replacement] = l:parts[1:2]
+    endif
 
     let l:replacement = PatternsOnText#EmulatePreviousReplacement(l:replacement, s:previousReplacement)
     let s:previousPattern = l:pattern
@@ -78,9 +94,9 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
 	" substitutions.
 	" The separation character must not appear (unescaped) in the expression, so
 	" we use the original separator.
-	silent execute printf('%d,%dsubstitute %s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
+	silent execute printf('%d,%dsubstitute %s%s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
 	\   a:firstLine, a:lastLine,
-	\   l:separator, l:separator,
+	\   l:separator, l:search, l:separator,
 	\   string(l:pattern),
 	\   string(l:replacement),
 	\   string(l:substFlags),
