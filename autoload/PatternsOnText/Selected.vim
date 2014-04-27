@@ -62,6 +62,8 @@
 "				answers.
 "   1.01.002	30-May-2013	Implement abort on error.
 "   1.00.001	22-Jan-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! PatternsOnText#Selected#CreateAnswers( argument )
     let [l:cnt, l:answers, l:repeatedAnswers] = [0, '', '']
@@ -223,4 +225,6 @@ function! PatternsOnText#Selected#Substitute( range, arguments, ... )
     endtry
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
