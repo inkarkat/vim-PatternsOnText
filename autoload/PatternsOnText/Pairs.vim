@@ -1,4 +1,4 @@
-" PatternsOnText/Pairs.vim: Advanced commands to apply pairs.
+" PatternsOnText/Pairs.vim: Commands to apply multiple pattern-replace pairs.
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
