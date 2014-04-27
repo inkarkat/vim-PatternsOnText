@@ -1,4 +1,4 @@
-" PatternsOnText/Duplicates.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/Duplicates.vim: Commands to work on duplicates.
 "
 " DEPENDENCIES:
 "   - ingo/msg.vim autoload script
