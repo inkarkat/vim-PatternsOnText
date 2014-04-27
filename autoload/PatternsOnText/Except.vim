@@ -6,7 +6,7 @@
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/cmdargs.vim autoload script
 "
-" Copyright: (C) 2011-2013 Ingo Karkat
+" Copyright: (C) 2011-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -50,6 +50,8 @@
 "				default to "g" then.
 "	002	21-Feb-2013	Use ingo-library.
 "	001	22-Jan-2013	file creation
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
     call ingo#err#Clear()
@@ -87,4 +89,6 @@ function! PatternsOnText#Except#Delete( range, arguments )
     return s:InvertedSubstitute(a:range, (empty(l:pattern) ? '/' : l:separator), (empty(l:pattern) ? @/ : l:pattern), '', l:flags, '')
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
