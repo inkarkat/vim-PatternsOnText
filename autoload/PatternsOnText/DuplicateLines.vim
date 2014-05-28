@@ -1,9 +1,8 @@
-" PatternsOnText/DuplicateLines.vim: Advanced commands to apply regular expressions.
+" PatternsOnText/DuplicateLines.vim: Commands to work on duplicate lines.
 "
 " DEPENDENCIES:
 "   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
-"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.30.007	10-Mar-2014	Extract PatternsOnText#DeleteLines().
 "   1.30.006	05-Mar-2014	Extract s:DeleteLines() and use in new
 "				PatternsOnText#DuplicateLines#DeleteAllLines()
 "				which implements the new
@@ -115,29 +115,13 @@ function! PatternsOnText#DuplicateLines#PrintLines( accumulator )
     endtry
 endfunction
 function! s:DeleteLines( accumulator, isDeleteFirstLine )
-    " Set a jump on the original position.
-    normal! m'
-
     let l:deleteLnums = []
 
     for l:slotLnums in values(a:accumulator)
 	call extend(l:deleteLnums, (a:isDeleteFirstLine ? l:slotLnums : l:slotLnums[1:]))
     endfor
 
-    " Sort from last to first line to avoid adapting the line numbers.
-    for l:lnum in reverse(sort(l:deleteLnums, 'ingo#collections#numsort'))
-	execute 'keepjumps' l:lnum . 'delete _'
-    endfor
-
-    " Position the cursor on the line after the last deletion, like
-    " :g/.../delete does.
-    execute (l:deleteLnums[0] - len(l:deleteLnums) + 1)
-    normal! ^
-
-    " Print a summary.
-    if len(l:deleteLnums) > &report
-	call ingo#msg#StatusMsg(printf('%d fewer line%s', len(l:deleteLnums), (len(l:deleteLnums) == 1 ? '' : 's')))
-    endif
+    call PatternsOnText#DeleteLines(l:deleteLnums)
 endfunction
 function! PatternsOnText#DuplicateLines#DeleteSubsequentLines( accumulator )
     call s:DeleteLines(a:accumulator, 0)
