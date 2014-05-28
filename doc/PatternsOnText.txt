@@ -268,7 +268,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.35	RELEASEME
+1.35	25-Apr-2014
 - ENH: Allow to pass multiple ranges to the :*Ranges commands.
 - FIX: The *Ranges commands only handled /{pattern}/,... ranges, not line
   numbers or marks. Only use :global for patterns; for everything else,
