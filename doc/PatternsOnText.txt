@@ -270,6 +270,7 @@ HISTORY						      *PatternsOnText-history*
 
 1.36	RELEASEME
 - Refactoring: Use ingo#cmdargs#pattern#ParseUnescaped().
+- Factor out ingo#range#lines#Get() into ingo-library.
   *** You need to update to ingo-library (vimscript #4433) version 1.020! ***
 
 1.35	25-Apr-2014
