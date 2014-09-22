@@ -5,6 +5,7 @@
 "   - ingo/cmdargs/register.vim autoload script
 "   - ingo/collections.vim autoload script
 "   - ingo/print.vim autoload script
+"   - ingo/range/lines.vim autoload script
 "   - PatternsOnText.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
@@ -13,6 +14,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.004	10-Jun-2014	Factor out ingo#range#lines#Get() into
+"				ingo-library.
 "   1.35.003	17-Apr-2014	Don't clobber the search history with the
 "				:*Ranges commands (through using :global).
 "				Add :RangeDo command.
@@ -27,38 +30,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:RecordLine( records, startLnum, endLnum )
-    let l:lnum = line('.')
-    if l:lnum < a:startLnum || l:lnum > a:endLnum
-	return
-    endif
-
-    let a:records[l:lnum] = 1
-endfunction
-function! s:GetLinesInRange( startLnum, endLnum, range )
-    let l:recordedLines = {}
-
-    if a:range =~# '^[/?]'
-	" For patterns, we need :global to find _all_ (not just the first)
-	" matching ranges.
-	execute printf('silent! %d,%dglobal %s call <SID>RecordLine(l:recordedLines, %d, %d)',
-	\  a:startLnum, a:endLnum,
-	\  a:range,
-	\  a:startLnum, a:endLnum
-	\)
-	let l:didClobberSearchHistory = 1
-    else
-	" For line number, marks, etc., we can just record them (limited to
-	" those that fall into the command's range).
-	execute printf('silent! %s call <SID>RecordLine(l:recordedLines, %d, %d)',
-	\  a:range,
-	\  a:startLnum, a:endLnum
-	\)
-	let l:didClobberSearchHistory = 0
-    endif
-
-    return [l:recordedLines, l:didClobberSearchHistory]
-endfunction
 function! s:Invert( startLnum, endLnum, lnums )
     return filter(
     \   range(a:startLnum, a:endLnum),
@@ -136,7 +107,7 @@ function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatch
     let l:lnumsInRanges = {}
     let l:isClearSearchHistory = 0
     for l:range in l:ranges
-	let [l:lnumsInThisRange, l:didClobberSearchHistory] = s:GetLinesInRange(a:startLnum, a:endLnum, l:range)
+	let [l:lnumsInThisRange, l:startLines, l:endLines, l:didClobberSearchHistory] = ingo#range#lines#Get(a:startLnum, a:endLnum, l:range)
 "****D echomsg '****' string(l:range) string(l:lnumsInThisRange)
 	call extend(l:lnumsInRanges, l:lnumsInThisRange)
 	let l:isClearSearchHistory = l:isClearSearchHistory || l:didClobberSearchHistory
