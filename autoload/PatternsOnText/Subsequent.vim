@@ -22,6 +22,8 @@
 "				and after the cursor in *all* lines, not just
 "				the current one.
 "   1.30.001	10-Mar-2014	file creation from plugin/ingocommands.vim.
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:previousAnswers = ''
 function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, startLnum, endLnum, arguments )
@@ -75,4 +77,6 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
     endtry
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
