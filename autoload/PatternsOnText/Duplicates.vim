@@ -5,7 +5,7 @@
 "   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
 "
-" Copyright: (C) 2013 Ingo Karkat
+" Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -49,7 +49,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
 	elseif ! empty(a:ReportAction)
 	    call call(a:ReportAction, [l:accumulator, a:startLnum, a:endLnum])
 	endif
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#msg#VimExceptionMsg()
     endtry
 
