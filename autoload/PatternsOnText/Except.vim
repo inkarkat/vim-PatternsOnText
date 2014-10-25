@@ -68,7 +68,7 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, c
 	\)
 
 	return 1
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     finally
