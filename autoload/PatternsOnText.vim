@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.004	23-Sep-2014	Make the deletions work with closed folds (i.e.
+"				only delete the duplicate lines / lines in range
+"				itself, not the entire folds) by temporarily
+"				disabling folding.
 "   1.30.003	10-Mar-2014	Add PatternsOnText#DeleteLines().
 "   1.20.002	17-Jan-2014	Add PatternsOnText#ReplaceSpecial().
 "   1.10.001	06-Jun-2013	file creation
@@ -43,15 +47,21 @@ function! PatternsOnText#DeleteLines( lnums )
     " Set a jump on the original position.
     normal! m'
 
-    " Sort from last to first line to avoid adapting the line numbers.
-    for l:lnum in reverse(sort(a:lnums, 'ingo#collections#numsort'))
-	execute 'keepjumps' l:lnum . 'delete _'
-    endfor
+    let l:save_foldenable = &l:foldenable
+    setlocal nofoldenable
+    try
+	" Sort from last to first line to avoid adapting the line numbers.
+	for l:lnum in reverse(sort(a:lnums, 'ingo#collections#numsort'))
+	    execute 'keepjumps' l:lnum . 'delete _'
+	endfor
 
-    " Position the cursor on the line after the last deletion, like
-    " :g/.../delete does.
-    execute (a:lnums[0] - len(a:lnums) + 1)
-    normal! ^
+	" Position the cursor on the line after the last deletion, like
+	" :g/.../delete does.
+	execute (a:lnums[0] - len(a:lnums) + 1)
+	normal! ^
+    finally
+	let &l:foldenable = l:save_foldenable
+    endtry
 
     " Print a summary.
     if len(a:lnums) > &report
