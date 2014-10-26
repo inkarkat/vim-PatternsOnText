@@ -273,7 +273,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.36	RELEASEME
+1.36	26-Oct-2014
 - BUG: :.DeleteRange et al. don't work correctly on a closed fold; need to use
   ingo#range#NetStart().
 - BUG: :.DeleteDuplicateLines... et al. don't work correctly on a closed fold;
