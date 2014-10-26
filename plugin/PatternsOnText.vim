@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.35.011	17-Apr-2014	Add :RangeDo command.
 "   1.30.010	10-Mar-2014	Add :DeleteRanges, :YankRanges, :PrintRanges
 "				commands.
 "   1.30.009	05-Mar-2014	Add :DeleteAllDuplicateLinesIgnoring command.
@@ -96,15 +97,19 @@ command! -bang -range -nargs=? DeleteDuplicates
 command! -bang -range=% -nargs=+ DeleteRanges
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Ranges#Command('delete', <line1>, <line2>, <bang>0, <q-args>) |
-\       echoerr 'No matching ranges' |
+\       echoerr ingo#err#Get() |
 \   endif
 command! -bang -range=% -nargs=+ YankRanges
 \   if ! PatternsOnText#Ranges#Command('yank', <line1>, <line2>, <bang>0, <q-args>) |
-\       echoerr 'No matching ranges' |
+\       echoerr ingo#err#Get() |
 \   endif
 command! -bang -range=% -nargs=+ PrintRanges
 \   if ! PatternsOnText#Ranges#Command('print', <line1>, <line2>, <bang>0, <q-args>) |
-\       echoerr 'No matching ranges' |
+\       echoerr ingo#err#Get() |
+\   endif
+command! -bang -range=% -nargs=+ RangeDo
+\   if ! PatternsOnText#Ranges#Command('do', <line1>, <line2>, <bang>0, <q-args>) |
+\       echoerr ingo#err#Get() |
 \   endif
 
 let &cpo = s:save_cpo
