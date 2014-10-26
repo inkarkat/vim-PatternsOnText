@@ -119,7 +119,7 @@ function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) r
 	endif
 
 	return 1
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     finally
