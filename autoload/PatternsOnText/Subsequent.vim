@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/cursor.vim autoload script
 "   - ingo/err.vim autoload script
+"   - ingo/range.vim autoload script
 "   - PatternsOnText/Selected.vim autoload script
 "
 " Copyright: (C) 2014 Ingo Karkat
@@ -11,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.003	23-Sep-2014	BUG: :SubstituteSubsequent doesn't work
+"				correctly on a closed fold; need to use
+"				ingo#range#NetStart().
 "   1.30.002	11-Mar-2014	Adapt injection of l:fromCurrentPositionExpr to
 "				use \& instead of simple concatentation in order
 "				to support patterns anchored with ^.
@@ -39,7 +43,7 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
     endif
 
     let s:previousAnswers = l:answers
-    if a:startLnum == a:endLnum || l:isBlockwise
+    if ingo#range#NetStart(a:startLnum) == ingo#range#NetEnd(a:endLnum) || l:isBlockwise
 	let l:fromCurrentPositionExpr = printf('\%%>%dv', l:startColumn - 1)
     else
 	let l:fromCurrentPositionExpr = printf('\%%(\%%%dl\%%>%dv\|\%%>%dl\)', line('.'), l:startColumn - 1, line('.'))
