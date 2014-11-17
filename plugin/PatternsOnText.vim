@@ -10,6 +10,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.012	27-Oct-2014	Add :SubstituteNotInSearch command.
 "   1.35.011	17-Apr-2014	Add :RangeDo command.
 "   1.30.010	10-Mar-2014	Add :DeleteRanges, :YankRanges, :PrintRanges
 "				commands.
@@ -55,7 +56,8 @@ command! -range -nargs=? SubstituteSubsequent
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? SubstituteInSearch if ! PatternsOnText#InSearch#Substitute(<line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=+ SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=+ SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
