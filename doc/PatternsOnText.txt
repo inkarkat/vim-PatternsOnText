@@ -32,6 +32,8 @@ SOURCE									     *
     http://stackoverflow.com/questions/1896793/remove-duplicate-line-in-vim
 |:DeleteAllDuplicateLinesIgnoring| inspired by
     http://stackoverflow.com/questions/22193596/in-vim-how-to-remove-all-lines-that-are-duplicate-somewhere
+|:SubstituteNotInSearch| inspired by
+    http://stackoverflow.com/questions/26569959/ignore-keywords-in-quotes-in-vim-regex-substitute
 
 SEE ALSO								     *
 
@@ -235,6 +237,54 @@ USAGE							*PatternsOnText-usage*
 :[range]DeleteDuplicates[!] /{pattern}/
 			Delete all subsequent matches of {pattern} (or the
 			last search pattern, if omitted) except the first.
+							 *:PrintUniqueLinesOf*
+:[range]PrintUniqueLinesOf[!] [/]{pattern}[/]
+			Print all unique occurrences of lines matching {pattern}.
+			All matching lines are added to the |jumplist|, so you
+			can use |CTRL-O| to revisit the locations.
+						     *:DeleteUniqueLinesOf*
+:[range]DeleteUniqueLinesOf[!] [/]{pattern}[/]
+			Delete all unique occurrences of lines matching
+			{pattern}. Only duplicate lines are kept.
+
+						   *:PrintUniqueLinesIgnoring*
+:[range]PrintUniqueLinesIgnoring[!] [{pattern}]
+:[range]PrintUniqueLinesIgnoring[!] /{pattern}/
+			Print all lines whose text (ignoring any text matched
+			by {pattern}) appears only once in the buffer /
+			[range].
+			All matching lines are added to the |jumplist|, so you
+			can use |CTRL-O| to revisit the locations.
+					       *:DeleteUniqueLinesIgnoring*
+:[range]DeleteUniqueLinesIgnoring[!] [{pattern}]
+:[range]DeleteUniqueLinesIgnoring[!] /{pattern}/
+			Delete all unique occurrences of a line (ignoring
+			any text matched by {pattern}). Only duplicate lines
+			are kept.
+					    *:DeleteAllUniqueLinesIgnoring*
+:[range]DeleteAllUniqueLinesIgnoring[!] [{pattern}]
+:[range]DeleteAllUniqueLinesIgnoring[!] /{pattern}/
+			Delete all (including the very first) occurrences of a
+			duplicate line (ignoring any text matched by
+			{pattern}).
+							    *:PrintUniques*
+:[range]PrintUniques[!] [{pattern}]
+:[range]PrintUniques[!] /{pattern}/
+			Print all matches of {pattern} (if omitted: the last
+			search pattern) that appear multiple times in the
+			current line / [range].
+			To print all duplicate matches of {pattern} within a
+			single line, processing a [range] or the entire
+			buffer, use: >
+			:global/^/PrintUniques! [{pattern}]
+			:global/^/PrintUniques! /{pattern}/
+<			The [!] suppresses the error when there are no
+			duplicates in a particular line.
+							   *:DeleteUniques*
+:[range]DeleteUniques[!] [{pattern}]
+:[range]DeleteUniques[!] /{pattern}/
+			Delete all subsequent matches of {pattern} (or the
+			last search pattern, if omitted) except the first.
 
 						 *:DeleteRanges* *:YankRanges*
 :[range]DeleteRanges[!] {range} [range] [...] [x]
@@ -300,7 +350,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.40	RELEASEME
+1.40	28-Oct-2014
 - FIX: :SubstituteSubsequent can give "E488: Trailing characters". Previous
   search pattern must be properly escaped in case the separators are
   different.
