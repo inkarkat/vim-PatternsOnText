@@ -4,6 +4,7 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
+"   - ingo/range.vim autoload script
 "
 " Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -11,6 +12,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.006	23-Sep-2014	Correctly report :PrintDuplicates on folded
+"				lines.
 "   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
 "				ingo/cmdargs/pattern.vim and
 "				ingo/cmdargs/substitute.vim.
@@ -47,7 +50,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
 	if empty(l:accumulator)
 	    return 0
 	elseif ! empty(a:ReportAction)
-	    call call(a:ReportAction, [l:accumulator, a:startLnum, a:endLnum])
+	    call call(a:ReportAction, [l:accumulator, ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)])
 	endif
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#msg#VimExceptionMsg()
