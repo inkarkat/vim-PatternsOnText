@@ -10,9 +10,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.50.010	18-Nov-2014	Factor out
-"				PatternsOnText#DuplicateLines#FilterDuplicateLines()
-"				and pass that in as Funcref.
 "   1.36.009	23-Sep-2014	BUG: :.DeleteDuplicateLines... et al. don't work
 "				correctly on a closed fold; need to use
 "				ingo#range#NetStart().
@@ -50,10 +47,10 @@ function! PatternsOnText#DuplicateLines#PatternOrCurrentLine( arguments )
 	return ingo#cmdargs#pattern#ParseUnescaped(a:arguments)
     endif
 endfunction
-function! PatternsOnText#DuplicateLines#FilterDuplicateLines( accumulator )
+function! s:FilterDuplicateLines( accumulator )
     call filter(a:accumulator, 'len(v:val) > 1')
 endfunction
-function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Filter, Action )
+function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Action )
     let l:ignorePattern = ingo#cmdargs#pattern#ParseUnescaped(a:ignorePattern)
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
     " Add the pattern to the search history, like :substitute, :global, etc.
@@ -87,7 +84,7 @@ function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePatte
 	endif
     endfor
 "****D echomsg '****' string(l:accumulator)
-    call call(a:Filter, [l:accumulator])
+    call s:FilterDuplicateLines(l:accumulator)
 
     if empty(l:accumulator)
 	return 0
