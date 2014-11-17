@@ -12,6 +12,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.50.007	18-Nov-2014	Factor out
+"				PatternsOnText#Duplicates#FilterDuplicates() and
+"				pass that in as Funcref.
 "   1.36.006	23-Sep-2014	Correctly report :PrintDuplicates on folded
 "				lines.
 "   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
@@ -27,10 +30,10 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:FilterDuplicates( accumulator )
+function! PatternsOnText#Duplicates#FilterDuplicates( accumulator )
     call filter(a:accumulator, 'v:val.cnt > 1')
 endfunction
-function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDuplicateAction, ReportAction )
+function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filter, OnDuplicateAction, ReportAction )
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
     else
@@ -45,7 +48,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, OnDu
 	\   l:separator
 	\)
 
-	call s:FilterDuplicates(l:accumulator)
+	call call(a:Filter, [l:accumulator])
 "****D echomsg '****' string(l:accumulator)
 	if empty(l:accumulator)
 	    return 0
