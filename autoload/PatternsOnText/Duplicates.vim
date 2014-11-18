@@ -15,6 +15,14 @@
 "   1.50.007	18-Nov-2014	Factor out
 "				PatternsOnText#Duplicates#FilterDuplicates() and
 "				pass that in as Funcref.
+"				Support opposite selection via
+"				PatternsOnText#Duplicates#FilterUnique() and a
+"				new PatternsOnText#Duplicates#DeleteUnique()
+"				ReportAction that deletes all matches found in
+"				the accumulator and does the appropriate
+"				reporting. The ReportAction is now also passed
+"				the parsed pattern and separator, as this is
+"				necessary there.
 "   1.36.006	23-Sep-2014	Correctly report :PrintDuplicates on folded
 "				lines.
 "   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
@@ -33,6 +41,10 @@ set cpo&vim
 function! PatternsOnText#Duplicates#FilterDuplicates( accumulator )
     call filter(a:accumulator, 'v:val.cnt > 1')
 endfunction
+function! PatternsOnText#Duplicates#FilterUnique( accumulator )
+    call filter(a:accumulator, 'v:val.cnt == 1')
+endfunction
+
 function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filter, OnDuplicateAction, ReportAction )
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
@@ -53,7 +65,7 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filt
 	if empty(l:accumulator)
 	    return 0
 	elseif ! empty(a:ReportAction)
-	    call call(a:ReportAction, [l:accumulator, ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)])
+	    call call(a:ReportAction, [l:accumulator, ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum), l:separator, l:pattern])
 	endif
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#msg#VimExceptionMsg()
@@ -92,7 +104,8 @@ function! PatternsOnText#Duplicates#PrintMatches( accumulator, startLnum, endLnu
 	    echohl Directory
 	    echon l:what
 	    echohl None
-	    echon ': ' . a:accumulator[l:what].cnt
+
+	    call s:PrintCount(a:accumulator[l:what].cnt)
 	endfor
     else
 	" List duplicates sorted by first occurrence.
@@ -116,7 +129,8 @@ function! PatternsOnText#Duplicates#PrintMatches( accumulator, startLnum, endLnu
 		echohl Directory
 		echon l:what
 		echohl None
-		echon ': ' . a:accumulator[l:what].cnt
+
+		call s:PrintCount(a:accumulator[l:what].cnt)
 
 		if len(a:accumulator[l:what].lnum) > 7
 		    " We have duplicates distributed over many lines, add a
@@ -133,10 +147,15 @@ function! PatternsOnText#Duplicates#PrintMatches( accumulator, startLnum, endLnu
 	endfor
     endif
 endfunction
+function! s:PrintCount( count )
+    if a:count > 1
+	echon ': ' . a:count
+    endif
+endfunction
 function! PatternsOnText#Duplicates#DeleteMatches( accumulator, match )
     return ''
 endfunction
-function! PatternsOnText#Duplicates#ReportDeletedMatches( accumulator, startLnum, endLnum )
+function! PatternsOnText#Duplicates#ReportDeletedMatches( accumulator, startLnum, endLnum, separator, pattern )
     let l:lines = {}
     let l:cnt = 0
     for l:what in keys(a:accumulator)
@@ -165,6 +184,35 @@ function! PatternsOnText#Duplicates#ReportDeletedMatches( accumulator, startLnum
 	    \   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
 	    \))
 	endif
+    endif
+endfunction
+function! PatternsOnText#Duplicates#DeleteUnique( accumulator, startLnum, endLnum, separator, pattern )
+    try
+	execute printf('silent %d,%dsubstitute %s%s%s\=s:DeleteUnique(a:accumulator)%sg',
+	\   a:startLnum, a:endLnum, a:separator, a:pattern, a:separator, a:separator
+	\)
+
+	call s:ReportDeleteUnique(a:accumulator)
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#msg#VimExceptionMsg()
+    endtry
+endfunction
+function! s:DeleteUnique( accumulator )
+    return (has_key(a:accumulator, submatch(0)) ? '' : submatch(0))
+endfunction
+function! s:ReportDeleteUnique( accumulator )
+    let l:lines = {}
+    for l:what in keys(a:accumulator)
+	let l:lines[keys(a:accumulator[l:what].lnum)[0]] = 1
+    endfor
+
+    let l:deletedLines = len(keys(l:lines))
+    if l:deletedLines >= &report
+	let l:cnt = len(keys(a:accumulator))
+	call ingo#msg#StatusMsg(printf('Deleted %d unique instance%s in %d line%s',
+	\   l:cnt, (l:cnt == 1 ? '' : 's'),
+	\   l:deletedLines, (l:deletedLines == 1 ? '' : 's')
+	\))
     endif
 endfunction
 
