@@ -4,6 +4,8 @@ autoload/PatternsOnText/Duplicates.vim
 autoload/PatternsOnText/Except.vim
 autoload/PatternsOnText/InSearch.vim
 autoload/PatternsOnText/Pairs.vim
+autoload/PatternsOnText/Ranges.vim
 autoload/PatternsOnText/Selected.vim
+autoload/PatternsOnText/Subsequent.vim
 plugin/PatternsOnText.vim
 doc/PatternsOnText.txt
