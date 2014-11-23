@@ -1,0 +1,10 @@
+start
+1 E: 10 in 10 lines
+1 foo: 2 in 1, 9
+2 bar: 4 in 2, 7, 9
+4 spaz: 2 in 4, 5
+7 hih: 2
+7 is: 2 in 7, 9
+7 the: 2
+9 my: 2
+end
