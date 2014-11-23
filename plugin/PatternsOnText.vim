@@ -147,7 +147,7 @@ command! -bang -range -nargs=? PrintDuplicates
 \   endif
 command! -bang -range -nargs=? PrintUniques
 \   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
-\       function('PatternsOnText#Duplicates#FilterUnique'),
+\       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
 \       ) && <bang>1 |
@@ -165,9 +165,9 @@ command! -bang -range -nargs=? DeleteDuplicates
 command! -bang -range -nargs=? DeleteUniques
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
-\       function('PatternsOnText#Duplicates#FilterUnique'),
+\       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
-\       function('PatternsOnText#Duplicates#DeleteUnique')
+\       function('PatternsOnText#Uniques#DeleteUnique')
 \       ) && <bang>1 |
 \       echoerr 'No unique matches' |
 \   endif
