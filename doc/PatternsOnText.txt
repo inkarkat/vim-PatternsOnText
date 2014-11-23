@@ -34,6 +34,8 @@ SOURCE									     *
     http://stackoverflow.com/questions/22193596/in-vim-how-to-remove-all-lines-that-are-duplicate-somewhere
 |:SubstituteNotInSearch| inspired by
     http://stackoverflow.com/questions/26569959/ignore-keywords-in-quotes-in-vim-regex-substitute
+|:DeleteUniqueLinesIgnoring| inspired by
+  http://stackoverflow.com/questions/26981192/how-do-i-remove-non-duplicate-lines-in-vim
 
 SEE ALSO								     *
 
@@ -53,10 +55,10 @@ RELATED WORKS								     *
 USAGE							*PatternsOnText-usage*
 							   *:SubstituteExcept*
 :[range]SubstituteExcept/{pattern}/{string}/[flags] [count]
-			Replace instances of text in the current line /
-			[range] that do not match {pattern} / the last used
-			search pattern with {string}; "g" is implicit. Empty
-			lines (without any whitespace) are kept empty.
+			Replace text in the current line / [range] that does
+			not match {pattern} / the last used search pattern
+			with {string}; "g" is implicit. Empty lines (without
+			any whitespace) are kept empty.
 			In {string}, & refers to the text that does not match,
 			whereas \1 etc. refer to the previous match of a
 			sub-expression in {pattern}.
@@ -91,19 +93,20 @@ USAGE							*PatternsOnText-usage*
 			|:s_flags|, and last used answers.
 						       *:SubstituteSubsequent*
 :[range]SubstituteSubsequent/{pattern}/{string}/[flags]
-			Replace all matches of {pattern} on or after the current
-			cursor position (and in all entire following lines) in
-			[range] with {string}.
+			Replace all matches of {pattern} on or after the
+			current cursor position (and in all entire following
+			lines) in [range] with {string}.
 			For a "blockwise to end" replacement that is
 			restricted to positions on and after the current
 			column in all lines, pass the special flag [b].
 :[range]SubstituteSubsequent/{pattern}/{string}/[flags] {answers}
-			Replace all matches of {pattern} on or after the current
-			cursor position in [range] with {string}, determining
-			whether a particular match should be replaced on the
-			sequence of "y" or "n" (a count can be prefixed, e.g.
-			"3y4n2y") or numeric positions "2,5", or ranges "3-5" in
-			{answers}, as with |:SubstituteSelected|.
+			Replace all matches of {pattern} on or after the
+			current cursor position in [range] with {string},
+			determining whether a particular match should be
+			replaced on the sequence of "y" or "n" (a count can be
+			prefixed, e.g. "3y4n2y") or numeric positions "2,5",
+			or ranges "3-5" in {answers}, as with
+			|:SubstituteSelected|.
 :[range]SubstituteSubsequent [flags] [answers]
 			Repeat the last substitution with the last used search
 			pattern, last used replacement string, last used
@@ -239,10 +242,11 @@ USAGE							*PatternsOnText-usage*
 			last search pattern, if omitted) except the first.
 							 *:PrintUniqueLinesOf*
 :[range]PrintUniqueLinesOf[!] [/]{pattern}[/]
-			Print all unique occurrences of lines matching {pattern}.
-			All matching lines are added to the |jumplist|, so you
-			can use |CTRL-O| to revisit the locations.
-						     *:DeleteUniqueLinesOf*
+			Print all unique occurrences of lines matching
+			{pattern}. All matching lines are added to the
+			|jumplist|, so you can use |CTRL-O| to revisit the
+			locations.
+							*:DeleteUniqueLinesOf*
 :[range]DeleteUniqueLinesOf[!] [/]{pattern}[/]
 			Delete all unique occurrences of lines matching
 			{pattern}. Only duplicate lines are kept.
@@ -350,6 +354,12 @@ IDEAS							*PatternsOnText-ideas*
 
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
+
+1.50	19-Nov-2014
+- ENH: Add :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
+  :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring, :PrintUniques,
+  :DeleteUniques commands that are the opposite of the corresponding
+  :...Duplicate... commands.
 
 1.40	28-Oct-2014
 - FIX: :SubstituteSubsequent can give "E488: Trailing characters". Previous
