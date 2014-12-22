@@ -355,6 +355,13 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+1.51	RELEASEME
+- Don't set the buffer 'modified' for :PrintDuplicates and :PrintUniques.
+- Improve reporting of readonly buffers for :SubstituteExcept, :DeleteExcept,
+  :SubstituteSelected, and :SubstituteSubsequent.
+- FIX: Misplaced :continue in s:Collect() safety check; must :return out of
+  factored out function.
+
 1.50	19-Nov-2014
 - ENH: Add :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
   :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring, :PrintUniques,
