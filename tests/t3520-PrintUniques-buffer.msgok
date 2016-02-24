@@ -1,4 +1,5 @@
 start
+/^19 .*/
 3 baz
 6 fooxy
 7 bartender
