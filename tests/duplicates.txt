@@ -6,5 +6,5 @@ E spaz
 E fooxy
 E the bar hih is in hih a bar for the bartender.
 E foox
-E my bar is not my foo
+E my bar is not my foo!
 E eof
