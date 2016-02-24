@@ -1,4 +1,5 @@
 start
+/^35 .*/
 1 E: 10 in 10 lines
 1 foo: 2 in 1, 9
 2 bar: 4 in 2, 7, 9
