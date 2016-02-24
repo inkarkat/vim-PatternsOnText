@@ -1,4 +1,5 @@
 start
+/^7 .*/
 9 E
 9 bar
 9 foo
