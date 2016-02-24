@@ -9,37 +9,17 @@ edit text.txt
 1SubstituteSelected/\<...\>/XXX/g yn
 let @/ = 'initial'
 call histadd('search', @/)
-try
-    %SubstituteSelected/foo/XXX/g
-    call vimtap#Fail('expected error on missing answers')
-catch
-    call vimtap#err#Thrown('Missing or invalid answers', 'error on missing answers')
-endtry
+call vimtap#err#Errors('Missing or invalid answers', '%SubstituteSelected/foo/XXX/g', 'error on missing answers')
 call vimtap#Is(@/, 'initial', ':SubstituteSelected does not set last search pattern bad command')
 call vimtap#Is(histget('search', -1), 'initial', ':SubstituteSelected fills search history on bad command')
 
-try
-    %SubstituteSelected/foo/XXX/g bad?!
-    call vimtap#Fail('expected error on very invalid answers')
-catch
-    call vimtap#err#Thrown('Missing or invalid answers', 'error on very invalid answers')
-endtry
+call vimtap#err#Errors('Missing or invalid answers', '%SubstituteSelected/foo/XXX/g bad?!', 'error on very invalid answers')
 
-try
-    %SubstituteSelected/foo/XXX/ynyn,2;3
-    call vimtap#Fail('expected error on barely invalid answers')
-catch
-    call vimtap#err#Thrown('Missing or invalid answers', 'error on barely invalid answers')
-endtry
+call vimtap#err#Errors('Missing or invalid answers', '%SubstituteSelected/foo/XXX/ynyn,2;3', 'error on barely invalid answers')
 
 let @/ = 'initial'
 call histadd('search', @/)
-try
-    %SubstituteSelected/foo/XXX/ynyn-2
-    call vimtap#Fail('expected position error')
-catch
-    call vimtap#err#Thrown('Preceding position 2 after position 4', 'position error')
-endtry
+call vimtap#err#Errors('Preceding position 2 after position 4', '%SubstituteSelected/foo/XXX/ynyn-2', 'position error')
 call vimtap#Is(@/, 'initial', ':SubstituteSelected does not set last search pattern bad command')
 call vimtap#Is(histget('search', -1), 'initial', ':SubstituteSelected fills search history on bad command')
 
