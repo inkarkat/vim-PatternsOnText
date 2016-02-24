@@ -5,11 +5,6 @@ call vimtap#Plan(1)
 
 edit duplicateLines.txt
 1
-try
-    PrintDuplicateLinesOf
-    call vimtap#Fail('expected error')
-catch
-    call vimtap#err#Thrown('No duplicate lines', 'error shown')
-endtry
+call vimtap#err#Errors('No duplicate lines', 'PrintDuplicateLinesOf', 'error shown')
 
 call vimtest#Quit()
