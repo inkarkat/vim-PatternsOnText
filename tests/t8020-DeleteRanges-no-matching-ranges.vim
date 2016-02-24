@@ -5,11 +5,6 @@ edit ranges.txt
 call vimtest#StartTap()
 call vimtap#Plan(1)
 
-try
-    %DeleteRanges /doesnot/,/exists/
-    call vimtap#Fail('expected error')
-catch
-    call vimtap#err#Thrown('No matching ranges', 'error shown')
-endtry
+call vimtap#err#Errors('No matching ranges', '%DeleteRanges /doesnot/,/exists/', 'error shown')
 
 call vimtest#Quit()
