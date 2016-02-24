@@ -1,0 +1,23 @@
+begin
+    foo
+    aaa
+    bar
+    {
+	h(a)
+    }
+    intermediate
+    {
+	h(i)
+	h(e)
+	h(o)
+    }
+    {
+    }
+end
+middle
+# begin
+    # foo
+    # zzz
+    # bar
+# end
+EOF
