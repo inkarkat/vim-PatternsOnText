@@ -12,6 +12,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.008	26-Oct-2014	Factor out
+"				PatternsOnText#Except#GetInvertedPattern().
 "   1.12.007	16-Sep-2013	FIX: Use of \v and \V magicness atoms in the
 "				pattern for :DeleteExcept and :SubstituteExcept
 "				cause errors like "E54: Unmatched (" and "E486:
@@ -53,21 +55,30 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
-    call ingo#err#Clear()
+function! PatternsOnText#Except#GetInvertedPattern( separator, pattern )
     if empty(a:pattern) | throw 'ASSERT: Passed pattern must not be empty' | endif
     if a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\z[se]'
-	call ingo#err#Set(printf('The pattern cannot use the set start / end match patterns \zs / \ze: %s%s%s', a:separator, a:pattern, a:separator))
-	return 0
+	throw printf('PatternsOnText: The pattern cannot use the set start / end match patterns \zs / \ze: %s%s%s', a:separator, a:pattern, a:separator)
     endif
 
+    return printf('\%%(^\|%s\m\)\zs\%%(%s\m\)\@!.\{-1,}\ze\%%(%s\m\|$\)',
+    \   a:pattern, a:pattern, a:pattern
+    \)
+endfunction
+function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
+    call ingo#err#Clear()
     try
-	execute printf('%ssubstitute %s\%%(^\|%s\m\)\zs\%%(%s\m\)\@!.\{-1,}\ze\%%(%s\m\|$\)%s%s%s%s%s',
-	\   a:range, a:separator, a:pattern, a:pattern, a:pattern, a:separator, a:replacement, a:separator,
+	execute printf('%ssubstitute %s%s%s%s%s%s%s',
+	\   a:range, a:separator,
+	\   PatternsOnText#Except#GetInvertedPattern(a:separator, a:pattern),
+	\   a:separator, a:replacement, a:separator,
 	\   a:flags . (&gdefault || a:flags =~# '^&\|g' ? '' : 'g'), a:count
 	\)
 
 	return 1
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
+	return 0
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
