@@ -1,0 +1,5 @@
+start
+  1 foo
+  3 baz
+ 12 eof
+end
