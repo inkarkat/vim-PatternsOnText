@@ -1,0 +1,23 @@
+begin
+    foo
+    aaa
+    # bar
+    # {
+	ha
+    # }
+    # intermediate
+    # {
+	hi
+	he
+	ho
+    # }
+    # {
+    # }
+# end
+middle
+begin
+    foo
+    zzz
+    bar
+end
+# EOF
