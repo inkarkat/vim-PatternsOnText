@@ -5,11 +5,6 @@ call vimtap#Plan(1)
 
 edit text.txt
 let @/ = '\<...\>'
-try
-    %SubstituteInSearch/doesNotExist/XXX/g
-    call vimtap#Fail('expected error')
-catch
-    call vimtap#err#Thrown('Pattern not found: doesNotExist', 'error shown')
-endtry
+call vimtap#err#Errors('Pattern not found: doesNotExist', '%SubstituteInSearch/doesNotExist/XXX/g', 'error shown')
 
 call vimtest#Quit()
