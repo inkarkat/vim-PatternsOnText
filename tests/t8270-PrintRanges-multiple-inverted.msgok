@@ -1,0 +1,13 @@
+start
+
+  4     bar
+  5     {
+  7     }
+  8     intermediate
+  9     {
+ 13     }
+ 14     {
+ 15     }
+ 16 end
+ 23 EOF
+end
