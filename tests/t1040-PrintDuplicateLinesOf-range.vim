@@ -1,4 +1,4 @@
-" Test printing duplicates of the current line found in the passed buffer.
+" Test printing duplicates of the current line found in the passed range.
 " Tests that the current line, not the start of the range is used.
 
 call vimtest#StartTap()
