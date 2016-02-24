@@ -4,12 +4,7 @@ call vimtest#StartTap()
 call vimtap#Plan(1)
 
 edit text.txt
-try
-    %SubstituteMultiple /FOO/BAR/ minimal-pair
-    call vimtap#Fail('expected no match')
-catch
-    call vimtap#err#Thrown('E486: Pattern not found: \(FOO\)\|\(minimal-pair\)', 'no match error shown')
-endtry
+call vimtap#err#ErrorsLike('^E486: .*: \\(FOO\\)\\|\\(minimal-pair\\)', '%SubstituteMultiple /FOO/BAR/ minimal-pair', 'Pattern not found error shown')
 
 %SubstituteMultiple /FOO/BAR/ fault
 
