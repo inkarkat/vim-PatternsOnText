@@ -1,0 +1,8 @@
+start
+ 18 begin
+ 19     foo
+ 20     zzz
+ 21     bar
+ 22 end
+
+end
