@@ -6,5 +6,7 @@ spaz
 fooxy
 bar
 foox
+Boo
 bar
+Boo
 eof
