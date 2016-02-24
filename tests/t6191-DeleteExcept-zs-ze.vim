@@ -3,17 +3,7 @@
 edit text.txt
 call vimtest#StartTap()
 call vimtap#Plan(2)
-try
-    1DeleteExcept/\<.\zs..\>/
-    call vimtap#Fail('expected error on using zs atom')
-catch
-    call vimtap#err#Thrown('The pattern cannot use the set start / end match patterns \zs / \ze: /\<.\zs..\>/', 'error shown')
-endtry
-try
-    2DeleteExcept/\<..\ze.\>/
-    call vimtap#Fail('expected error on using ze atom')
-catch
-    call vimtap#err#Thrown('The pattern cannot use the set start / end match patterns \zs / \ze: /\<..\ze.\>/', 'error shown')
-endtry
+call vimtap#err#Errors('The pattern cannot use the set start / end match patterns \zs / \ze: /\<.\zs..\>/', '1DeleteExcept/\<.\zs..\>/', 'error shown')
+call vimtap#err#Errors('The pattern cannot use the set start / end match patterns \zs / \ze: /\<..\ze.\>/', '2DeleteExcept/\<..\ze.\>/', 'error shown')
 
 call vimtest#Quit()
