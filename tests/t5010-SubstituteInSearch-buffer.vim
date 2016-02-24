@@ -4,5 +4,9 @@ edit text.txt
 let @/ = '\<...\>'
 %SubstituteInSearch/o/X/g
 
+call vimtest#StartTap()
+call vimtap#Plan(1)
+call vimtap#Is(@/, '\<...\>', 'last search pattern not modified')
+
 call vimtest#SaveOut()
 call vimtest#Quit()
