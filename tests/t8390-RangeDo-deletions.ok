@@ -1,0 +1,16 @@
+begin
+    bar
+    {
+	ha
+    intermediate
+    {
+	hi
+	ho
+    {
+    }
+end
+middle
+begin
+    bar
+end
+EOF
