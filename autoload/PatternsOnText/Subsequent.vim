@@ -12,6 +12,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.004	27-Oct-2014	FIX: :SubstituteSubsequent can give "E488:
+"				Trailing characters". Previous search pattern
+"				must be properly escaped in case the separators
+"				are different.
 "   1.36.003	23-Sep-2014	BUG: :SubstituteSubsequent doesn't work
 "				correctly on a closed fold; need to use
 "				ingo#range#NetStart().
@@ -53,7 +57,7 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
 	" An empty pattern usually recalls the last search pattern. Since we
 	" prepend a regexp to restrict the location, we need to include it to
 	" avoid matching everywhere.
-	let l:pattern = @/
+	let l:pattern = PatternsOnText#PreviousSearchPattern(l:separator)
     endif
 
     try
