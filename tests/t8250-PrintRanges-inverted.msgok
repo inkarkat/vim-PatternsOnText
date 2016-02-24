@@ -1,0 +1,23 @@
+start
+
+  1 begin
+  2     foo
+  3     aaa
+  4     bar
+  5     {
+  7     }
+  8     intermediate
+  9     {
+ 13     }
+ 14     {
+ 15     }
+ 16 end
+
+end
+
+start
+ 17 middle
+ 22 end
+ 23 EOF
+
+end
