@@ -1,0 +1,13 @@
+begin
+    foo
+    aaa
+    bar
+    {
+    }
+    intermediate
+    {
+    }
+    {
+    }
+end
+EOF
