@@ -5,6 +5,7 @@
 "   - ingo/cmdargs/register.vim autoload script
 "   - ingo/collections.vim autoload script
 "   - ingo/print.vim autoload script
+"   - ingo/range.vim autoload script
 "   - ingo/range/lines.vim autoload script
 "   - PatternsOnText.vim autoload script
 "
@@ -14,6 +15,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.36.005	23-Sep-2014	BUG: :.DeleteRange et al. don't work correctly
+"				on a closed fold; need to use
+"				ingo#range#NetStart().
 "   1.36.004	10-Jun-2014	Factor out ingo#range#lines#Get() into
 "				ingo-library.
 "   1.35.003	17-Apr-2014	Don't clobber the search history with the
@@ -32,7 +36,7 @@ set cpo&vim
 
 function! s:Invert( startLnum, endLnum, lnums )
     return filter(
-    \   range(a:startLnum, a:endLnum),
+    \   range(ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum)),
     \   '! has_key(a:lnums, v:val)'
     \)
 endfunction
