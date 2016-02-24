@@ -12,6 +12,14 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.008	24-Nov-2014	Don't set the buffer 'modified' for
+"				:PrintDuplicates and :PrintUniques. Detect the
+"				:Print... (vs. :Delete...) commands on empty
+"				a:OnDuplicateAction and then pass the "n"
+"				:s_flag.
+"				FIX: Misplaced :continue in s:Collect() safety
+"				check; must :return out of factored out
+"				function.
 "   1.50.007	18-Nov-2014	Factor out
 "				PatternsOnText#Duplicates#FilterDuplicates() and
 "				pass that in as Funcref.
@@ -52,10 +60,11 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filt
 
     let l:accumulator = {}
     try
-	execute printf('silent %d,%dsubstitute %s%s%s\=s:Collect(l:accumulator%s)%sg',
+	execute printf('silent %d,%dsubstitute %s%s%s\=s:Collect(l:accumulator%s)%sg%s',
 	\   a:startLnum, a:endLnum, l:separator, l:pattern, l:separator,
 	\   (empty(a:OnDuplicateAction) ? '' : ', ' . string(a:OnDuplicateAction)),
-	\   l:separator
+	\   l:separator,
+	\   (empty(a:OnDuplicateAction) ? 'n' : '')
 	\)
 
 	call call(a:Filter, [l:accumulator])
@@ -75,7 +84,7 @@ function! s:Collect( accumulator, ... )
     let l:match = submatch(0)
 
     if empty(l:match)
-	continue
+	return l:match
     endif
 
     if ! has_key(a:accumulator, l:match)
