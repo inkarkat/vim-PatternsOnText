@@ -4,11 +4,6 @@ call vimtest#StartTap()
 call vimtap#Plan(1)
 
 edit text.txt
-try
-    %SubstituteMultiple /doesNotExist/XXX/
-    call vimtap#Fail('expected error')
-catch
-    call vimtap#err#Thrown('E486: Pattern not found: \(doesNotExist\)', 'error shown')
-endtry
+call vimtap#err#ErrorsLike('^E486: .*: \\(doesNotExist\\)', '%SubstituteMultiple /doesNotExist/XXX/', 'Pattern not found error shown')
 
 call vimtest#Quit()
