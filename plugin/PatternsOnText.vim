@@ -10,6 +10,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.51.014	24-Nov-2014	Improve reporting of readonly buffers for
+"				:SubstituteExcept, :DeleteExcept,
+"				:SubstituteSelected, and :SubstituteSubsequent.
 "   1.50.013	18-Nov-2014	Add :PrintUnique... and :DeleteUnique...
 "				variants for the opposite selection.
 "   1.40.012	27-Oct-2014	Add :SubstituteNotInSearch command.
@@ -46,14 +49,20 @@ let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -range -nargs=? SubstituteExcept call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
-command! -range -nargs=? DeleteExcept call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteExcept
+\   call setline(<line1>, getline(<line1>)) |
+\   call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+command! -range -nargs=? DeleteExcept
+\   call setline(<line1>, getline(<line1>)) |
+\   call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteSelected
+\   call setline(<line1>, getline(<line1>)) |
 \   call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) |
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteSubsequent
+\   call setline(<line1>, getline(<line1>)) |
 \   call PatternsOnText#Subsequent#Substitute('substitute', 'SubstituteSelected', <line1>, <line2>, <q-args>) |
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
