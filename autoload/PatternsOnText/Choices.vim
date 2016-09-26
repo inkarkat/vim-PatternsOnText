@@ -21,6 +21,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments )
     let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
 
     let s:lnum = -1
+    unlet! s:predefinedChoice
     try
 "****D echomsg '****' string([l:separator, l:pattern, l:choices, l:flags, l:count])
 	execute printf('%s%s %s%s%s\=PatternsOnText#Choices#QueriedReplace(l:choices)%s%s%s',
@@ -49,10 +50,15 @@ function! s:ShowContext()
     endif
 endfunction
 function! PatternsOnText#Choices#QueriedReplace( choices )
-    call s:ShowContext()
+    if exists('s:predefinedChoice')
+	let l:choiceIdx = s:predefinedChoice
+    else
+	call s:ShowContext()
+	let l:choiceIdx = ingo#query#fromlist#Query('replacement', a:choices)
+    endif
 
-    let l:choiceIdx = ingo#query#fromlist#Query('replacement', a:choices)
     if l:choiceIdx < 0
+	let s:predefinedChoice = l:choiceIdx    " Emulate abort: All further replacements will be no-ops, without querying the user, too.
 	return submatch(0)
     endif
 
