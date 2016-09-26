@@ -355,7 +355,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.51	RELEASEME
+1.51	23-Dec-2014
 - Don't set the buffer 'modified' for :PrintDuplicates and :PrintUniques.
 - Improve reporting of readonly buffers for :SubstituteExcept, :DeleteExcept,
   :SubstituteSelected, and :SubstituteSubsequent.
