@@ -36,6 +36,8 @@ SOURCE									     *
     http://stackoverflow.com/questions/26569959/ignore-keywords-in-quotes-in-vim-regex-substitute
 |:DeleteUniqueLinesIgnoring| inspired by
   http://stackoverflow.com/questions/26981192/how-do-i-remove-non-duplicate-lines-in-vim
+|:SubstituteChoices| inspired by
+  http://vi.stackexchange.com/questions/9700/mutliple-choice-substitute
 
 SEE ALSO								     *
 
@@ -164,6 +166,11 @@ USAGE							*PatternsOnText-usage*
 			{pattern} and substitute {string}, but without the
 			same flags or given {search} pattern.
 
+							  *:SubstituteChoices*
+:[range]SubstituteChoices /{pattern}/{string1}/{string2}/[.../] [flags] [count]
+			Replace a match of {pattern} with one of {string1},
+			{string2}, ..., with each replacement queried from the
+			user.
 							 *:SubstituteMultiple*
 :[range]SubstituteMultiple /{pattern}/{string}/ [...] [flags] [count]
 			Change any of the {pattern} given to the corresponding
@@ -337,7 +344,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *PatternsOnText-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.022 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.027 or
   higher.
 
 ==============================================================================
@@ -354,6 +361,10 @@ IDEAS							*PatternsOnText-ideas*
 
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
+
+1.60	RELEASEME
+- Add :SubstituteChoices command.
+  *** You need to update to ingo-library (vimscript #4433) version 1.027! ***
 
 1.51	23-Dec-2014
 - Don't set the buffer 'modified' for :PrintDuplicates and :PrintUniques.
@@ -458,7 +469,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2014 Ingo Karkat
+Copyright: (C) 2011-2016 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
