@@ -4,12 +4,13 @@
 "   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.016	27-Sep-2016	Add :SubstituteChoices command.
 "   1.51.014	24-Nov-2014	Improve reporting of readonly buffers for
 "				:SubstituteExcept, :DeleteExcept,
 "				:SubstituteSelected, and :SubstituteSubsequent.
@@ -70,6 +71,7 @@ command! -range -nargs=? SubstituteSubsequent
 command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
+command! -range -nargs=+ SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=+ SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=+ SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
