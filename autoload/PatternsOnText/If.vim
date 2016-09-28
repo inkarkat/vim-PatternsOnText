@@ -1,10 +1,6 @@
 " PatternsOnText/If.vim: Commands to substitute if a predicate matches.
 "
 " DEPENDENCIES:
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -12,9 +8,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.002	29-Sep-2016	Factor out
-"				PatternsOnText#DefaultReplacementOnPrediate().
-"				Complete implementation.
 "   1.60.001	28-Sep-2016	file creation
 
 let s:previousPattern = ''
@@ -74,7 +67,18 @@ function! s:Replace()
 	return submatch(0)
     endtry
 
-    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteIf)
+    if l:isSelected
+	let s:SubstituteIf.lastLnum = line('.')
+	if s:SubstituteIf.replacement =~# '^\\='
+	    " Handle sub-replace-special.
+	    return eval(s:SubstituteIf.replacement[2:])
+	else
+	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
+	    return PatternsOnText#ReplaceSpecial('', s:SubstituteIf.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
+	endif
+    else
+	return submatch(0)
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
