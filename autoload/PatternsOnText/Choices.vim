@@ -20,13 +20,16 @@
 " REVISION	DATE		REMARKS
 "   1.60.001	27-Sep-2016	file creation
 
-let s:previousChoices = []
-function! PatternsOnText#Choices#Substitute( range, arguments )
+function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments)
 
     " The original parsing groups {string1}/{string2} into l:replacement.
     let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
+    if len(l:choices) <= 1
+	call ingo#err#Set(printf('%s replacement given', empty(l:choices) ? 'No' : 'Only one'))
+	return 0
+    endif
 
     " Don't use the built-in :s_c; this would result in two separate queries
     " (and choices like (a)ll would not work right). Instead, emulate this via
