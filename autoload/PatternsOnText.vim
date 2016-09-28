@@ -3,6 +3,7 @@
 " DEPENDENCIES:
 "   - ingo/collections.vim autoload script
 "   - ingo/msg.vim autoload script
+"   - ingo/escape.vim autoload script
 "
 " Copyright: (C) 2013-2014 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -10,6 +11,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.005	27-Oct-2014	Add PatternsOnText#PreviousSearchPattern().
 "   1.36.004	23-Sep-2014	Make the deletions work with closed folds (i.e.
 "				only delete the duplicate lines / lines in range
 "				itself, not the entire folds) by temporarily
@@ -67,6 +69,10 @@ function! PatternsOnText#DeleteLines( lnums )
     if len(a:lnums) > &report
 	call ingo#msg#StatusMsg(printf('%d fewer line%s', len(a:lnums), (len(a:lnums) == 1 ? '' : 's')))
     endif
+endfunction
+
+function! PatternsOnText#PreviousSearchPattern( separator )
+    return escape(ingo#escape#Unescape(@/, '/'), a:separator)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
