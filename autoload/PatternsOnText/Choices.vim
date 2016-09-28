@@ -18,18 +18,32 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
 "   1.60.001	27-Sep-2016	file creation
 
+let s:previousPattern = ''
+let s:previousChoices = []
 function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
-    \   ingo#cmdargs#substitute#Parse(a:arguments)
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPattern})
 
-    " The original parsing groups {string1}/{string2} into l:replacement.
-    let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
+    if l:flags . l:count ==# a:arguments
+	" Recall previous choices.
+	let l:choices = s:previousChoices
+	if empty(l:flags)
+	    let l:flags = '&'
+	endif
+    else
+	" The original parsing groups {string1}/{string2} into l:replacement.
+	let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
+	call map(l:choices, 'ingo#escape#Unescape(v:val, l:separator)')
+    endif
     if len(l:choices) <= 1
 	call ingo#err#Set(printf('%s replacement given', empty(l:choices) ? 'No' : 'Only one'))
 	return 0
     endif
+    let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
+    let s:previousChoices = l:choices
 
     " Don't use the built-in :s_c; this would result in two separate queries
     " (and choices like (a)ll would not work right). Instead, emulate this via
@@ -45,7 +59,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     unlet! s:predefinedChoice
     try
 "****D echomsg '****' string([l:separator, l:pattern, l:choices, l:flags, l:count])
-	execute printf('%s%s %s%s%s\=PatternsOnText#Choices#QueriedReplace(%s, l:choices)%s%s%s',
+	execute printf('%s%s %s%s%s\=s:Replace(%s, l:choices)%s%s%s',
 	\   a:range, (a:0 ? a:1 : 'substitute'),
 	\   l:separator, l:pattern, l:separator,
 	\   string(l:queryFunction),
@@ -58,6 +72,9 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     catch /^PatternsOnText:/
 	call ingo#err#SetCustomException('PatternsOnText')
 	return 0
+    finally
+	" Clear the last query.
+	echo
     endtry
 endfunction
 
@@ -72,7 +89,7 @@ function! s:ShowContext()
 	endif
     endif
 endfunction
-function! PatternsOnText#Choices#QueriedReplace( QueryFuncref, choices )
+function! s:Replace( QueryFuncref, choices )
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
