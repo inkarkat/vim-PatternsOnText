@@ -216,7 +216,7 @@ function! PatternsOnText#Selected#Substitute( range, arguments, ... )
 	" actually selected match.
 	execute s:SubstituteSelected.lastLnum . 'normal! ^'
 	return 1
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     catch /^PatternsOnText:/
