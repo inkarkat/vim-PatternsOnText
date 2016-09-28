@@ -2,6 +2,7 @@
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
+"   - PatternsOnText/Except.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/msg.vim autoload script
@@ -13,6 +14,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.40.008	27-Oct-2014	Implement :SubstituteNotInSearch by passing
+"				a:isOutsideSearch flag to
+"				PatternsOnText#InSearch#Substitute().
 "   1.35.007	24-Apr-2014	ENH: Also support passing the search pattern
 "				inline with
 "				:SubstituteInSearch/{search}/{pattern}/{string}/[flags]
@@ -58,19 +62,27 @@ function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
 endfunction
 let s:previousPattern = ''
 let s:previousReplacement = ''
-function! PatternsOnText#InSearch#Substitute( firstLine, lastLine, arguments ) range
+function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
     let l:parts = matchlist(l:replacement,
     \   '\C^\(.*\)'.'\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator . '\m\(.*\)$'
     \)
     if empty(l:parts)
-	let l:search = ''
+	if a:isOutsideSearch
+	    let l:search = PatternsOnText#Except#GetInvertedPattern(l:separator, PatternsOnText#PreviousSearchPattern(l:separator))
+	else
+	    let l:search = ''
+	endif
     else
 	" When the search pattern is inlined as
 	" :SubstituteInSearch/{search}/{pattern}/{string}/[flags]
 	" the original parsing groups {pattern}/{string} into l:replacement.
-	let l:search = l:pattern
+	if a:isOutsideSearch
+	    let l:search = PatternsOnText#Except#GetInvertedPattern(l:separator, l:pattern)
+	else
+	    let l:search = l:pattern
+	endif
 	let [l:pattern, l:replacement] = l:parts[1:2]
     endif
 
