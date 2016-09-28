@@ -53,7 +53,7 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
     catch /^Substitute:/
 	call ingo#err#SetCustomException('Substitute')
 	return 0
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     finally
@@ -97,7 +97,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
 	\   a:range, l:pattern, l:flags, l:count
 	\)
 	return 1
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     finally
