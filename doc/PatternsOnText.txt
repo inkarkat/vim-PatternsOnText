@@ -46,12 +46,23 @@ SEE ALSO								     *
 - The |EditSimilar.vim| plugin (vimscript #2544) uses the same
   {wildcard}={string} replacement pairs of |:SubstituteWildcard|, but for
   editing a similar file, e.g. via |:EditSubstitute|.
-
+- The ingo#syntaxitem#IsOnSyntax() function provided by |ingo-library.vim| can
+  be used with |:SubstituteIf| as a predicate that checks for the syntax of
+  the current match. For example, a predicate that detects comments can be
+  defined as: >
+    function! Comment()
+	return ingo#syntaxitem#IsOnSyntax(getpos('.'), '^Comment$')
+    endfunction
+<
 RELATED WORKS								     *
 
 - The :SubstituteSelected command can be emulated with built-ins via >
     :call feedkeys('yyyq') | %s/{pattern}/{string}/gc
 < (Source: http://stackoverflow.com/a/25840884/813602)
+- substitute_unless_string.vim
+  (https://github.com/LucHermitte/lh-misc/blob/master/plugin/substitute_unless_string.vim)
+  implements a :SubstituteIf with a fixed predicate (that checks the current
+  syntax).
 
 ==============================================================================
 USAGE							*PatternsOnText-usage*
@@ -166,11 +177,24 @@ USAGE							*PatternsOnText-usage*
 			{pattern} and substitute {string}, but without the
 			same flags or given {search} pattern.
 
+							       *:SubstituteIf*
+:[range]SubstituteIf/{pattern}/{string}/[flags] {predicate}
+			Replace matches of {pattern} in the current line /
+			[range] with {string} if the expression {predicate}
+			returns a true value.
+:[range]SubstituteIf [flags] [predicate]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement string, last used
+			|:s_flags|, and last used predicate.
 							  *:SubstituteChoices*
 :[range]SubstituteChoices /{pattern}/{string1}/{string2}/[.../] [flags] [count]
 			Replace a match of {pattern} with one of {string1},
 			{string2}, ..., with each replacement queried from the
 			user.
+:[range]SubstituteChoices [flags] [count]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement choices, last used
+			|:s_flags| and count.
 							 *:SubstituteMultiple*
 :[range]SubstituteMultiple /{pattern}/{string}/ [...] [flags] [count]
 			Change any of the {pattern} given to the corresponding
@@ -183,6 +207,10 @@ USAGE							*PatternsOnText-usage*
 			pairs must be escaped; for a literal backslash search
 			/ replace, use \\\\:
 			    /C:\\\\/my\ drive\\\\/ ~
+:[range]SubstituteMultiple [flags] [count]
+			Repeat the last substitution with the last used search
+			patterns, last used replacement strings, last used
+			|:s_flags| and count.
 							 *:SubstituteWildcard*
 :[range]SubstituteWildcard {wildcard}={string} [...] [flags] [count]
 			Change (first in the line, with "g" flag all) matches
@@ -192,6 +220,10 @@ USAGE							*PatternsOnText-usage*
 			pairs must be escaped; for a literal backslash search
 			/ replace, use \\:
 			    C:\\=my\ drive ~
+:[range]SubstituteWildcard [flags] [count]
+			Repeat the last substitution with the last used search
+			pattern, last used wildcard replacements, last used
+			|:s_flags| and count.
 
 
 			For all following commands, the [!] suppresses the
@@ -354,6 +386,8 @@ KNOWN PROBLEMS				       *PatternsOnText-known-problems*
 
 - The # pattern separator cannot be used with :SubstituteSelected,
   :SubstituteInSearch, and :SubstituteNotInSearch.
+- The : pattern separator cannot be used with :SubstituteChoices and
+  :SubstituteIf.
 
 TODO							 *PatternsOnText-todo*
 
@@ -364,6 +398,11 @@ HISTORY						      *PatternsOnText-history*
 
 1.60	RELEASEME
 - Add :SubstituteChoices command.
+- Add :SubstituteIf command.
+- ENH: Support recall of previous pairs / substitutions in :SubstituteWildcard
+  / :SubstituteMultiple.
+- FIX: Minor: With :SubstituteSelected, Cursor jumps to first line if no
+  substitution at all ("nnnnn"). Initialize l:lastNum to current line.
   *** You need to update to ingo-library (vimscript #4433) version 1.027! ***
 
 1.51	23-Dec-2014
