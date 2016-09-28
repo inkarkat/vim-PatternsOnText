@@ -6,12 +6,15 @@
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.013	29-Sep-2016	FIX: Minor: Cursor jumps to first line if no
+"				substitution at all ("nnnnn"). Initialize
+"				l:lastNum to current line.
 "   1.30.012	12-Mar-2014	Handle \r, \n, \t, \b in replacement, too.
 "   1.30.011	11-Mar-2014	Allow to pass additional substitute flags to
 "				PatternsOnText#Selected#Parse(), used by
@@ -192,7 +195,7 @@ function! PatternsOnText#Selected#Parse( arguments, previousAnswers, ... )
 endfunction
 function! PatternsOnText#Selected#Substitute( range, arguments, ... )
     call ingo#err#Clear()
-    let s:SubstituteSelected = {'count': 0, 'lastLnum': 0}
+    let s:SubstituteSelected = {'count': 0, 'lastLnum': line('.')}
     let [l:separator, l:pattern, l:replacement, l:substituteFlags, l:answers] = PatternsOnText#Selected#Parse(a:arguments, s:previousAnswers)
     if empty(l:answers)
 	call ingo#err#Set('Missing or invalid answers')
