@@ -6,12 +6,15 @@
 "   - ingo/escape.vim autoload script
 "   - ingo/subst/pairs.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.011	29-Sep-2016	ENH: Support recall of previous pairs /
+"				substitutions in :SubstituteWildcard /
+"				:SubstituteMultiple.
 "   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
 "				passed a:expr (after the previous fix).
 "   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
@@ -26,20 +29,41 @@ set cpo&vim
 function! s:ParseArguments( arguments )
     let l:count = ''
     let l:flags = ''
-    if a:arguments[-1] =~# '^\d\+$'
+    if get(a:arguments, -1, '') =~# '^\d\+$'
 	let l:count = remove(a:arguments, -1)
     endif
-    if a:arguments[-1] =~# '^&\?[cegiInp#lr]*\d*$'
+    if get(a:arguments, -1, '.') =~# '^&\?[cegiInp#lr]*\d*$'
 	let l:flags = remove(a:arguments, -1)
     endif
 
     return [l:flags, l:count]
 endfunction
+let [s:previousSplitPairs, s:previousWildcardFlags, s:previousWildcardCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
     let l:pairs = copy(a:000)
     let [l:flags, l:count] = s:ParseArguments(l:pairs)
     try
 	let l:splitPairs = ingo#subst#pairs#Split(l:pairs)
+	if empty(l:splitPairs)
+	    let l:splitPairs = s:previousSplitPairs
+	    if empty(l:flags)
+		let l:flags = s:previousWildcardFlags
+	    endif
+	    if empty(l:flags)
+		let l:flags = '&'
+	    endif
+	    if empty(l:count)
+		let l:count = s:previousWildcardCount
+	    endif
+	endif
+	if empty(l:splitPairs)
+	    call ingo#err#Set('No pairs')
+	    return 0
+	endif
+	let s:previousSplitPairs = l:splitPairs
+	let s:previousWildcardFlags = l:flags
+	let s:previousWildcardCount = l:count
+
 	" Surround each individual match with a capturing group, so that we can
 	" determine which branch matched (and use the corresponding
 	" replacement).
@@ -60,6 +84,7 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
 	let s:replacements = []
     endtry
 endfunction
+let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
     let l:substitutions = copy(a:000)
     let [l:flags, l:count] = s:ParseArguments(l:substitutions)
@@ -76,6 +101,26 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
 		return 0
 	    endif
 	endfor
+
+	if empty(l:splitSubstitutions)
+	    let l:splitSubstitutions = s:previousSplitSubstitutions
+	    if empty(l:flags)
+		let l:flags = s:previousMultipleFlags
+	    endif
+	    if empty(l:flags)
+		let l:flags = '&'
+	    endif
+	    if empty(l:count)
+		let l:count = s:previousMultipleCount
+	    endif
+	endif
+	if empty(l:splitSubstitutions)
+	    call ingo#err#Set('No substitutions')
+	    return 0
+	endif
+	let s:previousSplitSubstitutions = l:splitSubstitutions
+	let s:previousMultipleFlags = l:flags
+	let s:previousMultipleCount = l:count
 
 	" Unescape as we need to use a common separator and remove any atoms
 	" changing the magicness, then surround each individual match with a
