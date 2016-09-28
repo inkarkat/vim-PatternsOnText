@@ -1,6 +1,10 @@
 " PatternsOnText/If.vim: Commands to substitute if a predicate matches.
 "
 " DEPENDENCIES:
+"   - ingo/cmdargs/substitute.vim autoload script
+"   - ingo/err.vim autoload script
+"   - ingo/escape.vim autoload script
+"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -8,25 +12,31 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.002	29-Sep-2016	Factor out
+"				PatternsOnText#DefaultReplacementOnPrediate().
+"				Complete implementation.
 "   1.60.001	28-Sep-2016	file creation
 
+let s:previousPattern = ''
 let s:previousPredicateExpr = ''
+let s:previousReplacement = ''
 function! PatternsOnText#If#Substitute( range, arguments, ... )
     call ingo#err#Clear()
-    let s:SubstituteIf = {'count': 0, 'lastLnum': 0}
+    let s:SubstituteIf = {'count': 0, 'lastLnum': line('.')}
     let [l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr] =
-    \   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': '\(&\?[cegiInp#lr]*\)\s*\(.*\)', 'flagsMatchCount': 2, 'emptyFlags': ['&', s:previousPredicateExpr]})
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)', 'flagsMatchCount': 2, 'emptyFlags': ['&', s:previousPredicateExpr], 'emptyPattern': s:previousPattern})
     if empty(l:predicateExpr)
 	call ingo#err#Set('Missing predicate')
 	return 0
     endif
+    let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
     let s:previousPredicateExpr = l:predicateExpr
     let s:SubstituteIf.replacement = PatternsOnText#EmulatePreviousReplacement(l:replacement, s:previousReplacement)
     let s:previousReplacement = s:SubstituteIf.replacement
 
     try
-echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr])
-	execute printf('%s%s %s%s%s\=PatternsOnText#If#Replace()%s%s',
+"****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr])
+	execute printf('%s%s %s%s%s\=s:Replace()%s%s',
 	\   a:range, (a:0 ? a:1 : 'substitute'),
 	\   l:separator, l:pattern, l:separator, l:separator, l:flags
 	\)
@@ -35,6 +45,11 @@ echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:predica
 	" may have happened before that. Position the cursor on the last
 	" actually selected match.
 	execute s:SubstituteIf.lastLnum . 'normal! ^'
+
+	if has_key(s:SubstituteIf, 'error')
+	    call ingo#err#Set(s:SubstituteIf.error)
+	    return 0
+	endif
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
@@ -44,8 +59,8 @@ echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:predica
 	return 0
     endtry
 endfunction
-function! PatternsOnText#If#Replace()
-    if has_key(s:SubstituteIf, 'isError') && s:SubstituteIf.isError
+function! s:Replace()
+    if has_key(s:SubstituteIf, 'error')
 	" Short-circuit all further errors; printing the predicate error once is
 	" enough.
 	return submatch(0)
@@ -55,23 +70,11 @@ function! PatternsOnText#If#Replace()
     try
 	let l:isSelected = eval(s:previousPredicateExpr)
     catch /^Vim\%((\a\+)\)\=:/
-	call ingo#msg#VimExceptionMsg()
-	let s:SubstituteIf.isError = 1
+	let s:SubstituteIf.error = ingo#msg#MsgFromVimException()
 	return submatch(0)
     endtry
 
-    if l:isSelected
-	let s:SubstituteIf.lastLnum = line('.')
-	if s:SubstituteIf.replacement =~# '^\\='
-	    " Handle sub-replace-special.
-	    return eval(s:SubstituteIf.replacement[2:])
-	else
-	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
-	    return PatternsOnText#ReplaceSpecial('', s:SubstituteIf.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
-	endif
-    else
-	return submatch(0)
-    endif
+    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteIf)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
