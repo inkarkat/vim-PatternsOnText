@@ -14,6 +14,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.00.010	30-Sep-2016	Refactoring: Use ingo#str#trd().
 "   1.60.009	29-Sep-2016	FIX: Need to re-escape s:previousPattern
 "				according to current l:separator.
 "   1.40.008	27-Oct-2014	Implement :SubstituteNotInSearch by passing
@@ -96,7 +97,7 @@ function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLi
     let l:substFlags = 'g'
     if l:flags =~# 'f'
 	let l:substFlags = ''
-	let l:flags = substitute(l:flags, '\Cf', '', 'g')
+	let l:flags = ingo#str#trd(l:flags, 'f')
     endif
 
     let s:didInnerSubstitution = 0
