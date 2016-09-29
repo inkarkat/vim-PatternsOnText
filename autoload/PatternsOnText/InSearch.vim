@@ -8,12 +8,14 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/subst/expr/emulation.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.009	29-Sep-2016	FIX: Need to re-escape s:previousPattern
+"				according to current l:separator.
 "   1.40.008	27-Oct-2014	Implement :SubstituteNotInSearch by passing
 "				a:isOutsideSearch flag to
 "				PatternsOnText#InSearch#Substitute().
@@ -87,7 +89,7 @@ function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLi
     endif
 
     let l:replacement = PatternsOnText#EmulatePreviousReplacement(l:replacement, s:previousReplacement)
-    let s:previousPattern = l:pattern
+    let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
     let s:previousReplacement = l:replacement
 
     " Handle custom substitution flags.
