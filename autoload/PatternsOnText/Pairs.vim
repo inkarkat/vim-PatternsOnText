@@ -70,7 +70,7 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
 	let l:pattern = join(map(copy(l:splitPairs), '"\\(" . escape(v:val[0], "/") . "\\)"'), '\|')
 	let s:replacements = map(copy(l:splitPairs), 'v:val[1]')    " No escaping, returned by sub-replace-expression.
 
-	execute printf('%ssubstitute/%s/\=s:Replacement()/%s %s',
+	execute printf('%ssubstitute/%s/\=s:Replace()/%s %s',
 	\   a:range, l:pattern, l:flags, l:count
 	\)
 	return 1
@@ -138,7 +138,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
 	\   'ingo#escape#Unescape(v:val[2], v:val[0])'
 	\)  " No escaping, returned by sub-replace-expression.
 
-	execute printf('%ssubstitute/%s/\=s:Replacement()/%s %s',
+	execute printf('%ssubstitute/%s/\=s:Replace()/%s %s',
 	\   a:range, l:pattern, l:flags, l:count
 	\)
 	return 1
@@ -150,7 +150,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
     endtry
 endfunction
 
-function! s:Replacement()
+function! s:Replace()
     for l:i in range(len(s:replacements))
 	if ! empty(submatch(l:i + 1))
 	    return PatternsOnText#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
