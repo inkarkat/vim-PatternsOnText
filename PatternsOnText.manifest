@@ -7,5 +7,6 @@ autoload/PatternsOnText/Pairs.vim
 autoload/PatternsOnText/Ranges.vim
 autoload/PatternsOnText/Selected.vim
 autoload/PatternsOnText/Subsequent.vim
+autoload/PatternsOnText/Uniques.vim
 plugin/PatternsOnText.vim
 doc/PatternsOnText.txt
