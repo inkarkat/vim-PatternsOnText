@@ -13,7 +13,9 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.001	29-Sep-2016	file creation from If.vim
+"   2.00.002	30-Sep-2016	Refactoring: Factor out
+"				PatternsOnText#InitialContext().
+"   2.00.001	29-Sep-2016	file creation from If.vim
 
 function! s:Parse( arguments )
     let l:flagsAndExprPattern = '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)'
@@ -30,7 +32,7 @@ let s:previousPattern = ''
 let s:previousExpr = ''
 function! PatternsOnText#Execute#Substitute( range, arguments, ... )
     call ingo#err#Clear()
-    let s:SubstituteExecute = {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 0, 'l': [], 'd': {}, 's': ''}
+    let s:SubstituteExecute = PatternsOnText#InitialContext()
     let [l:separator, l:pattern, l:flags, l:expr] = s:Parse(a:arguments)
     if empty(l:expr)
 	let l:expr = s:previousExpr
