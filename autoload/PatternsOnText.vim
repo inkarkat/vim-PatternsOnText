@@ -5,12 +5,17 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.006	29-Sep-2016	Move factored out
+"				PatternsOnText#DefaultReplacementOnPrediate()
+"				here.
+"				Move PatternsOnText#Selected#ReplaceSpecial() to
+"				PatternsOnText#DefaultReplacer().
 "   1.40.005	27-Oct-2014	Add PatternsOnText#PreviousSearchPattern().
 "   1.36.004	23-Sep-2014	Make the deletions work with closed folds (i.e.
 "				only delete the duplicate lines / lines in range
@@ -39,6 +44,34 @@ function! PatternsOnText#ReplaceSpecial( match, replacement, specialExpr, Specia
     \   ),
     \   ''
     \)
+endfunction
+function! PatternsOnText#DefaultReplacer( expr, match, replacement )
+    if a:replacement ==# '\n'
+	return "\n"
+    elseif a:replacement ==# '\r'
+	return "\r"
+    elseif a:replacement ==# '\t'
+	return "\t"
+    elseif a:replacement ==# '\b'
+	return "\<BS>"
+    elseif a:replacement =~# '^' . a:expr . '$'
+	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
+    endif
+    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
+endfunction
+function! PatternsOnText#DefaultReplacementOnPrediate( predicate, contextObject )
+    if a:predicate
+	let a:contextObject.lastLnum = line('.')
+	if a:contextObject.replacement =~# '^\\='
+	    " Handle sub-replace-special.
+	    return eval(a:contextObject.replacement[2:])
+	else
+	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
+	    return PatternsOnText#ReplaceSpecial('', a:contextObject.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#DefaultReplacer'))
+	endif
+    else
+	return submatch(0)
+    endif
 endfunction
 
 function! PatternsOnText#DeleteLines( lnums )
