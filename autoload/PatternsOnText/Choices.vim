@@ -1,6 +1,7 @@
 " PatternsOnText/Choices.vim: Commands to substitute from a set of choices.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/err.vim autoload script
@@ -9,8 +10,6 @@
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/fromlist.vim autoload script
 "   - ingo/query/get.vim autoload script
-"   - PatternsOnText.vim autoload script
-"   - PatternsOnText/Selected.vim autoload script
 "
 " Copyright: (C) 2016 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -19,6 +18,8 @@
 "
 " REVISION	DATE		REMARKS
 "   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
+"				Factor out
+"				PatternsOnText#DefaultReplacementOnPrediate().
 "   1.60.001	27-Sep-2016	file creation
 
 let s:previousPattern = ''
@@ -108,14 +109,7 @@ function! s:Replace( QueryFuncref, choices )
 	let s:lastChoice = l:choiceIdx
     endif
 
-    let l:replacement = a:choices[l:choiceIdx]
-    if l:replacement =~# '^\\='
-	" Handle sub-replace-special.
-	return eval(l:replacement[2:])
-    else
-	" Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
-	return PatternsOnText#ReplaceSpecial('', l:replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
-    endif
+    return PatternsOnText#DefaultReplacementOnPrediate(1, {'replacement': a:choices[l:choiceIdx]})
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
