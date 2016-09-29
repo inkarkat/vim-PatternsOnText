@@ -15,6 +15,10 @@
 "   1.60.013	29-Sep-2016	FIX: Minor: Cursor jumps to first line if no
 "				substitution at all ("nnnnn"). Initialize
 "				l:lastNum to current line.
+"				Move PatternsOnText#Selected#ReplaceSpecial() to
+"				PatternsOnText#DefaultReplacer(). Factor out the
+"				invocation around it into
+"				PatternsOnText#DefaultReplacementOnPrediate().
 "   1.30.012	12-Mar-2014	Handle \r, \n, \t, \b in replacement, too.
 "   1.30.011	11-Mar-2014	Allow to pass additional substitute flags to
 "				PatternsOnText#Selected#Parse(), used by
@@ -141,32 +145,7 @@ function! PatternsOnText#Selected#CountedReplace()
     let s:SubstituteSelected.count += 1
     let l:isSelected = PatternsOnText#Selected#GetAnswer(s:SubstituteSelected.answers, s:SubstituteSelected.count)
 
-    if l:isSelected
-	let s:SubstituteSelected.lastLnum = line('.')
-	if s:SubstituteSelected.replacement =~# '^\\='
-	    " Handle sub-replace-special.
-	    return eval(s:SubstituteSelected.replacement[2:])
-	else
-	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
-	    return PatternsOnText#ReplaceSpecial('', s:SubstituteSelected.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#Selected#ReplaceSpecial'))
-	endif
-    else
-	return submatch(0)
-    endif
-endfunction
-function! PatternsOnText#Selected#ReplaceSpecial( expr, match, replacement )
-    if a:replacement ==# '\n'
-	return "\n"
-    elseif a:replacement ==# '\r'
-	return "\r"
-    elseif a:replacement ==# '\t'
-	return "\t"
-    elseif a:replacement ==# '\b'
-	return "\<BS>"
-    elseif a:replacement =~# '^' . a:expr . '$'
-	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
-    endif
-    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
+    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteSelected)
 endfunction
 let s:previousReplacement = ''
 let s:previousAnswers = ''
