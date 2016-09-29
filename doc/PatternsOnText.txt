@@ -189,7 +189,7 @@ USAGE							*PatternsOnText-usage*
 					      done so far, i.e. where
 					      {predicate} was true
 			It also contains pre-initialized variables for use by
-			{predicate}. These get cleared by each :SubstituteIf
+			{predicate}. These get cleared by each |:SubstituteIf|
 			invocation:
 			    n, m: numbers (0)
 			    l: empty List []
@@ -237,7 +237,29 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			pattern, last used wildcard replacements, last used
 			|:s_flags| and count.
-
+							  *:SubstituteExecute*
+:[range]SubstituteExecute/{pattern}/[flags] {expr}
+			Replace matches of {pattern} in the current line /
+			[range] with whatever {expr} |:return|s.
+			This is like |:sub-replace-expression|, but you can
+			use commands like |:let|, and have to explicitly
+			|:return| the replacement value.
+			Inside {expr}, you can reference a context object
+			via |v:val|. It provides the following information:
+			    matchCount: number of current match of {pattern}
+			    replacementCount: number of actual replacements
+					      done so far
+			It also contains pre-initialized variables for use by
+			{expr}. These get cleared by each |:SubstituteExecute|
+			invocation:
+			    n, m: numbers (0)
+			    l: empty List []
+			    d: empty Dictionary {}
+			    s: empty String ""
+:[range]SubstituteExecute [flags] [expr]
+			Repeat the last substitution with the last used search
+			pattern, last used |:s_flags|, and last used
+			expression.
 
 			For all following commands, the [!] suppresses the
 			error when there are no duplicates.
@@ -399,8 +421,8 @@ KNOWN PROBLEMS				       *PatternsOnText-known-problems*
 
 - The # pattern separator cannot be used with :SubstituteSelected,
   :SubstituteInSearch, and :SubstituteNotInSearch.
-- The : pattern separator cannot be used with :SubstituteChoices and
-  :SubstituteIf.
+- The : pattern separator cannot be used with :SubstituteChoices,
+  :SubstituteIf, and :SubstituteExecute.
 
 TODO							 *PatternsOnText-todo*
 
@@ -412,6 +434,7 @@ HISTORY						      *PatternsOnText-history*
 1.60	RELEASEME
 - Add :SubstituteChoices command.
 - Add :SubstituteIf command.
+- Add :SubstituteExecute command.
 - ENH: Support recall of previous pairs / substitutions in :SubstituteWildcard
   / :SubstituteMultiple.
 - FIX: Minor: With :SubstituteSelected, Cursor jumps to first line if no
