@@ -10,6 +10,10 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   1.60.018	29-Sep-2016	ENH: Support recall of previous pairs /
+"				substitutions in :SubstituteWildcard /
+"				:SubstituteMultiple.
+"				Add :SubstituteExecute command.
 "   1.60.017	28-Sep-2016	Add :SubstituteIf command.
 "   1.60.016	27-Sep-2016	Add :SubstituteChoices command.
 "   1.51.014	24-Nov-2014	Improve reporting of readonly buffers for
@@ -72,10 +76,11 @@ command! -range -nargs=? SubstituteSubsequent
 command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=+ SubstituteIf       if ! PatternsOnText#If#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=+ SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=+ SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=+ SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteIf       if ! PatternsOnText#If#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteExecute  if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
