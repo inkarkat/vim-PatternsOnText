@@ -1,7 +1,10 @@
 autoload/PatternsOnText.vim
+autoload/PatternsOnText/Choices.vim
 autoload/PatternsOnText/DuplicateLines.vim
 autoload/PatternsOnText/Duplicates.vim
 autoload/PatternsOnText/Except.vim
+autoload/PatternsOnText/Execute.vim
+autoload/PatternsOnText/If.vim
 autoload/PatternsOnText/InSearch.vim
 autoload/PatternsOnText/Pairs.vim
 autoload/PatternsOnText/Ranges.vim
