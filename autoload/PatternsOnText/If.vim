@@ -13,17 +13,19 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.002	29-Sep-2016	Factor out
+"   2.00.003	30-Sep-2016	Refactoring: Factor out
+"				PatternsOnText#InitialContext().
+"   2.00.002	29-Sep-2016	Factor out
 "				PatternsOnText#DefaultReplacementOnPrediate().
 "				Complete implementation.
-"   1.60.001	28-Sep-2016	file creation
+"   2.00.001	28-Sep-2016	file creation
 
 let s:previousPattern = ''
 let s:previousPredicateExpr = ''
 let s:previousReplacement = ''
 function! PatternsOnText#If#Substitute( range, arguments, ... )
     call ingo#err#Clear()
-    let s:SubstituteIf = {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 0, 'l': [], 'd': {}, 's': ''}
+    let s:SubstituteIf = PatternsOnText#InitialContext()
     let [l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)', 'flagsMatchCount': 2, 'emptyFlags': ['&', s:previousPredicateExpr], 'emptyPattern': s:previousPattern})
     if empty(l:predicateExpr)
