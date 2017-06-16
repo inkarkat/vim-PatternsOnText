@@ -4,12 +4,13 @@
 "   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.020	17-Jun-2017	Add :SubstituteUnless variant of :SubstituteIf.
 "   2.00.019	30-Sep-2016	Add completion for :SubstituteIf and
 "				:SubstituteExecute.
 "   2.00.018	29-Sep-2016	ENH: Support recall of previous pairs /
@@ -78,7 +79,8 @@ command! -range -nargs=? SubstituteSubsequent
 command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? -complete=expression SubstituteIf       if ! PatternsOnText#If#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteIf       if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteUnless   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? -complete=command    SubstituteExecute  if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
