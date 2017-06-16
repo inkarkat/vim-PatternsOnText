@@ -182,6 +182,7 @@ USAGE							*PatternsOnText-usage*
 			Replace matches of {pattern} in the current line /
 			[range] with {string} if the expression {predicate}
 			returns a true value.
+							    *Substitute-v:val*
 			Inside {predicate}, you can reference a context object
 			via |v:val|. It provides the following information:
 			    matchCount: number of current match of {pattern}
@@ -191,7 +192,8 @@ USAGE							*PatternsOnText-usage*
 			It also contains pre-initialized variables for use by
 			{predicate}. These get cleared by each |:SubstituteIf|
 			invocation:
-			    n, m: numbers (0)
+			    n: number / flag (0 / false)
+			    m: number / flag (1 / true)
 			    l: empty List []
 			    d: empty Dictionary {}
 			    s: empty String ""
@@ -244,18 +246,8 @@ USAGE							*PatternsOnText-usage*
 			This is like |:sub-replace-expression|, but you can
 			use commands like |:let|, and have to explicitly
 			|:return| the replacement value.
-			Inside {expr}, you can reference a context object
-			via |v:val|. It provides the following information:
-			    matchCount: number of current match of {pattern}
-			    replacementCount: number of actual replacements
-					      done so far
-			It also contains pre-initialized variables for use by
-			{expr}. These get cleared by each |:SubstituteExecute|
-			invocation:
-			    n, m: numbers (0)
-			    l: empty List []
-			    d: empty Dictionary {}
-			    s: empty String ""
+			Inside {expr}, you can reference a context object, as
+			with |:SubstituteIf|. Cp. |Substitute-v:val|
 :[range]SubstituteExecute [flags] [expr]
 			Repeat the last substitution with the last used search
 			pattern, last used |:s_flags|, and last used
@@ -431,7 +423,7 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-1.60	RELEASEME
+2.00	30-Sep-2016
 - Add :SubstituteChoices command.
 - Add :SubstituteIf command.
 - Add :SubstituteExecute command.
