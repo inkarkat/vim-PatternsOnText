@@ -12,7 +12,7 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.011	29-Sep-2016	ENH: Support recall of previous pairs /
+"   2.00.011	29-Sep-2016	ENH: Support recall of previous pairs /
 "				substitutions in :SubstituteWildcard /
 "				:SubstituteMultiple.
 "   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
