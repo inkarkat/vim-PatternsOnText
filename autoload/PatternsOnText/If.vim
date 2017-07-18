@@ -1,11 +1,13 @@
 " PatternsOnText/If.vim: Commands to substitute if a predicate matches.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
 "   - ingo/action.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "   - ingo/msg.vim autoload script
+"   - ingo/subst/replacement.vim autoload script
 "
 " Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -13,6 +15,12 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.005	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
+"				Move
+"				PatternsOnText#DefaultReplacementOnPredicate(),
+"				to ingo-library.
 "   2.01.004	17-Jun-2017	Add a:isNegate argument to
 "				PatternsOnText#If#Substitute() and use as
 "				s:previousIsNegate for new :SubstituteUnless.
@@ -94,7 +102,7 @@ function! s:Replace( hasValReferenceInPredicate )
 	return submatch(0)
     endtry
 
-    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteIf)
+    return ingo#subst#replacement#DefaultReplacementOnPredicate(l:isSelected, s:SubstituteIf)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
