@@ -5,13 +5,18 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.006	29-Sep-2016	Move factored out
+"   2.01.008	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
+"   2.00.007	30-Sep-2016	Refactoring: Factor out
+"				PatternsOnText#InitialContext().
+"   2.00.006	29-Sep-2016	Move factored out
 "				PatternsOnText#DefaultReplacementOnPrediate()
 "				here.
 "				Move PatternsOnText#Selected#ReplaceSpecial() to
@@ -59,7 +64,7 @@ function! PatternsOnText#DefaultReplacer( expr, match, replacement )
     endif
     return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
-function! PatternsOnText#DefaultReplacementOnPrediate( predicate, contextObject )
+function! PatternsOnText#DefaultReplacementOnPredicate( predicate, contextObject )
     if a:predicate
 	let a:contextObject.lastLnum = line('.')
 	if a:contextObject.replacement =~# '^\\='
@@ -106,6 +111,10 @@ endfunction
 
 function! PatternsOnText#PreviousSearchPattern( separator )
     return escape(ingo#escape#Unescape(@/, '/'), a:separator)
+endfunction
+
+function! PatternsOnText#InitialContext()
+    return {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
