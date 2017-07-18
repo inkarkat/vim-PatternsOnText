@@ -6,13 +6,16 @@
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   1.60.013	29-Sep-2016	FIX: Minor: Cursor jumps to first line if no
+"   2.01.014	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
+"   2.00.013	29-Sep-2016	FIX: Minor: Cursor jumps to first line if no
 "				substitution at all ("nnnnn"). Initialize
 "				l:lastNum to current line.
 "				Move PatternsOnText#Selected#ReplaceSpecial() to
@@ -145,7 +148,7 @@ function! PatternsOnText#Selected#CountedReplace()
     let s:SubstituteSelected.count += 1
     let l:isSelected = PatternsOnText#Selected#GetAnswer(s:SubstituteSelected.answers, s:SubstituteSelected.count)
 
-    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteSelected)
+    return PatternsOnText#DefaultReplacementOnPredicate(l:isSelected, s:SubstituteSelected)
 endfunction
 let s:previousReplacement = ''
 let s:previousAnswers = ''
