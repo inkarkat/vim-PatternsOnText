@@ -406,7 +406,7 @@ To uninstall, use the |:RmVimball| command.
 DEPENDENCIES					 *PatternsOnText-dependencies*
 
 - Requires Vim 7.0 or higher.
-- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.027 or
+- Requires the |ingo-library.vim| plugin (vimscript #4433), version 1.032 or
   higher.
 
 ==============================================================================
@@ -428,6 +428,10 @@ HISTORY						      *PatternsOnText-history*
 
 2.01	RELEASEME
 - Add :SubstituteUnless variant of :SubstituteIf.
+- Move PatternsOnText#DefaultReplacementOnPredicate(),
+  PatternsOnText#ReplaceSpecial(), and PatternsOnText#DefaultReplacer() to
+  ingo-library.
+  *** You need to update to ingo-library (vimscript #4433) version 1.032! ***
 
 2.00	30-Sep-2016
 - Add :SubstituteChoices command.
