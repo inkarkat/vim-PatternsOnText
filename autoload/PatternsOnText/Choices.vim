@@ -1,7 +1,6 @@
 " PatternsOnText/Choices.vim: Commands to substitute from a set of choices.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/compat.vim autoload script
 "   - ingo/err.vim autoload script
@@ -10,6 +9,7 @@
 "   - ingo/query/confirm.vim autoload script
 "   - ingo/query/fromlist.vim autoload script
 "   - ingo/query/get.vim autoload script
+"   - ingo/subst/replacement.vim autoload script
 "
 " Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -20,6 +20,9 @@
 "   2.01.004	19-Jul-2017	Fix typo in
 "				PatternsOnText#DefaultReplacementOnPredicate()
 "				function name.
+"				Move
+"				PatternsOnText#DefaultReplacementOnPredicate(),
+"				to ingo-library.
 "   2.00.003	30-Sep-2016	Refactoring: Use ingo#str#trd().
 "				FIX: Forgot to invoke s:ShowContext().
 "   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
@@ -117,7 +120,7 @@ function! s:Replace( QueryFuncref, choices )
 	let s:lastChoice = l:choiceIdx
     endif
 
-    return PatternsOnText#DefaultReplacementOnPredicate(1, {'replacement': a:choices[l:choiceIdx]})
+    return ingo#subst#replacement#DefaultReplacementOnPredicate(1, {'replacement': a:choices[l:choiceIdx]})
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
