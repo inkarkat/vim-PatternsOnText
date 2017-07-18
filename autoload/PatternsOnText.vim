@@ -5,12 +5,20 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2016 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.008	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
+"				Move
+"				PatternsOnText#DefaultReplacementOnPredicate(),
+"				PatternsOnText#ReplaceSpecial(), and
+"				PatternsOnText#DefaultReplacer() to
+"				ingo-library.
 "   2.00.007	30-Sep-2016	Refactoring: Factor out
 "				PatternsOnText#InitialContext().
 "   2.00.006	29-Sep-2016	Move factored out
@@ -32,48 +40,6 @@ function! PatternsOnText#EmulatePreviousReplacement( replacement, previousReplac
     " substitution text; emulate this from our own history.
     let l:previousReplacementExpr = (&magic ? '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\~' : '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\\~')
     return (a:replacement =~# l:previousReplacementExpr ? substitute(a:replacement, l:previousReplacementExpr, escape(a:previousReplacement, '\'), 'g') : a:replacement)
-endfunction
-
-function! PatternsOnText#ReplaceSpecial( match, replacement, specialExpr, SpecialReplacer )
-    if empty(a:specialExpr)
-	return a:replacement
-    endif
-
-    return join(
-    \   map(
-    \       ingo#collections#SplitKeepSeparators(a:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!' . a:specialExpr),
-    \       'call(a:SpecialReplacer, [a:specialExpr, a:match, v:val])'
-    \   ),
-    \   ''
-    \)
-endfunction
-function! PatternsOnText#DefaultReplacer( expr, match, replacement )
-    if a:replacement ==# '\n'
-	return "\n"
-    elseif a:replacement ==# '\r'
-	return "\r"
-    elseif a:replacement ==# '\t'
-	return "\t"
-    elseif a:replacement ==# '\b'
-	return "\<BS>"
-    elseif a:replacement =~# '^' . a:expr . '$'
-	return submatch(a:replacement ==# '&' ? 0 : a:replacement[-1:-1])
-    endif
-    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
-endfunction
-function! PatternsOnText#DefaultReplacementOnPrediate( predicate, contextObject )
-    if a:predicate
-	let a:contextObject.lastLnum = line('.')
-	if a:contextObject.replacement =~# '^\\='
-	    " Handle sub-replace-special.
-	    return eval(a:contextObject.replacement[2:])
-	else
-	    " Handle & and \0, \1 .. \9, and \r\n\t\b (but not \u, \U, etc.)
-	    return PatternsOnText#ReplaceSpecial('', a:contextObject.replacement, '\%(&\|\\[0-9rnbt]\)', function('PatternsOnText#DefaultReplacer'))
-	endif
-    else
-	return submatch(0)
-    endif
 endfunction
 
 function! PatternsOnText#DeleteLines( lnums )
@@ -113,4 +79,5 @@ endfunction
 function! PatternsOnText#InitialContext()
     return {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
