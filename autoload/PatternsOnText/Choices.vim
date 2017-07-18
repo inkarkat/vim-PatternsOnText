@@ -17,6 +17,8 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.00.003	30-Sep-2016	Refactoring: Use ingo#str#trd().
+"				FIX: Forgot to invoke s:ShowContext().
 "   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
 "				Factor out
 "				PatternsOnText#DefaultReplacementOnPrediate().
@@ -52,7 +54,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     let l:queryFunction = 'ingo#query#fromlist#Query'
     if l:flags =~# 'c'
 	let l:queryFunction = 's:ConfirmQuery'
-	let l:flags = substitute(l:flags, '\Cc', '', 'g')
+	let l:flags = ingo#str#trd(l:flags, 'c')
     endif
 
     let s:lnum = -1
@@ -86,15 +88,18 @@ function! s:ShowContext()
 	if &cursorline
 	    redraw!
 	else
+	    redraw
 	    call ingo#print#Number(line('.'))
 	endif
+    else
+	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
     endif
 endfunction
 function! s:Replace( QueryFuncref, choices )
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
-	redraw " If we let the previous query linger, the actuall buffer contents will slowly scroll out of view.
+	call s:ShowContext()
 	let l:choiceIdx = call(a:QueryFuncref, ['replacement', a:choices])
     endif
 
