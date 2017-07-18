@@ -7,12 +7,18 @@
 "   - ingo/escape.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.005	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
+"   2.01.004	17-Jun-2017	Add a:isNegate argument to
+"				PatternsOnText#If#Substitute() and use as
+"				s:previousIsNegate for new :SubstituteUnless.
 "   2.00.003	30-Sep-2016	Refactoring: Factor out
 "				PatternsOnText#InitialContext().
 "   2.00.002	29-Sep-2016	Factor out
@@ -21,9 +27,10 @@
 "   2.00.001	28-Sep-2016	file creation
 
 let s:previousPattern = ''
+let s:previousIsNegate = 0
 let s:previousPredicateExpr = ''
 let s:previousReplacement = ''
-function! PatternsOnText#If#Substitute( range, arguments, ... )
+function! PatternsOnText#If#Substitute( isNegate, range, arguments, ... )
     call ingo#err#Clear()
     let s:SubstituteIf = PatternsOnText#InitialContext()
     let [l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr] =
@@ -33,6 +40,7 @@ function! PatternsOnText#If#Substitute( range, arguments, ... )
 	return 0
     endif
     let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
+    let s:previousIsNegate = a:isNegate
     let s:previousPredicateExpr = l:predicateExpr
     let s:SubstituteIf.replacement = PatternsOnText#EmulatePreviousReplacement(l:replacement, s:previousReplacement)
     let s:previousReplacement = s:SubstituteIf.replacement
@@ -77,6 +85,9 @@ function! s:Replace( hasValReferenceInPredicate )
 	else
 	    let l:isSelected = eval(s:previousPredicateExpr)
 	endif
+	if s:previousIsNegate
+	    let l:isSelected = ! l:isSelected
+	endif
 
 	if l:isSelected
 	    let s:SubstituteIf.replacementCount += 1
@@ -86,7 +97,7 @@ function! s:Replace( hasValReferenceInPredicate )
 	return submatch(0)
     endtry
 
-    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteIf)
+    return PatternsOnText#DefaultReplacementOnPredicate(l:isSelected, s:SubstituteIf)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
