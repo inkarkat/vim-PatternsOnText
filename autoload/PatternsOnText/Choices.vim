@@ -11,12 +11,15 @@
 "   - ingo/query/fromlist.vim autoload script
 "   - ingo/query/get.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.004	19-Jul-2017	Fix typo in
+"				PatternsOnText#DefaultReplacementOnPredicate()
+"				function name.
 "   2.00.003	30-Sep-2016	Refactoring: Use ingo#str#trd().
 "				FIX: Forgot to invoke s:ShowContext().
 "   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
@@ -114,7 +117,7 @@ function! s:Replace( QueryFuncref, choices )
 	let s:lastChoice = l:choiceIdx
     endif
 
-    return PatternsOnText#DefaultReplacementOnPrediate(1, {'replacement': a:choices[l:choiceIdx]})
+    return PatternsOnText#DefaultReplacementOnPredicate(1, {'replacement': a:choices[l:choiceIdx]})
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
