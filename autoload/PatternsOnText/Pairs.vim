@@ -5,13 +5,16 @@
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "   - ingo/subst/pairs.vim autoload script
+"   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2014-2016 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
+"   2.01.012	19-Jul-2017	Move PatternsOnText#ReplaceSpecial() to
+"				ingo-library.
 "   2.00.011	29-Sep-2016	ENH: Support recall of previous pairs /
 "				substitutions in :SubstituteWildcard /
 "				:SubstituteMultiple.
@@ -153,7 +156,7 @@ endfunction
 function! s:Replace()
     for l:i in range(len(s:replacements))
 	if ! empty(submatch(l:i + 1))
-	    return PatternsOnText#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
+	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
 	endif
     endfor
 
