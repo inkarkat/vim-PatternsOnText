@@ -177,11 +177,13 @@ USAGE							*PatternsOnText-usage*
 			{pattern} and substitute {string}, but without the
 			same flags or given {search} pattern.
 
-							       *:SubstituteIf*
+					   *:SubstituteIf* *:SubstituteUnless*
 :[range]SubstituteIf/{pattern}/{string}/[flags] {predicate}
+:[range]SubstituteUnless/{pattern}/{string}/[flags] {predicate}
 			Replace matches of {pattern} in the current line /
 			[range] with {string} if the expression {predicate}
-			returns a true value.
+			returns a true (:SubstituteIf) / false
+			(:SubstituteUnless) value.
 							    *Substitute-v:val*
 			Inside {predicate}, you can reference a context object
 			via |v:val|. It provides the following information:
@@ -191,13 +193,14 @@ USAGE							*PatternsOnText-usage*
 					      {predicate} was true
 			It also contains pre-initialized variables for use by
 			{predicate}. These get cleared by each |:SubstituteIf|
-			invocation:
+			/ |:SubstituteUnless| invocation:
 			    n: number / flag (0 / false)
 			    m: number / flag (1 / true)
 			    l: empty List []
 			    d: empty Dictionary {}
 			    s: empty String ""
 :[range]SubstituteIf [flags] [predicate]
+:[range]SubstituteUnless [flags] [predicate]
 			Repeat the last substitution with the last used search
 			pattern, last used replacement string, last used
 			|:s_flags|, and last used predicate.
@@ -423,6 +426,9 @@ IDEAS							*PatternsOnText-ideas*
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+2.01	RELEASEME
+- Add :SubstituteUnless variant of :SubstituteIf.
+
 2.00	30-Sep-2016
 - Add :SubstituteChoices command.
 - Add :SubstituteIf command.
@@ -536,7 +542,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2016 Ingo Karkat
+Copyright: (C) 2011-2017 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
