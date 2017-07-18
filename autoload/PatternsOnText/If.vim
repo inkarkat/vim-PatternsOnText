@@ -13,9 +13,6 @@
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
 " REVISION	DATE		REMARKS
-"   2.01.005	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
 "   2.01.004	17-Jun-2017	Add a:isNegate argument to
 "				PatternsOnText#If#Substitute() and use as
 "				s:previousIsNegate for new :SubstituteUnless.
@@ -97,7 +94,7 @@ function! s:Replace( hasValReferenceInPredicate )
 	return submatch(0)
     endtry
 
-    return PatternsOnText#DefaultReplacementOnPredicate(l:isSelected, s:SubstituteIf)
+    return PatternsOnText#DefaultReplacementOnPrediate(l:isSelected, s:SubstituteIf)
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
