@@ -35,9 +35,9 @@ SOURCE									     *
 |:SubstituteNotInSearch| inspired by
     http://stackoverflow.com/questions/26569959/ignore-keywords-in-quotes-in-vim-regex-substitute
 |:DeleteUniqueLinesIgnoring| inspired by
-  http://stackoverflow.com/questions/26981192/how-do-i-remove-non-duplicate-lines-in-vim
+    http://stackoverflow.com/questions/26981192/how-do-i-remove-non-duplicate-lines-in-vim
 |:SubstituteChoices| inspired by
-  http://vi.stackexchange.com/questions/9700/mutliple-choice-substitute
+    http://vi.stackexchange.com/questions/9700/mutliple-choice-substitute
 
 SEE ALSO								     *
 
@@ -395,10 +395,16 @@ USAGE							*PatternsOnText-usage*
 ==============================================================================
 INSTALLATION					 *PatternsOnText-installation*
 
-This script is packaged as a |vimball|. If you have the "gunzip" decompressor
-in your PATH, simply edit the *.vmb.gz package in Vim; otherwise, decompress
-the archive first, e.g. using WinZip. Inside Vim, install by sourcing the
-vimball or via the |:UseVimball| command. >
+The code is hosted in a Git repo at
+    https://github.com/inkarkat/vim-PatternsOnText
+You can use your favorite plugin manager, or "git clone" into a directory used
+for Vim |packages|. Releases are on the "stable" branch, the latest unstable
+development snapshot on "master".
+
+This script is also packaged as a |vimball|. If you have the "gunzip"
+decompressor in your PATH, simply edit the *.vmb.gz package in Vim; otherwise,
+decompress the archive first, e.g. using WinZip. Inside Vim, install by
+sourcing the vimball or via the |:UseVimball| command. >
     vim PatternsOnText*.vmb.gz
     :so %
 To uninstall, use the |:RmVimball| command.
@@ -423,10 +429,15 @@ TODO							 *PatternsOnText-todo*
 
 IDEAS							*PatternsOnText-ideas*
 
+CONTRIBUTING					   *PatternsOnText-contribute*
+
+Report any bugs, send patches, or suggest features via the issue tracker at
+https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
+
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
-2.01	RELEASEME
+2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
 - Move PatternsOnText#DefaultReplacementOnPredicate(),
   PatternsOnText#ReplaceSpecial(), and PatternsOnText#DefaultReplacer() to
