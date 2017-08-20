@@ -1,0 +1,29 @@
+@Test(priority=10)
+# For every 1.0 in 1.1 to 1.2.
+
+0.5 + 1.0 = 1.5
+
+2.00) foo
+2.33) bar
+2.67) hihi
+3.00) hoho
+
+@Test(priority=20)
+# Some stuff 0-0-0-0.
+# 419507b8-84f5-11e7-88cf-101f74778c39
+
+@Test(priority=25)
+
+@Test(priority=30)
+# This is 1000000.0 in 1150000.0 to 1300000.0.
+# Why is 1450000.0 afraid of 1600000.0? Because 1750000.0 1900000.0 2050000.0.
+# The 2200000.0s of 2350000.0s of 2500000.0.
+# More 2650000.0s in 2800000.0s of 2950000.0s.
+
+@Test(priority=31)
+So negative like -1 and -1 and -1 for -1 and -1.
+
+@Test(priority=32)
+
+0.0x-0.01 + -0.02x-0.03 = -0.04x-0.05
+No Number found!

@@ -10,23 +10,30 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 
+let s:numberExpr = '[+-]\?\d\+\%(\.\d\+\%([eE][+-]\?\d\+\)\?\)\?'
+function! s:IsFloat( num )
+    return (a:num =~# '\.')
+endfunction
 function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
     if a:arguments !=# '&'
-	let [s:startNum, l:subArguments, s:offset] = matchlist(a:arguments, '^\(-\?\d\+\)\?\(.\{-}\)\(-\?\d\+\)\?$')[1:3]
-	if empty(s:startNum) | let s:startNum = 1 | endif
-	if empty(s:offset) | let s:offset = 1 | endif
+	let [l:startNum, l:subArguments, l:offset] = matchlist(a:arguments, '^\(' . s:numberExpr . '\)\?\(.\{-}\)\(' . s:numberExpr . '\)\?$')[1:3]
+	let l:isFloat = (s:IsFloat(l:startNum) || s:IsFloat(l:offset))
+	execute 'let s:startNum =' (empty(l:startNum) ? 1 : l:startNum)
+	execute 'let s:offset =' (empty(l:offset) ? 1 : l:offset)
 
 	let [l:separator, l:pattern, s:format, l:flags, l:unusedCount] = ingo#cmdargs#substitute#Parse(
 	\   ingo#str#Trim(l:subArguments),
 	\   {'emptyReplacement': '', 'emptyFlags': ['', '']})
 
-	if empty(l:pattern) | let l:pattern = '[+-]\?\d\+' | endif
-	if empty(l:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*'
+	if empty(l:pattern) | let l:pattern = s:numberExpr | endif
+	if empty(l:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*$'
 	    " The parser has a precedence for replacement over flags, but we can
 	    " have either of them. Correct misattributed flags.
 	    let [s:format, l:flags] = ['', s:format]
 	endif
-	if empty(s:format) | let s:format = '%d' | endif
+	if empty(s:format)
+	    let s:format = (l:isFloat ? '%g' : '%d')
+	endif
 
 	let s:num = s:startNum
     endif
