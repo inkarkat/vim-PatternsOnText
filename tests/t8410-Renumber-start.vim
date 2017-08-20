@@ -3,8 +3,8 @@
 edit numbers.txt
 
 4Renumber 5 g
-18,21Renumber -3
-24Renumber -2 g
+19,22Renumber -3
+25Renumber -2 g
 
 call vimtest#SaveOut()
 call vimtest#Quit()
