@@ -8,47 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.020	17-Jun-2017	Add :SubstituteUnless variant of :SubstituteIf.
-"   2.00.019	30-Sep-2016	Add completion for :SubstituteIf and
-"				:SubstituteExecute.
-"   2.00.018	29-Sep-2016	ENH: Support recall of previous pairs /
-"				substitutions in :SubstituteWildcard /
-"				:SubstituteMultiple.
-"				Add :SubstituteExecute command.
-"   2.00.017	28-Sep-2016	Add :SubstituteIf command.
-"   2.00.016	27-Sep-2016	Add :SubstituteChoices command.
-"   1.51.014	24-Nov-2014	Improve reporting of readonly buffers for
-"				:SubstituteExcept, :DeleteExcept,
-"				:SubstituteSelected, and :SubstituteSubsequent.
-"   1.50.013	18-Nov-2014	Add :PrintUnique... and :DeleteUnique...
-"				variants for the opposite selection.
-"   1.40.012	27-Oct-2014	Add :SubstituteNotInSearch command.
-"   1.35.011	17-Apr-2014	Add :RangeDo command.
-"   1.30.010	10-Mar-2014	Add :DeleteRanges, :YankRanges, :PrintRanges
-"				commands.
-"   1.30.009	05-Mar-2014	Add :DeleteAllDuplicateLinesIgnoring command.
-"   1.20.008	16-Jan-2014	Add :SubstituteWildcard and :SubstituteMultiple
-"				commands.
-"   1.11.007	10-Jun-2013	FIX: Remove -bar from all commands to correctly
-"				handle patterns like foo\|bar without escaping
-"				as foo\\|bar.
-"   1.10.006	06-Jun-2013	Also recall previous answers in a bare
-"				:SubstituteSelected command.
-"   1.10.005	04-Jun-2013	The commands that take a {pattern}, i.e.
-"				:SubstituteExcept, :DeleteExcept,
-"				:SubstituteSelected now consistently set that as
-"				the last search pattern.
-"   1.01.004	30-May-2013	Implement abort on error for :SubstituteExcept,
-"				:DeleteExcept, :SubstituteSelected, and
-"				:SubstituteInSearch, too.
-"   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
-"				deletion via
-"				PatternsOnText#Duplicates#ReportDeletedMatches().
-"	002	22-Jan-2013	Separate each functionality part into a separate
-"				autoload module.
-"	001	21-Jan-2013	file creation
 
 " Avoid installing twice or when in unsupported Vim version.
 if exists('g:loaded_PatternsOnText') || (v:version < 700)
@@ -209,6 +168,12 @@ command! -bang -range=% -nargs=+ PrintRanges
 \   endif
 command! -bang -range=% -nargs=+ RangeDo
 \   if ! PatternsOnText#Ranges#Command('do', <line1>, <line2>, <bang>0, <q-args>) |
+\       echoerr ingo#err#Get() |
+\   endif
+
+command! -range=-1 -nargs=? Renumber
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Renumber#Renumber((<count> == -1 && <q-args> ==# '&'), (<line2> == 1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 
