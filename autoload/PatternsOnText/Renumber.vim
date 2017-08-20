@@ -9,6 +9,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:numberExpr = '[+-]\?\d\+\%(\.\d\+\%([eE][+-]\?\d\+\)\?\)\?'
 function! s:IsFloat( num )
@@ -16,10 +18,12 @@ function! s:IsFloat( num )
 endfunction
 function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
     if a:arguments !=# '&'
-	let [l:startNum, l:subArguments, l:offset] = matchlist(a:arguments, '^\(' . s:numberExpr . '\)\?\(.\{-}\)\(' . s:numberExpr . '\)\?$')[1:3]
+	let [l:startNum, l:subArguments, l:multiplicator, l:offset] =
+	\   matchlist(a:arguments, '^\(' . s:numberExpr . '\)\?\(.\{-}\)\%(\(\*\)\?\(' . s:numberExpr . '\)\)\?$')[1:4]
 	let l:isFloat = (s:IsFloat(l:startNum) || s:IsFloat(l:offset))
 	execute 'let s:startNum =' (empty(l:startNum) ? 1 : l:startNum)
 	execute 'let s:offset =' (empty(l:offset) ? 1 : l:offset)
+	let s:operator = (empty(l:multiplicator) ? '+' : '*')
 
 	let [l:separator, l:pattern, s:format, l:flags, l:unusedCount] = ingo#cmdargs#substitute#Parse(
 	\   ingo#str#Trim(l:subArguments),
@@ -54,8 +58,10 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 endfunction
 function! s:Renumber()
     let l:renderedNumber = printf(s:format, s:num)
-    let s:num += s:offset
+    execute 'let s:num = s:num ' s:operator 's:offset'
     return l:renderedNumber
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
