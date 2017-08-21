@@ -450,6 +450,9 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+2.10	RELEASEME
+- Add :Renumber command.
+
 2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
 - Move PatternsOnText#DefaultReplacementOnPredicate(),

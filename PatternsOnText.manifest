@@ -8,6 +8,7 @@ autoload/PatternsOnText/If.vim
 autoload/PatternsOnText/InSearch.vim
 autoload/PatternsOnText/Pairs.vim
 autoload/PatternsOnText/Ranges.vim
+autoload/PatternsOnText/Renumber.vim
 autoload/PatternsOnText/Selected.vim
 autoload/PatternsOnText/Subsequent.vim
 autoload/PatternsOnText/Uniques.vim

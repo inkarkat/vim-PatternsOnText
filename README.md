@@ -372,6 +372,18 @@ USAGE
                             - supports multiple ranges (which are joined) and
                             inversion with [!]
 
+    :[range]Renumber [N][/{pattern}/[{fmt}/]][flags][[*]offset]
+                            Search for decimal numbers / {pattern} with [flags],
+                            and replace each (according to :s_flags with
+                            1, 2, ... / [N], [N] + [offset], ...
+                            (or [N] * [offset])
+                            formatted as {fmt} (cp. printf()).
+    :[range]Renumber &      Continue renumbering with the last used number, same
+                            {pattern}, {fmt}, [flags] and [offset]. Useful with
+                            :global to cover only certain lines. Use
+                            :0Renumber ... to prime the required values, e.g.:
+                                :0Renumber 100 g 10 | global/^#/.Renumber &
+    
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -403,7 +415,7 @@ KNOWN PROBLEMS
 - The # pattern separator cannot be used with :SubstituteSelected,
   :SubstituteInSearch, and :SubstituteNotInSearch.
 - The : pattern separator cannot be used with :SubstituteChoices,
-  :SubstituteIf, and :SubstituteExecute.
+  :SubstituteIf, :SubstituteExecute, and :Renumber.
 
 ### CONTRIBUTING
 
@@ -412,6 +424,9 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 
 HISTORY
 ------------------------------------------------------------------------------
+
+##### 2.10    RELEASEME
+- Add :Renumber command.
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
