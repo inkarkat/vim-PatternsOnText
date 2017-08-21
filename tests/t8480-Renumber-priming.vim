@@ -10,5 +10,10 @@ edit numbers.txt
 global/^@Test/execute '.Renumber &'
 6,9Renumber &
 
+0Renumber 2/-\?\(0x\)\?\d\+/<%s>/ge *2
+25Renumber &
+26Renumber &
+29Renumber &
+
 call vimtest#SaveOut()
 call vimtest#Quit()

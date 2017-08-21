@@ -22,9 +22,9 @@ Give me 5.368709e7 and 209701.778227 for 819.095146 or 3.199386 and 0.012497 for
 # More 222s in 333s of 111s.
 
 @Test(priority=50)
-So negative like -1 and -1 and -1 for -1 and -1.
+So negative like <2> and <4> and <8> for <16> and <32>.
 
 @Test(priority=60)
 
-0x00 + 0x00 = 0x00
+<64> + <128> = <256>
 No Number found!
