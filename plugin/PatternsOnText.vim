@@ -173,7 +173,7 @@ command! -bang -range=% -nargs=+ RangeDo
 
 command! -range=-1 -nargs=? Renumber
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Renumber#Renumber((<count> == -1 && <q-args> ==# '&'), (<line2> == 1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
+\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), (<count> == -1 && <line2> == 1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 

@@ -25,19 +25,19 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 	execute 'let s:offset =' (empty(l:offset) ? 1 : l:offset)
 	let s:operator = (empty(l:multiplicator) ? '+' : '*')
 
-	let [l:separator, l:pattern, s:format, l:flags, l:unusedCount] = ingo#cmdargs#substitute#Parse(
+	let [s:separator, s:pattern, s:format, s:flags, l:unusedCount] = ingo#cmdargs#substitute#Parse(
 	\   ingo#str#Trim(l:subArguments),
 	\   {'emptyReplacement': '', 'emptyFlags': ['', '']})
-	if (empty(l:separator) || l:separator ==# '.') && ! empty(l:pattern)
+	if (empty(s:separator) || s:separator ==# '.') && ! empty(s:pattern)
 	    call ingo#err#Set('Missing separators around /{pattern}/')
 	    return 0
 	endif
 
-	if empty(l:pattern) | let l:pattern = s:numberExpr | endif
-	if empty(l:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*$'
+	if empty(s:pattern) | let s:pattern = s:numberExpr | endif
+	if empty(s:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*$'
 	    " The parser has a precedence for replacement over flags, but we can
 	    " have either of them. Correct misattributed flags.
-	    let [s:format, l:flags] = ['', s:format]
+	    let [s:format, s:flags] = ['', s:format]
 	endif
 	if empty(s:format)
 	    let s:format = (l:isFloat ? '%g' : '%d')
@@ -52,8 +52,8 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
     call ingo#err#Clear()
     try
 	execute printf('%ssubstitute%s%s%s\=s:Renumber()%s%s',
-	\   a:range, l:separator, l:pattern, l:separator,
-	\   l:separator, l:flags
+	\   a:range, s:separator, s:pattern, s:separator,
+	\   s:separator, s:flags
 	\)
 
 	return ! ingo#err#IsSet()
