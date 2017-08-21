@@ -403,7 +403,7 @@ USAGE							*PatternsOnText-usage*
 			{pattern}, {fmt}, [flags] and [offset]. Useful with
 			|:global| to cover only certain lines. Use
 			:0Renumber ... to prime the required values, e.g.: >
-			    :0Renumber 100 g 10 | global/^#/Renumber &
+			    :0Renumber 100 g 10 | global/^#/.Renumber &
 <
 ==============================================================================
 INSTALLATION					 *PatternsOnText-installation*

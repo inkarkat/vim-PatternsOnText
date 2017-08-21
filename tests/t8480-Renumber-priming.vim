@@ -7,7 +7,7 @@ edit numbers.txt
 12Renumber &
 
 0Renumber 10 10
-global/^@Test/execute '.Renumber &'
+global/^@Test/.Renumber &
 6,9Renumber &
 
 0Renumber 2/-\?\(0x\)\?\d\+/<%s>/ge *2
