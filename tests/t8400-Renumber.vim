@@ -4,7 +4,8 @@ edit numbers.txt
 
 4Renumber g
 19,22Renumber
-25Renumber g
+25
+.Renumber g
 
 call vimtest#SaveOut()
 call vimtest#Quit()

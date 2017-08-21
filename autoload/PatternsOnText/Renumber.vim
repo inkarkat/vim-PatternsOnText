@@ -28,6 +28,10 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 	let [l:separator, l:pattern, s:format, l:flags, l:unusedCount] = ingo#cmdargs#substitute#Parse(
 	\   ingo#str#Trim(l:subArguments),
 	\   {'emptyReplacement': '', 'emptyFlags': ['', '']})
+	if (empty(l:separator) || l:separator ==# '.') && ! empty(l:pattern)
+	    call ingo#err#Set('Missing separators around /{pattern}/')
+	    return 0
+	endif
 
 	if empty(l:pattern) | let l:pattern = s:numberExpr | endif
 	if empty(l:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*$'
@@ -45,21 +49,28 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 	return 1
     endif
 
+    call ingo#err#Clear()
     try
 	execute printf('%ssubstitute%s%s%s\=s:Renumber()%s%s',
 	\   a:range, l:separator, l:pattern, l:separator,
 	\   l:separator, l:flags
 	\)
-	return 1
+
+	return ! ingo#err#IsSet()
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     endtry
 endfunction
 function! s:Renumber()
-    let l:renderedNumber = printf(s:format, s:num)
-    execute 'let s:num = s:num ' s:operator 's:offset'
-    return l:renderedNumber
+    try
+	let l:renderedNumber = printf(s:format, s:num)
+	execute 'let s:num = s:num ' s:operator 's:offset'
+	return l:renderedNumber
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return submatch(0)
+    endtry
 endfunction
 
 let &cpo = s:save_cpo
