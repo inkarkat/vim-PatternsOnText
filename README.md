@@ -274,24 +274,6 @@ USAGE
                             duplicate line (ignoring any text matched by
                             {pattern}).
 
-    :[range]PrintDuplicates[!] [{pattern}]
-    :[range]PrintDuplicates[!] /{pattern}/
-                            Print all matches of {pattern} (if omitted: the last
-                            search pattern) that appear multiple times in the
-                            current line / [range].
-                            To print all duplicate matches of {pattern} within a
-                            single line, processing a [range] or the entire
-                            buffer, use:
-                            :global/^/PrintDuplicates! [{pattern}]
-                            :global/^/PrintDuplicates! /{pattern}/
-                            The [!] suppresses the error when there are no
-                            duplicates in a particular line.
-
-    :[range]DeleteDuplicates[!] [{pattern}]
-    :[range]DeleteDuplicates[!] /{pattern}/
-                            Delete all subsequent matches of {pattern} (or the
-                            last search pattern, if omitted) except the first.
-
     :[range]PrintUniqueLinesOf[!] [/]{pattern}[/]
                             Print all unique occurrences of lines matching
                             {pattern}. All matching lines are added to the
@@ -340,6 +322,32 @@ USAGE
                             Delete all unique matches of {pattern} (or the last
                             search pattern, if omitted). Only duplicate matches
                             are kept.
+
+    :[range]PrintDuplicates[!] [{pattern}]
+    :[range]PrintDuplicates[!] /{pattern}/
+                            Print all matches of {pattern} (if omitted: the last
+                            search pattern) that appear multiple times in the
+                            current line / [range].
+                            To print all duplicate matches of {pattern} within a
+                            single line, processing a [range] or the entire
+                            buffer, use:
+                            :global/^/PrintDuplicates! [{pattern}]
+                            :global/^/PrintDuplicates! /{pattern}/
+                            The [!] suppresses the error when there are no
+                            duplicates in a particular line.
+
+    :[range]DeleteDuplicates[!] [{pattern}]
+    :[range]DeleteDuplicates[!] /{pattern}/
+                            Delete all subsequent matches of {pattern} (or the
+                            last search pattern, if omitted) except the first.
+                            To delete all non-unique matches, use
+                            :DeleteAllDuplicates instead.
+
+    :[range]DeleteAllDuplicates[!] [{pattern}]
+    :[range]DeleteAllDuplicates[!] /{pattern}/
+                            Delete all non-unique matches of {pattern} (or the last
+                            search pattern, if omitted). To keep the first match,
+                            use :DeleteDuplicates instead.
 
     :[range]DeleteRanges[!] {range} [range] [...] [x]
     :[range]YankRanges[!] {range} [range] [...] [x]
@@ -427,6 +435,8 @@ HISTORY
 
 ##### 2.10    RELEASEME
 - Add :Renumber command.
+- Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
+  of :DeleteUniques.
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.

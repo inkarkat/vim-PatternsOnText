@@ -143,6 +143,15 @@ command! -bang -range -nargs=? DeleteDuplicates
 \       ) && <bang>1 |
 \       echoerr 'No duplicates' |
 \   endif
+command! -bang -range -nargs=? DeleteAllDuplicates
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\       function('PatternsOnText#Uniques#FilterNonUnique'),
+\       '',
+\       function('PatternsOnText#Uniques#DeleteNonUnique')
+\       ) && <bang>1 |
+\       echoerr 'No duplicates' |
+\   endif
 command! -bang -range -nargs=? DeleteUniques
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
