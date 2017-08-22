@@ -22,7 +22,7 @@ Give me 5.368709e7 and 209701.778227 for 819.095146 or 3.199386 and 0.012497 for
 # More 222s in 333s of 111s.
 
 @Test(priority=31)
-So negative like -1000.0 and -1000000.0 and -1.0E9 for -1.0E12 and -1.0E15.
+So negative like -1.0 and -100.0 and -10000.0 for -1000000.0 and -1.0E8.
 
 @Test(priority=32)
 
