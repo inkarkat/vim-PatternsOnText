@@ -1,5 +1,7 @@
 " Test renumbering with floats.
 
+call vimtest#SkipAndQuitIf(! has('float'), 'Need support for +float')
+
 edit numbers.txt
 
 2Renumber g 0.1

@@ -1,5 +1,7 @@
 " Test renumbering with multiplicator offset.
 
+call vimtest#SkipAndQuitIf(! has('float'), 'Need support for +float')
+
 edit numbers.txt
 
 2Renumber 2 g *2

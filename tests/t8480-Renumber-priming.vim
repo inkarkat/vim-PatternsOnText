@@ -1,5 +1,7 @@
 " Test priming first then renumbering.
 
+call vimtest#SkipAndQuitIf(! has('float'), 'Need support for +float')
+
 edit numbers.txt
 
 0Renumber 1.1//(%G)/g 1.1

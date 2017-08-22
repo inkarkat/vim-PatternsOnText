@@ -1,5 +1,7 @@
 " Test renumbering with different format.
 
+call vimtest#SkipAndQuitIf(! has('float'), 'Need support for +float')
+
 edit numbers.txt
 
 2Renumber 9//%5d/g
