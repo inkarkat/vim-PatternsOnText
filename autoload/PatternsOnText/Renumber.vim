@@ -1,4 +1,4 @@
-" autoload/PatternsOnText/Renumber.vim: Commands to renumber matches.
+" PatternsOnText/Renumber.vim: Commands to renumber matches.
 "
 " DEPENDENCIES:
 "   - ingo/cmdargs/substitute.vim autoload script
