@@ -4,7 +4,7 @@
 "   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -69,7 +69,7 @@ function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePatte
 "****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
     " Add the pattern to the search history, like :substitute, :global, etc.
     for l:pattern in filter([l:ignorePattern, a:acceptPattern], '! empty(v:val)')
-	call histadd('search', l:pattern)
+	call histadd('search', escape(l:pattern, '/'))
     endfor
 
     let l:accumulator = {}

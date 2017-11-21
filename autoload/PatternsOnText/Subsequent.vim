@@ -6,7 +6,7 @@
 "   - ingo/range.vim autoload script
 "   - PatternsOnText/Selected.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -81,7 +81,7 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
 	" search pattern and history; this will only hamper further searches and
 	" command redo.
 	call histdel('search', -1)
-	call histadd('search', l:pattern)
+	call histadd('search', escape(ingo#escape#Unescape(l:pattern, l:separator), '/'))
     endtry
 endfunction
 

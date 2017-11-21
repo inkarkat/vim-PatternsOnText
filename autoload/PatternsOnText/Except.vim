@@ -6,7 +6,7 @@
 "   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/cmdargs.vim autoload script
 "
-" Copyright: (C) 2011-2014 Ingo Karkat
+" Copyright: (C) 2011-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -86,7 +86,7 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, c
 	" Don't remember the convoluted inverted pattern, but rather what was passed
 	" to the :SubstituteExcept command.
 	call histdel('search', -1)
-	call histadd('search', a:pattern)
+	call histadd('search', escape(ingo#escape#Unescape(a:pattern, a:separator), '/'))
     endtry
 endfunction
 function! PatternsOnText#Except#Substitute( range, arguments )

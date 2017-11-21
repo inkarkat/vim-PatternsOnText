@@ -34,6 +34,7 @@ the general built-in doesn't suffice.
   be used with :SubstituteIf as a predicate that checks for the syntax of
   the current match. For example, a predicate that detects comments can be
   defined as:
+ <!-- -->
 
     function! Comment()
         return ingo#syntaxitem#IsOnSyntax(getpos('.'), '^Comment$')
@@ -42,6 +43,7 @@ the general built-in doesn't suffice.
 ### RELATED WORKS
 
 - The :SubstituteSelected command can be emulated with built-ins via
+ <!-- -->
 
     :call feedkeys('yyyq') | %s/{pattern}/{string}/gc
 
@@ -114,12 +116,12 @@ USAGE
                             Within the current search pattern matches, replace all
                             matches of {pattern} with {string}. Shortcut for
                             :%s//\=substitute(submatch(0), "foo", "bar", "g")/gc
-                            ~ is replaced with the {string} of the previous
+                           ~ is replaced with the {string} of the previous
                             :Substitute[Not]InSearch.
                             Handles \= sub-replace-expression in {string}, which
                             can't be used recursively in the above built-in
                             :%s//\=...
-                            [flags] and [count] apply to the outer matching of the
+                           [flags] and [count] apply to the outer matching of the
                             last search pattern. The [e] from :s_flags also
                             suppresses the error message when {pattern} never
                             matches.
@@ -172,8 +174,8 @@ USAGE
                             via v:val. It provides the following information:
                                 matchCount: number of current match of {pattern}
                                 replacementCount: number of actual replacements
-                                                done so far, i.e. where
-                                                {predicate} was true
+                                                  done so far, i.e. where
+                                                  {predicate} was true
                             It also contains pre-initialized variables for use by
                             {predicate}. These get cleared by each :SubstituteIf
                             / :SubstituteUnless invocation:
@@ -314,7 +316,7 @@ USAGE
                             buffer, use:
                             :global/^/PrintUniques! [{pattern}]
                             :global/^/PrintUniques! /{pattern}/
-                            The [!] suppresses the error when there are no
+                           The [!] suppresses the error when there are no
                             uniques in a particular line.
 
     :[range]DeleteUniques[!] [{pattern}]
@@ -333,7 +335,7 @@ USAGE
                             buffer, use:
                             :global/^/PrintDuplicates! [{pattern}]
                             :global/^/PrintDuplicates! /{pattern}/
-                            The [!] suppresses the error when there are no
+                           The [!] suppresses the error when there are no
                             duplicates in a particular line.
 
     :[range]DeleteDuplicates[!] [{pattern}]
@@ -374,11 +376,11 @@ USAGE
                             the preceding ranges!
                             Works like
                                 :global/apples/,/peaches/ {cmd}
-                            but:
+                           but:
                             - processes each line only once when the ranges are
-                            overlapping
+                              overlapping
                             - supports multiple ranges (which are joined) and
-                            inversion with [!]
+                              inversion with [!]
 
     :[range]Renumber [N][/{pattern}/[{fmt}/]][flags][[*]offset]
                             Search for decimal numbers / {pattern} with [flags],
@@ -391,7 +393,7 @@ USAGE
                             :global to cover only certain lines. Use
                             :0Renumber ... to prime the required values, e.g.:
                                 :0Renumber 100 g 10 | global/^#/.Renumber &
-    
+
 INSTALLATION
 ------------------------------------------------------------------------------
 
@@ -437,6 +439,8 @@ HISTORY
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
   of :DeleteUniques.
+- Minor: Do proper escaping of pattern separators when adding to the search
+  history.
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.

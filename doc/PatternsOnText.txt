@@ -462,6 +462,8 @@ HISTORY						      *PatternsOnText-history*
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
   of :DeleteUniques.
+- Minor: Do proper escaping of pattern separators when adding to the search
+  history.
 
 2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
