@@ -8,47 +8,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.50.010	18-Nov-2014	Factor out
-"				PatternsOnText#DuplicateLines#FilterDuplicateLines()
-"				and pass that in as Funcref.
-"				Support opposite selection via
-"				PatternsOnText#DuplicateLines#FilterUniqueLines().
-"				In PatternsOnText#DuplicateLines#PrintLines(),
-"				also account for single (unique) line matches,
-"				and omit the header then, too. It makes no sense
-"				to print such when followed by just one
-"				identical line.
-"   1.36.009	23-Sep-2014	BUG: :.DeleteDuplicateLines... et al. don't work
-"				correctly on a closed fold; need to use
-"				ingo#range#NetStart().
-"   1.36.008	29-May-2014	Refactoring: Use
-"				ingo#cmdargs#pattern#ParseUnescaped().
-"   1.30.007	10-Mar-2014	Extract PatternsOnText#DeleteLines().
-"   1.30.006	05-Mar-2014	Extract s:DeleteLines() and use in new
-"				PatternsOnText#DuplicateLines#DeleteAllLines()
-"				which implements the new
-"				:DeleteAllDuplicateLinesIgnoring command.
-"				CHG: Don't ignore empty lines, but put them into
-"				the accumulator as ^@ ("\n"). Empty lines now
-"				need to be explicitly ignored, e.g. via /^$/
-"				pattern.
-"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.00.004	28-May-2013	Add the pattern to the search history, like
-"				:substitute, :global, etc. Because we're not
-"				invoking :substitute here, we have to do this
-"				explicitly.
-"				ENH: Print the customary summary when deleting
-"				duplicate lines.
-"	003	21-Feb-2013	Move to ingo-library.
-"	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
-"				take the result of
-"				ingocmdargs#ParsePatternArgument() instead of
-"				invoking that function itself.
-"	001	22-Jan-2013	file creation
 
 function! PatternsOnText#DuplicateLines#PatternOrCurrentLine( arguments )
     if empty(a:arguments)

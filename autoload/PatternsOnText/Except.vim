@@ -10,48 +10,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.36.008	26-Oct-2014	Factor out
-"				PatternsOnText#Except#GetInvertedPattern().
-"   1.12.007	16-Sep-2013	FIX: Use of \v and \V magicness atoms in the
-"				pattern for :DeleteExcept and :SubstituteExcept
-"				cause errors like "E54: Unmatched (" and "E486:
-"				Pattern not found". Revert to the default
-"				'magic' mode after each pattern insertion to the
-"				workhorse regular expression.
-"				FIX: Abort :DeleteExcept / :SubstituteExcept
-"				commands when the pattern contains the set start
-"				/ end match patterns \zs / \ze, as these
-"				interfere with the internal implemenation. (I
-"				managed to replace \ze with \@=, but couldn't
-"				substitute \zs with \@<= without affecting the
-"				results.)
-"   1.10.006	04-Jun-2013	Refactoring: Perform the defaulting to @/
-"				outside s:InvertedSubstitute(), partly through
-"				ingo#cmdargs#substitute#Parse().
-"				Don't remember the convoluted inverted pattern
-"				in the history, but rather what was passed to
-"				the command.
-"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.01.005	30-May-2013	Implement abort on error.
-"   1.00.004	29-May-2013	Adapt to changed
-"				ingo#cmdargs#ParseSubstituteArgument() interface
-"				in ingo-library version 1.006.
-"   1.00.003	28-May-2013	FIX: Forgot to adapt function names after move.
-"				Also re-use the previous (:substitute or
-"				:SubstituteExcept) flags by replacing
-"				s:SubstituteExcept_PreviousFlags with '&'. Makes
-"				more sense this way.
-"				CHG: Default to the "g" flag also for
-"				:SubstituteExcept, as a single replacement
-"				before the first match doesn't make much sense.
-"				Handle 'gdefault' setting by inverting the
-"				default to "g" then.
-"	002	21-Feb-2013	Use ingo-library.
-"	001	22-Jan-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
