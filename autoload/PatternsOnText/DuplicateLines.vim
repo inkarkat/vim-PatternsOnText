@@ -23,9 +23,21 @@ function! PatternsOnText#DuplicateLines#FilterUniqueLines( accumulator )
     call filter(a:accumulator, 'len(v:val) == 1')
 endfunction
 
-function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Filter, Action )
+function! s:Match( text, pattern, isInvert )
+    execute 'return a:text' (a:isInvert ? '!~' : '=~') 'a:pattern'
+endfunction
+function! s:Extract( text, pattern, isInvert )
+    if a:isInvert
+	let l:matches = []
+	call substitute(a:text, a:pattern, '\=empty(add(l:matches, submatch(0))) ? submatch(0) : submatch(0)', 'g')
+	return join(l:matches, '')
+    else
+	return substitute(a:text, a:pattern, '', 'g')
+    endif
+endfunction
+function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, isIgnorePatternInverted, acceptPattern, isAcceptPatternInverted, Filter, Action )
     let l:ignorePattern = ingo#cmdargs#pattern#ParseUnescaped(a:ignorePattern)
-"****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
+"****D echomsg '****' string(l:ignorePattern) a:isIgnorePatternInverted string(a:acceptPattern) a:isAcceptPatternInverted
     " Add the pattern to the search history, like :substitute, :global, etc.
     for l:pattern in filter([l:ignorePattern, a:acceptPattern], '! empty(v:val)')
 	call histadd('search', escape(l:pattern, '/'))
@@ -34,13 +46,13 @@ function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePatte
     let l:accumulator = {}
     for l:lnum in range(ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum))
 	let l:line = getline(l:lnum)
-	if ! empty(a:acceptPattern) && l:line !~ a:acceptPattern
+	if ! empty(a:acceptPattern) && ! s:Match(l:line, a:acceptPattern, a:isAcceptPatternInverted)
 	    continue
 	endif
 
 	if ! empty(l:ignorePattern)
 	    let l:wasEmpty = empty(l:line)
-	    let l:line = substitute(l:line, l:ignorePattern, '', 'g')
+	    let l:line = s:Extract(l:line, l:ignorePattern, a:isIgnorePatternInverted)
 	    if empty(l:line) && (! l:wasEmpty || '' =~ l:ignorePattern)
 		continue    " Filter out completely ignored lines.
 	    endif

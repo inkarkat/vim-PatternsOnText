@@ -256,8 +256,6 @@ USAGE							*PatternsOnText-usage*
 			pattern, last used |:s_flags|, and last used
 			expression.
 
-			For all following commands, the [!] suppresses the
-			error when there are no duplicates.
 						      *:PrintDuplicateLinesOf*
 :[range]PrintDuplicateLinesOf[!] [{pattern}]
 :[range]PrintDuplicateLinesOf[!] /{pattern}/
@@ -316,6 +314,10 @@ USAGE							*PatternsOnText-usage*
 			Delete all unique occurrences of a line (ignoring
 			any text matched by {pattern}). Only duplicate lines
 			are kept.
+
+
+			For the following commands, the [!] suppresses the
+			error when there are no duplicates.
 					       *:DeleteAllUniqueLinesIgnoring*
 :[range]DeleteAllUniqueLinesIgnoring[!] [{pattern}]
 :[range]DeleteAllUniqueLinesIgnoring[!] /{pattern}/
@@ -464,6 +466,12 @@ HISTORY						      *PatternsOnText-history*
   of :DeleteUniques.
 - Minor: Do proper escaping of pattern separators when adding to the search
   history.
+- CHG: Allow inversion of :...LinesOf and :...LinesIgnoring {pattern} via !
+  (instead of suppressing error message with !) Affects
+  :PrintDuplicateLinesOf, :DeleteDuplicateLinesOf,
+  :PrintDuplicateLinesIgnoring, :DeleteDuplicateLinesIgnoring,
+  :DeleteAllDuplicateLinesIgnoring, :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
+  :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring
 
 2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.

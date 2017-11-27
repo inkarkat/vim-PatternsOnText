@@ -46,75 +46,89 @@ command! -range -nargs=* SubstituteMultiple if ! PatternsOnText#Pairs#Substitute
 command! -range -nargs=* SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>),
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       )  && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=1 PrintUniqueLinesOf
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       <q-args>,
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       <q-args>, <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       )  && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>),
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')
-\   ) && <bang>1 |
+\   ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteUniqueLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       <q-args>,
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       <q-args>, <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\   ) && <bang>1 |
+\   ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintDuplicateLinesIgnoring
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintUniqueLinesIgnoring
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteUniqueLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteAllDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 
@@ -123,7 +137,7 @@ command! -bang -range -nargs=? PrintDuplicates
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? PrintUniques
@@ -131,7 +145,7 @@ command! -bang -range -nargs=? PrintUniques
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique matches' |
 \   endif
 command! -bang -range -nargs=? DeleteDuplicates
@@ -140,7 +154,7 @@ command! -bang -range -nargs=? DeleteDuplicates
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       function('PatternsOnText#Duplicates#DeleteMatches'),
 \       function('PatternsOnText#Duplicates#ReportDeletedMatches')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? DeleteAllDuplicates
@@ -149,7 +163,7 @@ command! -bang -range -nargs=? DeleteAllDuplicates
 \       function('PatternsOnText#Uniques#FilterNonUnique'),
 \       '',
 \       function('PatternsOnText#Uniques#DeleteNonUnique')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? DeleteUniques
@@ -158,7 +172,7 @@ command! -bang -range -nargs=? DeleteUniques
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Uniques#DeleteUnique')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique matches' |
 \   endif
 
