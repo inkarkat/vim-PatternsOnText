@@ -243,59 +243,62 @@ USAGE
 
     :[range]PrintDuplicateLinesOf[!] [{pattern}]
     :[range]PrintDuplicateLinesOf[!] /{pattern}/
-                            Print all occurrences of lines matching {pattern} (or
-                            the current line, if omitted).
+                            Print all occurrences of lines matching (with [!]: not
+                            matching) {pattern} (or the current line, if omitted).
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteDuplicateLinesOf[!] [{pattern}]
     :[range]DeleteDuplicateLinesOf[!] /{pattern}/
                             Delete all subsequent occurrences of lines matching
-                            {pattern} (or the current line, if omitted).
+                            (with [!]: not matching) {pattern} (or the current
+                            line, if omitted).
 
     :[range]PrintDuplicateLinesIgnoring[!] [{pattern}]
     :[range]PrintDuplicateLinesIgnoring[!] /{pattern}/
                             Print all occurrences of a line whose text (ignoring
-                            any text matched by {pattern}) appears multiple times.
-                            To ignore empty lines, use a {pattern} of ^$ (strict)
-                            or ^\s*$ (lenient).
+                            any text matched (with [!]: not matched) by {pattern})
+                            appears multiple times. To ignore empty lines, use a
+                            {pattern} of ^$ (strict) or ^\s*$ (lenient).
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteDuplicateLinesIgnoring[!] [{pattern}]
     :[range]DeleteDuplicateLinesIgnoring[!] /{pattern}/
                             Delete all subsequent occurrences of a line (ignoring
-                            any text matched by {pattern}).
+                            any text matched (with [!]: not matched) by
+                            {pattern}).
 
     :[range]DeleteAllDuplicateLinesIgnoring[!] [{pattern}]
     :[range]DeleteAllDuplicateLinesIgnoring[!] /{pattern}/
                             Delete all (including the very first) occurrences of a
-                            duplicate line (ignoring any text matched by
-                            {pattern}).
+                            duplicate line (ignoring any text matched (with [!]:
+                            not matched) by {pattern}).
 
     :[range]PrintUniqueLinesOf[!] [/]{pattern}[/]
-                            Print all unique occurrences of lines matching
-                            {pattern}. All matching lines are added to the
-                            jumplist, so you can use CTRL-O to revisit the
-                            locations.
+                            Print all unique occurrences of lines matching (with
+                            [!]: not matching) {pattern}. All matching lines are
+                            added to the jumplist, so you can use CTRL-O to
+                            revisit the locations.
 
     :[range]DeleteUniqueLinesOf[!] [/]{pattern}[/]
-                            Delete all unique occurrences of lines matching
-                            {pattern}. Only duplicate lines are kept.
+                            Delete all unique occurrences of lines matching (with
+                            [!]: not matching) {pattern}. Only duplicate lines are
+                            kept.
 
     :[range]PrintUniqueLinesIgnoring[!] [{pattern}]
     :[range]PrintUniqueLinesIgnoring[!] /{pattern}/
                             Print all lines whose text (ignoring any text matched
-                            by {pattern}) appears only once in the buffer /
-                            [range].
+                            (with [!]: not matched) by {pattern}) appears only
+                            once in the buffer / [range].
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteUniqueLinesIgnoring[!] [{pattern}]
     :[range]DeleteUniqueLinesIgnoring[!] /{pattern}/
                             Delete all unique occurrences of a line (ignoring
-                            any text matched by {pattern}). Only duplicate lines
-                            are kept.
+                            any text matched (with [!]: not matched) by
+                            {pattern}). Only duplicate lines are kept.
 
                             For the following commands, the [!] suppresses the
                             error when there are no duplicates.
