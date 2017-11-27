@@ -318,12 +318,6 @@ USAGE							*PatternsOnText-usage*
 
 			For the following commands, the [!] suppresses the
 			error when there are no duplicates.
-					       *:DeleteAllUniqueLinesIgnoring*
-:[range]DeleteAllUniqueLinesIgnoring[!] [{pattern}]
-:[range]DeleteAllUniqueLinesIgnoring[!] /{pattern}/
-			Delete all (including the very first) occurrences of a
-			duplicate line (ignoring any text matched by
-			{pattern}).
 							       *:PrintUniques*
 :[range]PrintUniques[!] [{pattern}]
 :[range]PrintUniques[!] /{pattern}/
