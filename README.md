@@ -116,12 +116,12 @@ USAGE
                             Within the current search pattern matches, replace all
                             matches of {pattern} with {string}. Shortcut for
                             :%s//\=substitute(submatch(0), "foo", "bar", "g")/gc
-                           ~ is replaced with the {string} of the previous
+                            ~ is replaced with the {string} of the previous
                             :Substitute[Not]InSearch.
                             Handles \= sub-replace-expression in {string}, which
                             can't be used recursively in the above built-in
                             :%s//\=...
-                           [flags] and [count] apply to the outer matching of the
+                            [flags] and [count] apply to the outer matching of the
                             last search pattern. The [e] from :s_flags also
                             suppresses the error message when {pattern} never
                             matches.
@@ -313,7 +313,7 @@ USAGE
                             buffer, use:
                             :global/^/PrintUniques! [{pattern}]
                             :global/^/PrintUniques! /{pattern}/
-                           The [!] suppresses the error when there are no
+                            The [!] suppresses the error when there are no
                             uniques in a particular line.
 
     :[range]DeleteUniques[!] [{pattern}]
@@ -332,7 +332,7 @@ USAGE
                             buffer, use:
                             :global/^/PrintDuplicates! [{pattern}]
                             :global/^/PrintDuplicates! /{pattern}/
-                           The [!] suppresses the error when there are no
+                            The [!] suppresses the error when there are no
                             duplicates in a particular line.
 
     :[range]DeleteDuplicates[!] [{pattern}]
@@ -373,7 +373,7 @@ USAGE
                             the preceding ranges!
                             Works like
                                 :global/apples/,/peaches/ {cmd}
-                           but:
+                            but:
                             - processes each line only once when the ranges are
                               overlapping
                             - supports multiple ranges (which are joined) and
@@ -444,6 +444,14 @@ HISTORY
   :PrintDuplicateLinesIgnoring, :DeleteDuplicateLinesIgnoring,
   :DeleteAllDuplicateLinesIgnoring, :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
   :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring
+- :SubstituteChoices: FIX: Forgot to update current line number; current line
+  is re-printed on each occurrence.
+- :SubstituteChoices: Only rely on 'cursorline' highlighting if the line isn't
+  actually folded.
+- :SubstituteChoices: ENH: Include count of match replacements in current line
+  in query.
+- :SubstituteChoices: Correctly handle multi-digit entry, leading zeros with
+  /c flag.
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
@@ -565,7 +573,7 @@ HISTORY
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2017 Ingo Karkat -
+Copyright: (C) 2011-2018 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat <ingo@karkat.de>

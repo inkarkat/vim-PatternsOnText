@@ -469,6 +469,14 @@ HISTORY						      *PatternsOnText-history*
   :PrintDuplicateLinesIgnoring, :DeleteDuplicateLinesIgnoring,
   :DeleteAllDuplicateLinesIgnoring, :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
   :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring
+- :SubstituteChoices: FIX: Forgot to update current line number; current line
+  is re-printed on each occurrence.
+- :SubstituteChoices: Only rely on 'cursorline' highlighting if the line isn't
+  actually folded.
+- :SubstituteChoices: ENH: Include count of match replacements in current line
+  in query.
+- :SubstituteChoices: Correctly handle multi-digit entry, leading zeros with
+  /c flag.
 
 2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
@@ -590,7 +598,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2017 Ingo Karkat
+Copyright: (C) 2011-2018 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
