@@ -65,6 +65,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
 
     let s:lnum = -1
     let s:lastChoice = -1
+    let s:matchesInLineCnt = 1
     unlet! s:predefinedChoice
     try
 "****D echomsg '****' string([l:separator, l:pattern, l:choices, l:flags, l:count])
@@ -87,28 +88,31 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     endtry
 endfunction
 
-function! s:ShowContext()
-    let l:currentLnum = line('.')
-    if l:currentLnum != s:lnum
+function! s:ShowContext( currentLnum, isSameLineAsPrevious )
+    if a:isSameLineAsPrevious
+	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
+    else
 	" Show the current line; unfortunately, :substitute doesn't update each
 	" individual replacement, so a refresh once per line is sufficient.
-	if &cursorline && foldclosed(l:currentLnum) == -1
+	if &cursorline && foldclosed(a:currentLnum) == -1
 	    redraw!
 	else
 	    redraw
-	    call ingo#print#Number(l:currentLnum)
+	    call ingo#print#Number(a:currentLnum)
 	endif
-	let s:lnum = l:currentLnum
-    else
-	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
     endif
 endfunction
 function! s:Replace( QueryFuncref, choices )
+    let l:currentLnum = line('.')
+    let l:isSameLineAsPrevious = (l:currentLnum == s:lnum)
+    let s:lnum = l:currentLnum
+    let s:matchesInLineCnt = (l:isSameLineAsPrevious ? s:matchesInLineCnt + 1 : 1)
+
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
-	call s:ShowContext()
-	let l:choiceIdx = call(a:QueryFuncref, ['replacement', a:choices])
+	call s:ShowContext(l:currentLnum, l:isSameLineAsPrevious)
+	let l:choiceIdx = call(a:QueryFuncref, [printf('replacement of match %s', s:matchesInLineCnt), a:choices])
     endif
 
     if l:choiceIdx < 0 || l:choiceIdx == len(a:choices) " Confirm: quit
