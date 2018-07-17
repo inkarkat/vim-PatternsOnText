@@ -15,20 +15,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.004	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
-"				Move
-"				PatternsOnText#DefaultReplacementOnPredicate(),
-"				to ingo-library.
-"   2.00.003	30-Sep-2016	Refactoring: Use ingo#str#trd().
-"				FIX: Forgot to invoke s:ShowContext().
-"   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
-"				Factor out
-"				PatternsOnText#DefaultReplacementOnPrediate().
-"   1.60.001	27-Sep-2016	file creation
 
 let s:previousPattern = ''
 let s:previousChoices = []
