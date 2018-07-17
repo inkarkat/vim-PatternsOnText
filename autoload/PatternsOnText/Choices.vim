@@ -88,16 +88,17 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
 endfunction
 
 function! s:ShowContext()
-    if line('.') != s:lnum
+    let l:currentLnum = line('.')
+    if l:currentLnum != s:lnum
 	" Show the current line; unfortunately, :substitute doesn't update each
 	" individual replacement, so a refresh once per line is sufficient.
 	if &cursorline
 	    redraw!
 	else
 	    redraw
-	    call ingo#print#Number(line('.'))
+	    call ingo#print#Number(l:currentLnum)
 	endif
-	let s:lnum = line('.')
+	let s:lnum = l:currentLnum
     else
 	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
     endif
