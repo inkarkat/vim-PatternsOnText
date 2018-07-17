@@ -477,6 +477,8 @@ HISTORY						      *PatternsOnText-history*
   in query.
 - :SubstituteChoices: Correctly handle multi-digit entry, leading zeros with
   /c flag.
+- FIX: Many :Substitute... commands did not yet check for read-only or
+  unmodifiable buffer and instead printed an ugly multi-line error.
 
 2.01	15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.

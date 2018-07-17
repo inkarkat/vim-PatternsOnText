@@ -4,7 +4,7 @@
 "   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -35,15 +35,31 @@ command! -range -nargs=? SubstituteSubsequent
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteInSearch
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteNotInSearch
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? -complete=expression SubstituteIf       if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? -complete=expression SubstituteUnless   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? -complete=command    SubstituteExecute  if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=* SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=* SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteIf
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteUnless
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=command    SubstituteExecute
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteChoices
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteMultiple
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteWildcard
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
