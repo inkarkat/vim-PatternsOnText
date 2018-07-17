@@ -11,7 +11,7 @@
 "   - ingo/query/get.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2016-2017 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -97,6 +97,7 @@ function! s:ShowContext()
 	    redraw
 	    call ingo#print#Number(line('.'))
 	endif
+	let s:lnum = line('.')
     else
 	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
     endif
