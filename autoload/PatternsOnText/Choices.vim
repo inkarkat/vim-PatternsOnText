@@ -167,6 +167,7 @@ function! s:ConfirmQuery( what, list, ... )
 	    \)
 	endif
 
+	let l:maxNum = len(l:originalList)
 	let l:choice = ingo#query#get#Char()
 	if l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
 	    execute 'normal!' l:choice
@@ -174,25 +175,40 @@ function! s:ConfirmQuery( what, list, ... )
 	    continue
 	endif
 
-	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1) + 1)
-	if l:count == 0
+	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
+	if l:count == 0 && l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
-	    if len(l:originalList) > 10 * l:count
+	    if l:maxNum > 10 * l:count
 		" Need to query more numbers to be able to address all choices.
 		echon ' ' . l:count
 
-		while len(l:originalList) > 10 * l:count
-		    let l:digit = ingo#query#get#Number(9)
-		    if l:digit == -1
+		let l:leadingZeroCnt = (l:choice ==# '0')
+		while l:maxNum > 10 * l:count
+		    let l:char = nr2char(getchar())
+		    if l:char ==# "\<CR>"
+			break
+		    elseif l:char !~# '\d'
 			redraw | echo ''
 			return -1
 		    endif
-		    let l:count = 10 * l:count + l:digit
+
+		    echon l:char
+		    if l:char ==# '0' && l:count == 0
+			let l:leadingZeroCnt += 1
+			if l:leadingZeroCnt >= len(l:maxNum)
+			    return -1
+			endif
+		    else
+			let l:count = 10 * l:count + str2nr(l:char)
+			if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			    break
+			endif
+		    endif
 		endwhile
 	    endif
 	endif
 
-	if l:count < 1 || l:count > len(l:originalList)
+	if l:count < 1 || l:count > l:maxNum
 	    redraw | echo ''
 	    return -1
 	endif
