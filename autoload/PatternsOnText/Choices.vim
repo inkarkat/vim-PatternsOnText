@@ -92,7 +92,7 @@ function! s:ShowContext()
     if l:currentLnum != s:lnum
 	" Show the current line; unfortunately, :substitute doesn't update each
 	" individual replacement, so a refresh once per line is sufficient.
-	if &cursorline
+	if &cursorline && foldclosed(l:currentLnum) == -1
 	    redraw!
 	else
 	    redraw
