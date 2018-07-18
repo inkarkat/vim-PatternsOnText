@@ -454,6 +454,8 @@ HISTORY
   /c flag.
 - FIX: Many :Substitute... commands did not yet check for read-only or
   unmodifiable buffer and instead printed an ugly multi-line error.
+- :SubstituteChoices: Also offer "no" and "last as ..." choices if the :s\_c
+  flag is given, to offer feature parity with built-in :substitute.
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
