@@ -94,6 +94,7 @@ function! s:Replace( QueryFuncref, choices )
     let s:lnum = l:currentLnum
     let s:matchesInLineCnt = (l:isSameLineAsPrevious ? s:matchesInLineCnt + 1 : 1)
 
+    let s:additionalOptions = []
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
@@ -101,11 +102,11 @@ function! s:Replace( QueryFuncref, choices )
 	let l:choiceIdx = call(a:QueryFuncref, [printf('replacement of match %s', s:matchesInLineCnt), a:choices])
     endif
 
-    if l:choiceIdx < 0 || l:choiceIdx == len(a:choices) " Confirm: quit
-	let s:predefinedChoice = l:choiceIdx    " Emulate abort: All further replacements will be no-ops, without querying the user, too.
+    let l:selectedAdditionalOption = (l:choiceIdx < len(a:choices) ? '' : get(s:additionalOptions, l:choiceIdx - len(a:choices), ''))
+    if l:choiceIdx < 0 || l:selectedAdditionalOption ==# '&quit'
+	let s:predefinedChoice = -1 " Emulate abort: All further replacements will be no-ops, without querying the user, too.
 	return submatch(0)
-    elseif l:choiceIdx == len(a:choices) + 1
-	" Confirm: all remaining as <last choice>
+    elseif l:selectedAdditionalOption =~# '^&all remaining as '
 	let s:predefinedChoice = s:lastChoice
 	let l:choiceIdx = s:lastChoice
     else
@@ -116,10 +117,11 @@ function! s:Replace( QueryFuncref, choices )
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
-    let l:originalList = a:list + ['&quit']
+    let s:additionalOptions = ['&quit']
     if s:lastChoice >= 0
-	call add(l:originalList, '&all remaining as ' . a:list[s:lastChoice])
+	call insert(s:additionalOptions, '&all remaining as ' . a:list[s:lastChoice])
     endif
+    let l:originalList = a:list + s:additionalOptions
 
     let l:defaultIndex = (a:0 ? a:1 : -1)
     let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1)
