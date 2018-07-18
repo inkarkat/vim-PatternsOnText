@@ -109,6 +109,10 @@ function! s:Replace( QueryFuncref, choices )
     elseif l:selectedAdditionalOption =~# '^&all remaining as '
 	let s:predefinedChoice = s:lastChoice
 	let l:choiceIdx = s:lastChoice
+    elseif l:selectedAdditionalOption ==# '&no'
+	return submatch(0)
+    elseif ! empty(l:selectedAdditionalOption)
+	throw 'ASSERT: Unknown l:selectedAdditionalOption: ' . string(l:selectedAdditionalOption)
     else
 	let s:lastChoice = l:choiceIdx
     endif
@@ -117,7 +121,7 @@ function! s:Replace( QueryFuncref, choices )
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
-    let s:additionalOptions = ['&quit']
+    let s:additionalOptions = ['&no', '&quit']
     if s:lastChoice >= 0
 	call insert(s:additionalOptions, '&all remaining as ' . a:list[s:lastChoice])
     endif
