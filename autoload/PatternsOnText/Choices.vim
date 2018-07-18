@@ -109,6 +109,9 @@ function! s:Replace( QueryFuncref, choices )
     elseif l:selectedAdditionalOption =~# '^&all remaining as '
 	let s:predefinedChoice = s:lastChoice
 	let l:choiceIdx = s:lastChoice
+    elseif l:selectedAdditionalOption =~# '^&last as '
+	let s:predefinedChoice = -1 " Emulate abort: All further replacements will be no-ops, without querying the user, too.
+	let l:choiceIdx = s:lastChoice
     elseif l:selectedAdditionalOption ==# '&no'
 	return submatch(0)
     elseif ! empty(l:selectedAdditionalOption)
@@ -124,6 +127,7 @@ function! s:ConfirmQuery( what, list, ... )
     let s:additionalOptions = ['&no', '&quit']
     if s:lastChoice >= 0
 	call insert(s:additionalOptions, '&all remaining as ' . a:list[s:lastChoice])
+	call add(s:additionalOptions, '&last as ' . a:list[s:lastChoice])
     endif
     let l:originalList = a:list + s:additionalOptions
 
