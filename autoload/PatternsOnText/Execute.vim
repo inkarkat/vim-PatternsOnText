@@ -11,11 +11,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.00.002	30-Sep-2016	Refactoring: Factor out
-"				PatternsOnText#InitialContext().
-"   2.00.001	29-Sep-2016	file creation from If.vim
 let s:save_cpo = &cpo
 set cpo&vim
 
