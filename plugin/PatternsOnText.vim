@@ -51,6 +51,9 @@ command! -range -nargs=? -complete=expression SubstituteUnless
 command! -range -nargs=? -complete=command    SubstituteExecute
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -bang -range -nargs=? -complete=expression SubstituteTranslate
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Translate#Substitute('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteChoices
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif

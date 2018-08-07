@@ -71,7 +71,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     finally
 	" Clear the last query.
 	redraw
-	echo ''
+	echo
     endtry
 endfunction
 

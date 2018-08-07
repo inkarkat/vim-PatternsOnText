@@ -255,6 +255,32 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			pattern, last used |:s_flags|, and last used
 			expression.
+							*:SubstituteTranslate*
+:[range]SubstituteTranslate[!] /{pattern}/\={expr}/[flags]
+			Put each unique match of {pattern} through {expr} ...
+			Inside {expr}, you can reference a context object, as
+			with |:SubstituteIf|. Cp. |Substitute-v:val|
+:[range]SubstituteTranslate[!] /{pattern}/{func}/[flags]
+			Invoke {func} (a context object, as with
+			|:SubstituteIf|, cp. |Substitute-v:val| is the only
+			argument; the match can be inspected via |submatch()|)
+			for each unique match ...
+:[range]SubstituteTranslate[!] /{pattern}/{item1}/{item2}[/...]/[flags]
+			Replace each unique match of {pattern} with the
+			{item1}, ... (from left to right; if these are new
+			{itemA} or there are additional appended {item3},
+			those are added to the original ones, unless ! is
+			given) ...
+			... and memoize the association, so that further
+			identical matches will automatically use the same
+			value (without invoking {expr} / {func} / popping
+			{item1}). This persists across invocations (so you can
+			apply the same translation on multiple ranges /
+			buffers); use ! to clear any stored associations.
+:[range]SubstituteTranslate[!] [flags] [count]
+			Repeat the last substitution with the last used search
+			pattern, last used {expr} / {func} / {item1}..., last
+			used |:s_flags| and count.
 
 						      *:PrintDuplicateLinesOf*
 :[range]PrintDuplicateLinesOf[!] [{pattern}]
