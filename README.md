@@ -241,6 +241,42 @@ USAGE
                             pattern, last used :s_flags, and last used
                             expression.
 
+    :[range]SubstituteTranslate[!] /{pattern}/\={expr}/[flags]
+                            Put each unique match of {pattern} through {expr} ...
+                            Inside {expr}, you can reference a context object, as
+                            with :SubstituteIf. Cp. Substitute-v:val; here,
+                            the information is:
+                                matchCount: number of non-memoized match of
+                                            {pattern}
+                                replacementCount: number of actual replacements
+                                                  (memoized and new) done so far
+    :[range]SubstituteTranslate[!] /{pattern}/{func}/[flags]
+                            Invoke {func} (a context object, as with
+                            :SubstituteIf, cp. Substitute-v:val is the only
+                            argument; the match can be inspected via submatch())
+                            for each unique match ...
+    :[range]SubstituteTranslate[!] /{pattern}/{item1}/{item2}[/...]/[flags]
+                            Replace each unique match of {pattern} with the
+                            {item1}, ... (from left to right; if these are new
+                            {itemA} or there are additional appended {item3},
+                            those are added to the original ones, unless ! is
+                            given) ...
+                            ... and memoize the association, so that further
+                            identical matches will automatically use the same
+                            value (without invoking {expr} / {func} / popping
+                            {item1}). This persists across invocations (so you can
+                            apply the same translation on multiple ranges /
+                            buffers); use ! to clear any stored associations and
+                            reset the context object.
+                            By returning a List, {expr} / {func} can indicate the
+                            the current match should be skipped (this decision
+                            isn't memoized), just like if there are no {item1}
+                            available any longer.
+    :[range]SubstituteTranslate[!] [flags] [count]
+                            Repeat the last substitution with the last used search
+                            pattern, last used {expr} / {func} / {item1}..., last
+                            used :s_flags and count.
+
     :[range]PrintDuplicateLinesOf[!] [{pattern}]
     :[range]PrintDuplicateLinesOf[!] /{pattern}/
                             Print all occurrences of lines matching (with [!]: not
@@ -413,7 +449,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.032 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.035 or
   higher.
 
 KNOWN PROBLEMS
@@ -456,6 +492,8 @@ HISTORY
   unmodifiable buffer and instead printed an ugly multi-line error.
 - :SubstituteChoices: Also offer "no" and "last as ..." choices if the :s\_c
   flag is given, to offer feature parity with built-in :substitute.
+- Add :SubstituteTranslate command.
+  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
