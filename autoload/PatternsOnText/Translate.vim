@@ -1,6 +1,14 @@
 " PatternsOnText/Translate.vim: Commands to translate each unique match to a fixed item.
 "
 " DEPENDENCIES:
+"   - PatternsOnText.vim autoload script
+"   - ingo/actions.vim autoload script
+"   - ingo/cmdargs/substitute.vim autoload script
+"   - ingo/err.vim autoload script
+"   - ingo/escape.vim autoload script
+"   - ingo/funcref.vim autoload script
+"   - ingo/lists.vim autoload script
+"   - ingo/msg.vim autoload script
 "
 " Copyright: (C) 2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -15,13 +23,14 @@ let s:previousTranslation = ''
 let s:previousItems = []
 let s:items = []
 let s:memoizedTranslations = {}
+let s:SubstituteTranslate = PatternsOnText#InitialContext()
 function! PatternsOnText#Translate#Substitute( range, isClearAssociations, arguments, ... )
     call ingo#err#Clear()
 
-    let s:SubstituteTranslate = PatternsOnText#InitialContext()
     if a:isClearAssociations
 	let s:items = []
 	let s:memoizedTranslations = {}
+	let s:SubstituteTranslate = PatternsOnText#InitialContext()
     endif
 
     let [l:separator, l:pattern, l:translationString, l:flags, l:count] =
@@ -34,6 +43,8 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
 	" Recall previous translation.
 	if empty(l:flags)
 	    let l:flags = '&'
+	elseif l:flags =~# 'i'
+	    let s:previousIsCaseInsensitive = 1
 	endif
     else
 	" The original parsing groups {string1}/{string2} into l:replacement.
@@ -109,7 +120,7 @@ function! s:Replace( hasValReferenceInTranslation )
     let l:match = submatch(0)
     let l:matchKey = (s:previousIsCaseInsensitive ? tolower(l:match) : l:match)
     if has_key(s:memoizedTranslations, l:matchKey)
-	return s:memoizedTranslations[l:matchKey]
+	return s:ReplaceReturn(l:match, s:memoizedTranslations[l:matchKey])
     endif
 
     if has_key(s:SubstituteTranslate, 'error')
@@ -125,20 +136,14 @@ function! s:Replace( hasValReferenceInTranslation )
 	\   s:previousTranslation
 	\)
 	let l:replacement = s:Invoke(l:translation, s:SubstituteTranslate)
-echomsg '****' string(l:matchKey) '=>' string(l:replacement)
+"****D echomsg '****' string(l:matchKey) '=>' string(l:replacement)
 	if type(l:replacement) == type([])
 	    " A List indicates that no replacement is available.
 	    let s:SubstituteTranslate.missingItems[l:matchKey] = 1
 	    return l:match
 	endif
 	let s:memoizedTranslations[l:matchKey] = l:replacement
-
-	if l:replacement !=# l:match
-	    let s:SubstituteTranslate.replacementCount += 1
-	    let s:SubstituteTranslate.lastLnum = line('.')
-	endif
-
-	return l:replacement
+	return s:ReplaceReturn(l:match, l:replacement)
     catch /^Vim\%((\a\+)\)\=:/
 	let s:SubstituteTranslate.error = ingo#msg#MsgFromVimException()
 	return l:match
@@ -146,6 +151,14 @@ echomsg '****' string(l:matchKey) '=>' string(l:replacement)
 	let s:SubstituteTranslate.error = 'Expression threw exception: ' . v:exception
 	return l:match
     endtry
+endfunction
+function! s:ReplaceReturn( match, replacement )
+    if a:replacement !=# a:match
+	let s:SubstituteTranslate.replacementCount += 1
+	let s:SubstituteTranslate.lastLnum = line('.')
+    endif
+
+    return a:replacement
 endfunction
 function! s:Invoke( expr, context )
     execute 'return' a:expr

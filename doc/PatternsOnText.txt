@@ -259,7 +259,12 @@ USAGE							*PatternsOnText-usage*
 :[range]SubstituteTranslate[!] /{pattern}/\={expr}/[flags]
 			Put each unique match of {pattern} through {expr} ...
 			Inside {expr}, you can reference a context object, as
-			with |:SubstituteIf|. Cp. |Substitute-v:val|
+			with |:SubstituteIf|. Cp. |Substitute-v:val|; here,
+			the information is:
+			    matchCount: number of non-memoized match of
+					{pattern}
+			    replacementCount: number of actual replacements
+					      (memoized and new) done so far
 :[range]SubstituteTranslate[!] /{pattern}/{func}/[flags]
 			Invoke {func} (a context object, as with
 			|:SubstituteIf|, cp. |Substitute-v:val| is the only
@@ -276,7 +281,12 @@ USAGE							*PatternsOnText-usage*
 			value (without invoking {expr} / {func} / popping
 			{item1}). This persists across invocations (so you can
 			apply the same translation on multiple ranges /
-			buffers); use ! to clear any stored associations.
+			buffers); use ! to clear any stored associations and
+			reset the context object.
+			By returning a List, {expr} / {func} can indicate the
+			the current match should be skipped (this decision
+			isn't memoized), just like if there are no {item1}
+			available any longer.
 :[range]SubstituteTranslate[!] [flags] [count]
 			Repeat the last substitution with the last used search
 			pattern, last used {expr} / {func} / {item1}..., last
