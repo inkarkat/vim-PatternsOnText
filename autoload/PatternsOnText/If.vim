@@ -13,23 +13,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.005	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
-"				Move
-"				PatternsOnText#DefaultReplacementOnPredicate(),
-"				to ingo-library.
-"   2.01.004	17-Jun-2017	Add a:isNegate argument to
-"				PatternsOnText#If#Substitute() and use as
-"				s:previousIsNegate for new :SubstituteUnless.
-"   2.00.003	30-Sep-2016	Refactoring: Factor out
-"				PatternsOnText#InitialContext().
-"   2.00.002	29-Sep-2016	Factor out
-"				PatternsOnText#DefaultReplacementOnPrediate().
-"				Complete implementation.
-"   2.00.001	28-Sep-2016	file creation
 
 let s:previousPattern = ''
 let s:previousIsNegate = 0

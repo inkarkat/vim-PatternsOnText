@@ -8,44 +8,10 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/subst/expr/emulation.vim autoload script
 "
-" Copyright: (C) 2011-2016 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.00.010	30-Sep-2016	Refactoring: Use ingo#str#trd().
-"   1.60.009	29-Sep-2016	FIX: Need to re-escape s:previousPattern
-"				according to current l:separator.
-"   1.40.008	27-Oct-2014	Implement :SubstituteNotInSearch by passing
-"				a:isOutsideSearch flag to
-"				PatternsOnText#InSearch#Substitute().
-"   1.35.007	24-Apr-2014	ENH: Also support passing the search pattern
-"				inline with
-"				:SubstituteInSearch/{search}/{pattern}/{string}/[flags]
-"				instead of using the last search pattern.
-"   1.30.006	07-Mar-2014	Emulate use of \= sub-replace-expression.
-"   1.12.005	14-Jun-2013	Minor: Make substitute() robust against
-"				'ignorecase'.
-"   1.10.004	06-Jun-2013	Factor out
-"				PatternsOnText#EmulatePreviousReplacement(); it
-"				is also needed by PatternsOnText/Selected.vim.
-"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.01.005	30-May-2013	Implement abort on error.
-"   1.00.004	29-May-2013	Adapt to changed
-"				ingo#cmdargs#ParseSubstituteArgument() interface
-"				in ingo-library version 1.006.
-"   1.00.003	28-May-2013	Use ingo#msg#StatusMsg().
-"				Replace the custom parsing with the (extended
-"				new) parsing of
-"				ingo#cmdargs#ParseSubstituteArgument().
-"   1.00.002	06-Mar-2013	Print :substitute-like summary for the inner
-"				substitutions instead of the rather meaningless
-"				default summary from the outer :substitute
-"				command.
-"	001	22-Jan-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

@@ -13,21 +13,6 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.012	19-Jul-2017	Move PatternsOnText#ReplaceSpecial() to
-"				ingo-library.
-"   2.00.011	29-Sep-2016	ENH: Support recall of previous pairs /
-"				substitutions in :SubstituteWildcard /
-"				:SubstituteMultiple.
-"   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
-"				passed a:expr (after the previous fix).
-"   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
-"				to unescape the \& or \\1 (to & or \1) via
-"				substitute(), as the library function does not
-"				take an expression.
-"   1.20.002	17-Jan-2014	Implement replacement with special "&" symbol.
-"   1.20.001	16-Jan-2014	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

@@ -6,44 +6,10 @@
 "   - ingo/collections.vim autoload script
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.51.008	24-Nov-2014	Don't set the buffer 'modified' for
-"				:PrintDuplicates and :PrintUniques. Detect the
-"				:Print... (vs. :Delete...) commands on empty
-"				a:OnDuplicateAction and then pass the "n"
-"				:s_flag.
-"				FIX: Misplaced :continue in s:Collect() safety
-"				check; must :return out of factored out
-"				function.
-"   1.50.007	18-Nov-2014	Factor out
-"				PatternsOnText#Duplicates#FilterDuplicates() and
-"				pass that in as Funcref.
-"				Support opposite selection via
-"				PatternsOnText#Uniques#FilterUnique() and a
-"				new PatternsOnText#Uniques#DeleteUnique()
-"				ReportAction that deletes all matches found in
-"				the accumulator and does the appropriate
-"				reporting (now moved to a separate module). The
-"				ReportAction is now also passed the parsed
-"				pattern and separator, as this is necessary
-"				there.
-"   1.36.006	23-Sep-2014	Correctly report :PrintDuplicates on folded
-"				lines.
-"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.00.004	28-May-2013	Remove a suspect duplicate :echomsg.
-"				Use ingo#msg#StatusMsg().
-"   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
-"				deletion via
-"				PatternsOnText#Duplicates#ReportDeletedMatches().
-"	002     21-Feb-2013     Move to ingo-library.
-"	001	22-Jan-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 
