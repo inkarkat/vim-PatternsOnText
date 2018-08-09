@@ -5,7 +5,7 @@
 "   - ingo/err.vim autoload script
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2017 Ingo Karkat
+" Copyright: (C) 2017-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -34,7 +34,7 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 	endif
 
 	if empty(s:pattern) | let s:pattern = s:numberExpr | endif
-	if empty(s:flags) && ! empty(s:format) && s:format =~# '^&\?[cegiInp#lr]*$'
+	if empty(s:flags) && ! empty(s:format) && s:format =~# '^' . ingo#cmdargs#substitute#GetFlags() . '$'
 	    " The parser has a precedence for replacement over flags, but we can
 	    " have either of them. Correct misattributed flags.
 	    let [s:format, s:flags] = ['', s:format]

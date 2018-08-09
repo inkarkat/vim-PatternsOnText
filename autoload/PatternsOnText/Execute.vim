@@ -1,8 +1,10 @@
 " PatternsOnText/Execute.vim: Commands to substitute with the result of evaluating an expression.
 "
 " DEPENDENCIES:
-"   - ingo/action.vim autoload script
+"   - PatternsOnText.vim autoload script
+"   - ingo/actions.vim autoload script
 "   - ingo/cmdargs/pattern.vim autoload script
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "   - ingo/msg.vim autoload script
@@ -15,7 +17,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! s:Parse( arguments )
-    let l:flagsAndExprPattern = '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)'
+    let l:flagsAndExprPattern = '\(' . ingo#cmdargs#substitute#GetFlags() . '\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)'
     let l:match = ingo#cmdargs#pattern#RawParse(a:arguments, [], l:flagsAndExprPattern, 2)
     if ! empty(l:match)
 	return l:match

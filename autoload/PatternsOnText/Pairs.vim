@@ -2,8 +2,10 @@
 "
 " DEPENDENCIES:
 "   - PatternsOnText.vim autoload script
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
+"   - ingo/regexp/magic.vim autoload script
 "   - ingo/subst/pairs.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
@@ -35,7 +37,7 @@ function! s:ParseArguments( arguments )
     if get(a:arguments, -1, '') =~# '^\d\+$'
 	let l:count = remove(a:arguments, -1)
     endif
-    if get(a:arguments, -1, '.') =~# '^&\?[cegiInp#lr]*\d*$'
+    if get(a:arguments, -1, '.') =~# '^' . ingo#cmdargs#substitute#GetFlags() . '\d*$'
 	let l:flags = remove(a:arguments, -1)
     endif
 

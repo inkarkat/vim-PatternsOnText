@@ -9,7 +9,7 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2016-2017 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -39,7 +39,7 @@ function! PatternsOnText#If#Substitute( isNegate, range, arguments, ... )
     call ingo#err#Clear()
     let s:SubstituteIf = PatternsOnText#InitialContext()
     let [l:separator, l:pattern, l:replacement, l:flags, l:predicateExpr] =
-    \   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)', 'flagsMatchCount': 2, 'emptyFlags': ['&', s:previousPredicateExpr], 'emptyPattern': s:previousPattern})
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': '\(' . ingo#cmdargs#substitute#GetFlags() . '\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)', 'flagsMatchCount': 2, 'emptyFlags': ['&', s:previousPredicateExpr], 'emptyPattern': s:previousPattern})
     if empty(l:predicateExpr)
 	call ingo#err#Set('Missing predicate')
 	return 0
