@@ -4,6 +4,7 @@
 "   - PatternsOnText.vim autoload script
 "   - ingo/actions.vim autoload script
 "   - ingo/cmdargs/substitute.vim autoload script
+"   - ingo/compat.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "   - ingo/funcref.vim autoload script
@@ -117,7 +118,7 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
 endfunction
 function! s:Replace( hasValReferenceInTranslation )
     let l:match = submatch(0)
-    let l:matchKey = (s:previousIsCaseInsensitive ? tolower(l:match) : l:match)
+    let l:matchKey = ingo#compat#DictKey(s:previousIsCaseInsensitive ? tolower(l:match) : l:match)
     if has_key(s:memoizedTranslations, l:matchKey)
 	return s:ReplaceReturn(l:match, s:memoizedTranslations[l:matchKey])
     endif
