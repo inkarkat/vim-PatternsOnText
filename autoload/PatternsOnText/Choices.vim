@@ -31,7 +31,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     else
 	" The original parsing groups {string1}/{string2} into l:replacement.
 	let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
-	call map(l:choices, 'ingo#escape#Unescape(v:val, l:separator)')
+	call map(l:choices, 'ingo#escape#Unescape(v:val, "\\" . l:separator)')
     endif
     if len(l:choices) <= 1
 	call ingo#err#Set(printf('%s replacement given', empty(l:choices) ? 'No' : 'Only one'))
