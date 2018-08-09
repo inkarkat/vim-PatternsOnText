@@ -7,7 +7,7 @@
 "   - ingo/subst/pairs.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -88,15 +88,22 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
     endtry
 endfunction
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
-function! PatternsOnText#Pairs#SubstituteMultiple( range, ... )
-    let l:substitutions = copy(a:000)
-    let [l:flags, l:count] = s:ParseArguments(l:substitutions)
+function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
+    let l:argumentsWordSplit = split(a:arguments, '\s\+')
+    let [l:flags, l:count] = s:ParseArguments(l:argumentsWordSplit)
+    let l:substitutions = (empty(l:flags) && empty(l:count) ?
+    \   a:arguments :
+    \   matchstr(a:arguments, '^.*\ze\V\C' . (empty(l:flags) ? '' : '\s\+' . l:flags) . (empty(l:count) ? '' : '\s\+' . l:count) . '\$')
+    \)
+"****D echomsg '****' string(l:substitutions) string(l:flags) string(l:count)
+    let l:splitSubstitutions = []
+    while ! empty(l:substitutions)
+	let [l:separator, l:pattern, l:replacement, l:substitutions] =
+	\   ingo#cmdargs#substitute#Parse(l:substitutions, {'flagsExpr': '\s*\(\%([[:alnum:]\\"|]\@![\x00-\xFF]\).*\)\?', 'emptyPattern': @", 'emptyFlags': '', 'isAllowLoneFlags': 0})
+	call add(l:splitSubstitutions, [l:separator, l:pattern, l:replacement])
+    endwhile
+"****D echomsg '****' string(l:splitSubstitutions)
     try
-	let l:splitSubstitutions = map(
-	\   l:substitutions,
-	\   'ingo#cmdargs#substitute#Parse(v:val, {"flagsExpr": "", "emptyPattern": @", "emptyFlags": "", "isAllowLoneFlags": 0})[0:2]'
-	\)
-
 	" Check for forbidden capture groups.
 	for l:splitS in l:splitSubstitutions
 	    if l:splitS[1] =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\('

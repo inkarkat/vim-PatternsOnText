@@ -206,10 +206,7 @@ USAGE
                             sequential :s/new/old/ | s/older/newer/ commands. For
                             example, you can swap texts with this.
                             Note: You cannot use capturing groups /\( here!
-                            Handles & in {string}. Whitespace in the substitution
-                            pairs must be escaped; for a literal backslash search
-                            / replace, use \\\\:
-                                /C:\\\\/my\ drive\\\\/
+                            Handles & in {string}.
     :[range]SubstituteMultiple [flags] [count]
                             Repeat the last substitution with the last used search
                             patterns, last used replacement strings, last used
@@ -493,6 +490,10 @@ HISTORY
 - :SubstituteChoices: Also offer "no" and "last as ..." choices if the :s\_c
   flag is given, to offer feature parity with built-in :substitute.
 - Add :SubstituteTranslate command.
+- CHG: Escaping of whitespace and backslashes in :SubstituteMultiple is not
+  necessary any longer (but now the full /{pattern}/{string}/ needs to be
+  given; you cannot omit e.g. the trailing /). This parsing better matches the
+  user expectation. :SubstituteWildcard still requires escaping, though.
   __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 2.01    15-Aug-2017
