@@ -74,7 +74,6 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
 	    let l:translation = ingo#funcref#ToString(l:translationString) . '(a:context)'
 	endif
 
-	let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
 	let s:previousIsCaseInsensitive = (l:flags =~# 'i')
 	let s:previousTranslation = l:translation
     endif
