@@ -49,7 +49,7 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
     else
 	" The original parsing groups {string1}/{string2} into l:replacement.
 	let l:items = split(l:translationString, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
-	call map(l:items, 'ingo#escape#Unescape(v:val, l:separator)')
+	call map(l:items, 'ingo#escape#Unescape(v:val, "\\" . l:separator)')
 
 	if len(l:items) > 1
 	    " {item1}/{item2}[/...]
