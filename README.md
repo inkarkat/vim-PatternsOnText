@@ -465,7 +465,7 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 2.10    RELEASEME
+##### 2.10    19-Oct-2018
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
   of :DeleteUniques.
