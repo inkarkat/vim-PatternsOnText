@@ -5,35 +5,10 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.008	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
-"				Move
-"				PatternsOnText#DefaultReplacementOnPredicate(),
-"				PatternsOnText#ReplaceSpecial(), and
-"				PatternsOnText#DefaultReplacer() to
-"				ingo-library.
-"   2.00.007	30-Sep-2016	Refactoring: Factor out
-"				PatternsOnText#InitialContext().
-"   2.00.006	29-Sep-2016	Move factored out
-"				PatternsOnText#DefaultReplacementOnPrediate()
-"				here.
-"				Move PatternsOnText#Selected#ReplaceSpecial() to
-"				PatternsOnText#DefaultReplacer().
-"   1.40.005	27-Oct-2014	Add PatternsOnText#PreviousSearchPattern().
-"   1.36.004	23-Sep-2014	Make the deletions work with closed folds (i.e.
-"				only delete the duplicate lines / lines in range
-"				itself, not the entire folds) by temporarily
-"				disabling folding.
-"   1.30.003	10-Mar-2014	Add PatternsOnText#DeleteLines().
-"   1.20.002	17-Jan-2014	Add PatternsOnText#ReplaceSpecial().
-"   1.10.001	06-Jun-2013	file creation
 
 function! PatternsOnText#EmulatePreviousReplacement( replacement, previousReplacement )
     " substitute() doesn't support the ~ special character to recall the last

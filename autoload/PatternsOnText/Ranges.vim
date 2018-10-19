@@ -9,28 +9,10 @@
 "   - ingo/range/lines.vim autoload script
 "   - PatternsOnText.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.36.005	23-Sep-2014	BUG: :.DeleteRange et al. don't work correctly
-"				on a closed fold; need to use
-"				ingo#range#NetStart().
-"   1.36.004	10-Jun-2014	Factor out ingo#range#lines#Get() into
-"				ingo-library.
-"   1.35.003	17-Apr-2014	Don't clobber the search history with the
-"				:*Ranges commands (through using :global).
-"				Add :RangeDo command.
-"   1.35.002	16-Apr-2014	ENH: Allow to pass multiple ranges to the
-"				:*Ranges commands.
-"				FIX: The *Ranges commands only handled
-"				/{pattern}/,... ranges, not line numbers or
-"				marks. Only use :global for patterns; for
-"				everything else, there's only a single range, so
-"				we can just prepend it to :call directly.
-"   1.30.001	10-Mar-2014	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

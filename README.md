@@ -34,6 +34,7 @@ the general built-in doesn't suffice.
   be used with :SubstituteIf as a predicate that checks for the syntax of
   the current match. For example, a predicate that detects comments can be
   defined as:
+ <!-- -->
 
     function! Comment()
         return ingo#syntaxitem#IsOnSyntax(getpos('.'), '^Comment$')
@@ -42,6 +43,7 @@ the general built-in doesn't suffice.
 ### RELATED WORKS
 
 - The :SubstituteSelected command can be emulated with built-ins via
+ <!-- -->
 
     :call feedkeys('yyyq') | %s/{pattern}/{string}/gc
 
@@ -172,8 +174,8 @@ USAGE
                             via v:val. It provides the following information:
                                 matchCount: number of current match of {pattern}
                                 replacementCount: number of actual replacements
-                                                done so far, i.e. where
-                                                {predicate} was true
+                                                  done so far, i.e. where
+                                                  {predicate} was true
                             It also contains pre-initialized variables for use by
                             {predicate}. These get cleared by each :SubstituteIf
                             / :SubstituteUnless invocation:
@@ -204,10 +206,7 @@ USAGE
                             sequential :s/new/old/ | s/older/newer/ commands. For
                             example, you can swap texts with this.
                             Note: You cannot use capturing groups /\( here!
-                            Handles & in {string}. Whitespace in the substitution
-                            pairs must be escaped; for a literal backslash search
-                            / replace, use \\\\:
-                                /C:\\\\/my\ drive\\\\/
+                            Handles & in {string}.
     :[range]SubstituteMultiple [flags] [count]
                             Repeat the last substitution with the last used search
                             patterns, last used replacement strings, last used
@@ -239,88 +238,103 @@ USAGE
                             pattern, last used :s_flags, and last used
                             expression.
 
-                            For all following commands, the [!] suppresses the
-                            error when there are no duplicates.
+    :[range]SubstituteTranslate[!] /{pattern}/\={expr}/[flags]
+                            Put each unique match of {pattern} through {expr} ...
+                            Inside {expr}, you can reference a context object, as
+                            with :SubstituteIf. Cp. Substitute-v:val; here,
+                            the information is:
+                                matchCount: number of non-memoized match of
+                                            {pattern}
+                                replacementCount: number of actual replacements
+                                                  (memoized and new) done so far
+    :[range]SubstituteTranslate[!] /{pattern}/{func}/[flags]
+                            Invoke {func} (a context object, as with
+                            :SubstituteIf, cp. Substitute-v:val is the only
+                            argument; the match can be inspected via submatch())
+                            for each unique match ...
+    :[range]SubstituteTranslate[!] /{pattern}/{item1}/{item2}[/...]/[flags]
+                            Replace each unique match of {pattern} with the
+                            {item1}, ... (from left to right; if these are new
+                            {itemA} or there are additional appended {item3},
+                            those are added to the original ones, unless ! is
+                            given) ...
+                            ... and memoize the association, so that further
+                            identical matches will automatically use the same
+                            value (without invoking {expr} / {func} / popping
+                            {item1}). This persists across invocations (so you can
+                            apply the same translation on multiple ranges /
+                            buffers); use ! to clear any stored associations and
+                            reset the context object.
+                            By returning a List, {expr} / {func} can indicate the
+                            the current match should be skipped (this decision
+                            isn't memoized), just like if there are no {item1}
+                            available any longer.
+    :[range]SubstituteTranslate[!] [flags] [count]
+                            Repeat the last substitution with the last used search
+                            pattern, last used {expr} / {func} / {item1}..., last
+                            used :s_flags and count.
 
     :[range]PrintDuplicateLinesOf[!] [{pattern}]
     :[range]PrintDuplicateLinesOf[!] /{pattern}/
-                            Print all occurrences of lines matching {pattern} (or
-                            the current line, if omitted).
+                            Print all occurrences of lines matching (with [!]: not
+                            matching) {pattern} (or the current line, if omitted).
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteDuplicateLinesOf[!] [{pattern}]
     :[range]DeleteDuplicateLinesOf[!] /{pattern}/
                             Delete all subsequent occurrences of lines matching
-                            {pattern} (or the current line, if omitted).
+                            (with [!]: not matching) {pattern} (or the current
+                            line, if omitted).
 
     :[range]PrintDuplicateLinesIgnoring[!] [{pattern}]
     :[range]PrintDuplicateLinesIgnoring[!] /{pattern}/
                             Print all occurrences of a line whose text (ignoring
-                            any text matched by {pattern}) appears multiple times.
-                            To ignore empty lines, use a {pattern} of ^$ (strict)
-                            or ^\s*$ (lenient).
+                            any text matched (with [!]: not matched) by {pattern})
+                            appears multiple times. To ignore empty lines, use a
+                            {pattern} of ^$ (strict) or ^\s*$ (lenient).
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteDuplicateLinesIgnoring[!] [{pattern}]
     :[range]DeleteDuplicateLinesIgnoring[!] /{pattern}/
                             Delete all subsequent occurrences of a line (ignoring
-                            any text matched by {pattern}).
+                            any text matched (with [!]: not matched) by
+                            {pattern}).
 
     :[range]DeleteAllDuplicateLinesIgnoring[!] [{pattern}]
     :[range]DeleteAllDuplicateLinesIgnoring[!] /{pattern}/
                             Delete all (including the very first) occurrences of a
-                            duplicate line (ignoring any text matched by
-                            {pattern}).
-
-    :[range]PrintDuplicates[!] [{pattern}]
-    :[range]PrintDuplicates[!] /{pattern}/
-                            Print all matches of {pattern} (if omitted: the last
-                            search pattern) that appear multiple times in the
-                            current line / [range].
-                            To print all duplicate matches of {pattern} within a
-                            single line, processing a [range] or the entire
-                            buffer, use:
-                            :global/^/PrintDuplicates! [{pattern}]
-                            :global/^/PrintDuplicates! /{pattern}/
-                            The [!] suppresses the error when there are no
-                            duplicates in a particular line.
-
-    :[range]DeleteDuplicates[!] [{pattern}]
-    :[range]DeleteDuplicates[!] /{pattern}/
-                            Delete all subsequent matches of {pattern} (or the
-                            last search pattern, if omitted) except the first.
+                            duplicate line (ignoring any text matched (with [!]:
+                            not matched) by {pattern}).
 
     :[range]PrintUniqueLinesOf[!] [/]{pattern}[/]
-                            Print all unique occurrences of lines matching
-                            {pattern}. All matching lines are added to the
-                            jumplist, so you can use CTRL-O to revisit the
-                            locations.
+                            Print all unique occurrences of lines matching (with
+                            [!]: not matching) {pattern}. All matching lines are
+                            added to the jumplist, so you can use CTRL-O to
+                            revisit the locations.
 
     :[range]DeleteUniqueLinesOf[!] [/]{pattern}[/]
-                            Delete all unique occurrences of lines matching
-                            {pattern}. Only duplicate lines are kept.
+                            Delete all unique occurrences of lines matching (with
+                            [!]: not matching) {pattern}. Only duplicate lines are
+                            kept.
 
     :[range]PrintUniqueLinesIgnoring[!] [{pattern}]
     :[range]PrintUniqueLinesIgnoring[!] /{pattern}/
                             Print all lines whose text (ignoring any text matched
-                            by {pattern}) appears only once in the buffer /
-                            [range].
+                            (with [!]: not matched) by {pattern}) appears only
+                            once in the buffer / [range].
                             All matching lines are added to the jumplist, so you
                             can use CTRL-O to revisit the locations.
 
     :[range]DeleteUniqueLinesIgnoring[!] [{pattern}]
     :[range]DeleteUniqueLinesIgnoring[!] /{pattern}/
                             Delete all unique occurrences of a line (ignoring
-                            any text matched by {pattern}). Only duplicate lines
-                            are kept.
+                            any text matched (with [!]: not matched) by
+                            {pattern}). Only duplicate lines are kept.
 
-    :[range]DeleteAllUniqueLinesIgnoring[!] [{pattern}]
-    :[range]DeleteAllUniqueLinesIgnoring[!] /{pattern}/
-                            Delete all (including the very first) occurrences of a
-                            duplicate line (ignoring any text matched by
-                            {pattern}).
+                            For the following commands, the [!] suppresses the
+                            error when there are no duplicates.
 
     :[range]PrintUniques[!] [{pattern}]
     :[range]PrintUniques[!] /{pattern}/
@@ -340,6 +354,32 @@ USAGE
                             Delete all unique matches of {pattern} (or the last
                             search pattern, if omitted). Only duplicate matches
                             are kept.
+
+    :[range]PrintDuplicates[!] [{pattern}]
+    :[range]PrintDuplicates[!] /{pattern}/
+                            Print all matches of {pattern} (if omitted: the last
+                            search pattern) that appear multiple times in the
+                            current line / [range].
+                            To print all duplicate matches of {pattern} within a
+                            single line, processing a [range] or the entire
+                            buffer, use:
+                            :global/^/PrintDuplicates! [{pattern}]
+                            :global/^/PrintDuplicates! /{pattern}/
+                            The [!] suppresses the error when there are no
+                            duplicates in a particular line.
+
+    :[range]DeleteDuplicates[!] [{pattern}]
+    :[range]DeleteDuplicates[!] /{pattern}/
+                            Delete all subsequent matches of {pattern} (or the
+                            last search pattern, if omitted) except the first.
+                            To delete all non-unique matches, use
+                            :DeleteAllDuplicates instead.
+
+    :[range]DeleteAllDuplicates[!] [{pattern}]
+    :[range]DeleteAllDuplicates[!] /{pattern}/
+                            Delete all non-unique matches of {pattern} (or the last
+                            search pattern, if omitted). To keep the first match,
+                            use :DeleteDuplicates instead.
 
     :[range]DeleteRanges[!] {range} [range] [...] [x]
     :[range]YankRanges[!] {range} [range] [...] [x]
@@ -368,9 +408,21 @@ USAGE
                                 :global/apples/,/peaches/ {cmd}
                             but:
                             - processes each line only once when the ranges are
-                            overlapping
+                              overlapping
                             - supports multiple ranges (which are joined) and
-                            inversion with [!]
+                              inversion with [!]
+
+    :[range]Renumber [N][/{pattern}/[{fmt}/]][flags][[*]offset]
+                            Search for decimal numbers / {pattern} with [flags],
+                            and replace each (according to :s_flags with
+                            1, 2, ... / [N], [N] + [offset], ...
+                            (or [N] * [offset])
+                            formatted as {fmt} (cp. printf()).
+    :[range]Renumber &      Continue renumbering with the last used number, same
+                            {pattern}, {fmt}, [flags] and [offset]. Useful with
+                            :global to cover only certain lines. Use
+                            :0Renumber ... to prime the required values, e.g.:
+                                :0Renumber 100 g 10 | global/^#/.Renumber &
 
 INSTALLATION
 ------------------------------------------------------------------------------
@@ -394,7 +446,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.032 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.035 or
   higher.
 
 KNOWN PROBLEMS
@@ -403,7 +455,7 @@ KNOWN PROBLEMS
 - The # pattern separator cannot be used with :SubstituteSelected,
   :SubstituteInSearch, and :SubstituteNotInSearch.
 - The : pattern separator cannot be used with :SubstituteChoices,
-  :SubstituteIf, and :SubstituteExecute.
+  :SubstituteIf, :SubstituteExecute, and :Renumber.
 
 ### CONTRIBUTING
 
@@ -412,6 +464,37 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 
 HISTORY
 ------------------------------------------------------------------------------
+
+##### 2.10    19-Oct-2018
+- Add :Renumber command.
+- Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
+  of :DeleteUniques.
+- Minor: Do proper escaping of pattern separators when adding to the search
+  history.
+- CHG: Allow inversion of :...LinesOf and :...LinesIgnoring {pattern} via !
+  (instead of suppressing error message with !) Affects
+  :PrintDuplicateLinesOf, :DeleteDuplicateLinesOf,
+  :PrintDuplicateLinesIgnoring, :DeleteDuplicateLinesIgnoring,
+  :DeleteAllDuplicateLinesIgnoring, :PrintUniqueLinesOf, :DeleteUniqueLinesOf,
+  :PrintUniqueLinesIgnoring, :DeleteUniqueLinesIgnoring
+- :SubstituteChoices: FIX: Forgot to update current line number; current line
+  is re-printed on each occurrence.
+- :SubstituteChoices: Only rely on 'cursorline' highlighting if the line isn't
+  actually folded.
+- :SubstituteChoices: ENH: Include count of match replacements in current line
+  in query.
+- :SubstituteChoices: Correctly handle multi-digit entry, leading zeros with
+  /c flag.
+- FIX: Many :Substitute... commands did not yet check for read-only or
+  unmodifiable buffer and instead printed an ugly multi-line error.
+- :SubstituteChoices: Also offer "no" and "last as ..." choices if the :s\_c
+  flag is given, to offer feature parity with built-in :substitute.
+- Add :SubstituteTranslate command.
+- CHG: Escaping of whitespace and backslashes in :SubstituteMultiple is not
+  necessary any longer (but now the full /{pattern}/{string}/ needs to be
+  given; you cannot omit e.g. the trailing /). This parsing better matches the
+  user expectation. :SubstituteWildcard still requires escaping, though.
+  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
@@ -533,7 +616,7 @@ HISTORY
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2017 Ingo Karkat -
+Copyright: (C) 2011-2018 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat <ingo@karkat.de>

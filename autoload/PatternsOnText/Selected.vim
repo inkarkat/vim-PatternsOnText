@@ -7,75 +7,10 @@
 "   - ingo/escape.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.014	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
-"				Move
-"				PatternsOnText#DefaultReplacementOnPredicate(),
-"				to ingo-library.
-"   2.00.013	29-Sep-2016	FIX: Minor: Cursor jumps to first line if no
-"				substitution at all ("nnnnn"). Initialize
-"				l:lastNum to current line.
-"				Move PatternsOnText#Selected#ReplaceSpecial() to
-"				PatternsOnText#DefaultReplacer(). Factor out the
-"				invocation around it into
-"				PatternsOnText#DefaultReplacementOnPrediate().
-"   1.30.012	12-Mar-2014	Handle \r, \n, \t, \b in replacement, too.
-"   1.30.011	11-Mar-2014	Allow to pass additional substitute flags to
-"				PatternsOnText#Selected#Parse(), used by
-"				PatternsOnText/Subsequent.vim
-"   1.21.010	05-Mar-2014	FIX: Need to escape '\\' in addition to the
-"				passed a:expr (after the previous fix).
-"   1.21.009	20-Feb-2014	FIX: Wrong use of ingo#escape#Unescape(); need
-"				to unescape the \& or \\1 (to & or \1) via
-"				substitute(), as the library function does not
-"				take an expression.
-"   1.20.008	17-Jan-2014	Replace the sequential expansion of &, \0, \1,
-"				... with a single iteration, implemented in new
-"				PatternsOnText#ReplaceSpecial(). Now, when \1
-"				expands to \2, it is not mistakenly re-expanded
-"				any more.
-"   1.12.007	14-Jun-2013	Minor: Make matchlist() robust against
-"				'ignorecase'.
-"   1.11.006	12-Jun-2013	Factor out PatternsOnText#Selected#Parse().
-"   1.11.005	11-Jun-2013	:SubstituteSelected now positions the cursor on
-"				the line where the last selected replacement
-"				happened, to behave like :substitute.
-"				Allow to use :SmartCase substitution via new
-"				optional argument to
-"				PatternsOnText#Selected#Substitute().
-"   1.10.004	06-Jun-2013	BUG: Because of substitute(), we have to handle
-"				"&" ourselves. Remember the last replacement and
-"				use factored out
-"				PatternsOnText#EmulatePreviousReplacement().
-"				BUG: Repeat :SubstituteSelected doesn't properly
-"				pick up the default "&" flag, because our flags
-"				are two-part. Let the parser default to empty
-"				flags, and handle the defaulting (and recall of
-"				previous answers) ourselves.
-"				Also recall previous answers in a bare
-"				:SubstituteSelected command.
-"				Parsing must not include the built-in :s_n flag,
-"				as this is one of the possible answers, and must
-"				be included there.
-"				More precise error message.
-"   1.10.003	03-Jun-2013	Factor out
-"				PatternsOnText#Selected#CreateAnswers() and
-"				PatternsOnText#Selected#GetAnswer().
-"				ENH: Handle count before "y" and "n" answers,
-"				numeric positions "2,5", and ranges "3-5".
-"				Use ingo#cmdargs#substitute#Parse() here, too.
-"				This just requires a little bit of additional
-"				parsing to separate the :s_flags from the
-"				answers.
-"   1.01.002	30-May-2013	Implement abort on error.
-"   1.00.001	22-Jan-2013	file creation
 let s:save_cpo = &cpo
 set cpo&vim
 

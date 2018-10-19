@@ -4,51 +4,10 @@
 "   - PatternsOnText/*.vim autoload scripts
 "   - ingo/err.vim autoload script
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.020	17-Jun-2017	Add :SubstituteUnless variant of :SubstituteIf.
-"   2.00.019	30-Sep-2016	Add completion for :SubstituteIf and
-"				:SubstituteExecute.
-"   2.00.018	29-Sep-2016	ENH: Support recall of previous pairs /
-"				substitutions in :SubstituteWildcard /
-"				:SubstituteMultiple.
-"				Add :SubstituteExecute command.
-"   2.00.017	28-Sep-2016	Add :SubstituteIf command.
-"   2.00.016	27-Sep-2016	Add :SubstituteChoices command.
-"   1.51.014	24-Nov-2014	Improve reporting of readonly buffers for
-"				:SubstituteExcept, :DeleteExcept,
-"				:SubstituteSelected, and :SubstituteSubsequent.
-"   1.50.013	18-Nov-2014	Add :PrintUnique... and :DeleteUnique...
-"				variants for the opposite selection.
-"   1.40.012	27-Oct-2014	Add :SubstituteNotInSearch command.
-"   1.35.011	17-Apr-2014	Add :RangeDo command.
-"   1.30.010	10-Mar-2014	Add :DeleteRanges, :YankRanges, :PrintRanges
-"				commands.
-"   1.30.009	05-Mar-2014	Add :DeleteAllDuplicateLinesIgnoring command.
-"   1.20.008	16-Jan-2014	Add :SubstituteWildcard and :SubstituteMultiple
-"				commands.
-"   1.11.007	10-Jun-2013	FIX: Remove -bar from all commands to correctly
-"				handle patterns like foo\|bar without escaping
-"				as foo\\|bar.
-"   1.10.006	06-Jun-2013	Also recall previous answers in a bare
-"				:SubstituteSelected command.
-"   1.10.005	04-Jun-2013	The commands that take a {pattern}, i.e.
-"				:SubstituteExcept, :DeleteExcept,
-"				:SubstituteSelected now consistently set that as
-"				the last search pattern.
-"   1.01.004	30-May-2013	Implement abort on error for :SubstituteExcept,
-"				:DeleteExcept, :SubstituteSelected, and
-"				:SubstituteInSearch, too.
-"   1.00.003	04-Mar-2013	ENH: Also print :substitute-like summary on
-"				deletion via
-"				PatternsOnText#Duplicates#ReportDeletedMatches().
-"	002	22-Jan-2013	Separate each functionality part into a separate
-"				autoload module.
-"	001	21-Jan-2013	file creation
 
 " Avoid installing twice or when in unsupported Vim version.
 if exists('g:loaded_PatternsOnText') || (v:version < 700)
@@ -76,86 +35,119 @@ command! -range -nargs=? SubstituteSubsequent
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? SubstituteInSearch    if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? SubstituteNotInSearch if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteInSearch
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteNotInSearch
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
-command! -range -nargs=? -complete=expression SubstituteIf       if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? -complete=expression SubstituteUnless   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? -complete=command    SubstituteExecute  if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=? SubstituteChoices  if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=* SubstituteMultiple if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=* SubstituteWildcard if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteIf
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=expression SubstituteUnless
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? -complete=command    SubstituteExecute
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -bang -range -nargs=? -complete=expression SubstituteTranslate
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Translate#Substitute('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=? SubstituteChoices
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteMultiple
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteWildcard
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>),
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       )  && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=1 PrintUniqueLinesOf
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       <q-args>,
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       <q-args>, <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       )  && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>),
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       PatternsOnText#DuplicateLines#PatternOrCurrentLine(<q-args>), <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')
-\   ) && <bang>1 |
+\   ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteUniqueLinesOf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, '',
-\       <q-args>,
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       '', 0,
+\       <q-args>, <bang>0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\   ) && <bang>1 |
+\   ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintDuplicateLinesIgnoring
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? PrintUniqueLinesIgnoring
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#PrintLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteSubsequentLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteUniqueLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterUniqueLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique lines' |
 \   endif
 command! -bang -range=% -nargs=? DeleteAllDuplicateLinesIgnoring
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>, <q-args>, '',
+\   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
+\       <q-args>, <bang>0,
+\       '', 0,
 \       function('PatternsOnText#DuplicateLines#FilterDuplicateLines'),
 \       function('PatternsOnText#DuplicateLines#DeleteAllLines')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicate lines' |
 \   endif
 
@@ -164,7 +156,7 @@ command! -bang -range -nargs=? PrintDuplicates
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? PrintUniques
@@ -172,7 +164,7 @@ command! -bang -range -nargs=? PrintUniques
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique matches' |
 \   endif
 command! -bang -range -nargs=? DeleteDuplicates
@@ -181,7 +173,16 @@ command! -bang -range -nargs=? DeleteDuplicates
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       function('PatternsOnText#Duplicates#DeleteMatches'),
 \       function('PatternsOnText#Duplicates#ReportDeletedMatches')
-\       ) && <bang>1 |
+\       ) |
+\       echoerr 'No duplicates' |
+\   endif
+command! -bang -range -nargs=? DeleteAllDuplicates
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\       function('PatternsOnText#Uniques#FilterNonUnique'),
+\       '',
+\       function('PatternsOnText#Uniques#DeleteNonUnique')
+\       ) |
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? DeleteUniques
@@ -190,7 +191,7 @@ command! -bang -range -nargs=? DeleteUniques
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Uniques#DeleteUnique')
-\       ) && <bang>1 |
+\       ) |
 \       echoerr 'No unique matches' |
 \   endif
 
@@ -209,6 +210,12 @@ command! -bang -range=% -nargs=+ PrintRanges
 \   endif
 command! -bang -range=% -nargs=+ RangeDo
 \   if ! PatternsOnText#Ranges#Command('do', <line1>, <line2>, <bang>0, <q-args>) |
+\       echoerr ingo#err#Get() |
+\   endif
+
+command! -range=-1 -nargs=? Renumber
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), (<count> == -1 && <line2> == 1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 

@@ -11,24 +11,10 @@
 "   - ingo/query/get.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2016-2017 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.01.004	19-Jul-2017	Fix typo in
-"				PatternsOnText#DefaultReplacementOnPredicate()
-"				function name.
-"				Move
-"				PatternsOnText#DefaultReplacementOnPredicate(),
-"				to ingo-library.
-"   2.00.003	30-Sep-2016	Refactoring: Use ingo#str#trd().
-"				FIX: Forgot to invoke s:ShowContext().
-"   1.60.002	29-Sep-2016	Need to unescape the l:separator in l:choices.
-"				Factor out
-"				PatternsOnText#DefaultReplacementOnPrediate().
-"   1.60.001	27-Sep-2016	file creation
 
 let s:previousPattern = ''
 let s:previousChoices = []
@@ -45,7 +31,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     else
 	" The original parsing groups {string1}/{string2} into l:replacement.
 	let l:choices = split(l:replacement, '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\V' . l:separator)
-	call map(l:choices, 'ingo#escape#Unescape(v:val, l:separator)')
+	call map(l:choices, 'ingo#escape#Unescape(v:val, "\\" . l:separator)')
     endif
     if len(l:choices) <= 1
 	call ingo#err#Set(printf('%s replacement given', empty(l:choices) ? 'No' : 'Only one'))
@@ -65,6 +51,7 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
 
     let s:lnum = -1
     let s:lastChoice = -1
+    let s:matchesInLineCnt = 1
     unlet! s:predefinedChoice
     try
 "****D echomsg '****' string([l:separator, l:pattern, l:choices, l:flags, l:count])
@@ -83,39 +70,53 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
 	return 0
     finally
 	" Clear the last query.
+	redraw
 	echo
     endtry
 endfunction
 
-function! s:ShowContext()
-    if line('.') != s:lnum
+function! s:ShowContext( currentLnum, isSameLineAsPrevious )
+    if a:isSameLineAsPrevious
+	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
+    else
 	" Show the current line; unfortunately, :substitute doesn't update each
 	" individual replacement, so a refresh once per line is sufficient.
-	if &cursorline
+	if &cursorline && foldclosed(a:currentLnum) == -1
 	    redraw!
 	else
 	    redraw
-	    call ingo#print#Number(line('.'))
+	    call ingo#print#Number(a:currentLnum)
 	endif
-    else
-	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
     endif
 endfunction
 function! s:Replace( QueryFuncref, choices )
+    let l:currentLnum = line('.')
+    let l:isSameLineAsPrevious = (l:currentLnum == s:lnum)
+    let s:lnum = l:currentLnum
+    let s:matchesInLineCnt = (l:isSameLineAsPrevious ? s:matchesInLineCnt + 1 : 1)
+
+    let s:additionalOptions = []
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
-	call s:ShowContext()
-	let l:choiceIdx = call(a:QueryFuncref, ['replacement', a:choices])
+	call s:ShowContext(l:currentLnum, l:isSameLineAsPrevious)
+	let l:choiceIdx = call(a:QueryFuncref, [printf('replacement of match %s', s:matchesInLineCnt), a:choices])
     endif
 
-    if l:choiceIdx < 0 || l:choiceIdx == len(a:choices) " Confirm: quit
-	let s:predefinedChoice = l:choiceIdx    " Emulate abort: All further replacements will be no-ops, without querying the user, too.
+    let l:selectedAdditionalOption = (l:choiceIdx < len(a:choices) ? '' : get(s:additionalOptions, l:choiceIdx - len(a:choices), ''))
+    if l:choiceIdx < 0 || l:selectedAdditionalOption ==# '&quit'
+	let s:predefinedChoice = -1 " Emulate abort: All further replacements will be no-ops, without querying the user, too.
 	return submatch(0)
-    elseif l:choiceIdx == len(a:choices) + 1
-	" Confirm: all remaining as <last choice>
+    elseif l:selectedAdditionalOption =~# '^&all remaining as '
 	let s:predefinedChoice = s:lastChoice
 	let l:choiceIdx = s:lastChoice
+    elseif l:selectedAdditionalOption =~# '^&last as '
+	let s:predefinedChoice = -1 " Emulate abort: All further replacements will be no-ops, without querying the user, too.
+	let l:choiceIdx = s:lastChoice
+    elseif l:selectedAdditionalOption ==# '&no'
+	return submatch(0)
+    elseif ! empty(l:selectedAdditionalOption)
+	throw 'ASSERT: Unknown l:selectedAdditionalOption: ' . string(l:selectedAdditionalOption)
     else
 	let s:lastChoice = l:choiceIdx
     endif
@@ -124,10 +125,12 @@ function! s:Replace( QueryFuncref, choices )
 endfunction
 
 function! s:ConfirmQuery( what, list, ... )
-    let l:originalList = a:list + ['&quit']
+    let s:additionalOptions = ['&no', '&quit']
     if s:lastChoice >= 0
-	call add(l:originalList, '&all remaining as ' . a:list[s:lastChoice])
+	call insert(s:additionalOptions, '&all remaining as ' . a:list[s:lastChoice])
+	call add(s:additionalOptions, '&last as ' . a:list[s:lastChoice])
     endif
+    let l:originalList = a:list + s:additionalOptions
 
     let l:defaultIndex = (a:0 ? a:1 : -1)
     let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1)
@@ -161,6 +164,7 @@ function! s:ConfirmQuery( what, list, ... )
 	    \)
 	endif
 
+	let l:maxNum = len(l:originalList)
 	let l:choice = ingo#query#get#Char()
 	if l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
 	    execute 'normal!' l:choice
@@ -168,25 +172,40 @@ function! s:ConfirmQuery( what, list, ... )
 	    continue
 	endif
 
-	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1) + 1)
-	if l:count == 0
+	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
+	if l:count == 0 && l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
-	    if len(l:originalList) > 10 * l:count
+	    if l:maxNum > 10 * l:count
 		" Need to query more numbers to be able to address all choices.
 		echon ' ' . l:count
 
-		while len(l:originalList) > 10 * l:count
-		    let l:digit = ingo#query#get#Number(9)
-		    if l:digit == -1
+		let l:leadingZeroCnt = (l:choice ==# '0')
+		while l:maxNum > 10 * l:count
+		    let l:char = nr2char(getchar())
+		    if l:char ==# "\<CR>"
+			break
+		    elseif l:char !~# '\d'
 			redraw | echo ''
 			return -1
 		    endif
-		    let l:count = 10 * l:count + l:digit
+
+		    echon l:char
+		    if l:char ==# '0' && l:count == 0
+			let l:leadingZeroCnt += 1
+			if l:leadingZeroCnt >= len(l:maxNum)
+			    return -1
+			endif
+		    else
+			let l:count = 10 * l:count + str2nr(l:char)
+			if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			    break
+			endif
+		    endif
 		endwhile
 	    endif
 	endif
 
-	if l:count < 1 || l:count > len(l:originalList)
+	if l:count < 1 || l:count > l:maxNum
 	    redraw | echo ''
 	    return -1
 	endif

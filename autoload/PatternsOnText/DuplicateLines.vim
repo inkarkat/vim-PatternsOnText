@@ -4,51 +4,10 @@
 "   - ingo/cmdargs/pattern.vim autoload script
 "   - ingo/collections.vim autoload script
 "
-" Copyright: (C) 2013-2014 Ingo Karkat
+" Copyright: (C) 2013-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.50.010	18-Nov-2014	Factor out
-"				PatternsOnText#DuplicateLines#FilterDuplicateLines()
-"				and pass that in as Funcref.
-"				Support opposite selection via
-"				PatternsOnText#DuplicateLines#FilterUniqueLines().
-"				In PatternsOnText#DuplicateLines#PrintLines(),
-"				also account for single (unique) line matches,
-"				and omit the header then, too. It makes no sense
-"				to print such when followed by just one
-"				identical line.
-"   1.36.009	23-Sep-2014	BUG: :.DeleteDuplicateLines... et al. don't work
-"				correctly on a closed fold; need to use
-"				ingo#range#NetStart().
-"   1.36.008	29-May-2014	Refactoring: Use
-"				ingo#cmdargs#pattern#ParseUnescaped().
-"   1.30.007	10-Mar-2014	Extract PatternsOnText#DeleteLines().
-"   1.30.006	05-Mar-2014	Extract s:DeleteLines() and use in new
-"				PatternsOnText#DuplicateLines#DeleteAllLines()
-"				which implements the new
-"				:DeleteAllDuplicateLinesIgnoring command.
-"				CHG: Don't ignore empty lines, but put them into
-"				the accumulator as ^@ ("\n"). Empty lines now
-"				need to be explicitly ignored, e.g. via /^$/
-"				pattern.
-"   1.02.005	01-Jun-2013	Move functions from ingo/cmdargs.vim to
-"				ingo/cmdargs/pattern.vim and
-"				ingo/cmdargs/substitute.vim.
-"   1.00.004	28-May-2013	Add the pattern to the search history, like
-"				:substitute, :global, etc. Because we're not
-"				invoking :substitute here, we have to do this
-"				explicitly.
-"				ENH: Print the customary summary when deleting
-"				duplicate lines.
-"	003	21-Feb-2013	Move to ingo-library.
-"	002	29-Jan-2013	Change ingocmdargs#UnescapePatternArgument() to
-"				take the result of
-"				ingocmdargs#ParsePatternArgument() instead of
-"				invoking that function itself.
-"	001	22-Jan-2013	file creation
 
 function! PatternsOnText#DuplicateLines#PatternOrCurrentLine( arguments )
     if empty(a:arguments)
@@ -64,24 +23,36 @@ function! PatternsOnText#DuplicateLines#FilterUniqueLines( accumulator )
     call filter(a:accumulator, 'len(v:val) == 1')
 endfunction
 
-function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, acceptPattern, Filter, Action )
+function! s:Match( text, pattern, isInvert )
+    execute 'return a:text' (a:isInvert ? '!~' : '=~') 'a:pattern'
+endfunction
+function! s:Extract( text, pattern, isInvert )
+    if a:isInvert
+	let l:matches = []
+	call substitute(a:text, a:pattern, '\=empty(add(l:matches, submatch(0))) ? submatch(0) : submatch(0)', 'g')
+	return join(l:matches, '')
+    else
+	return substitute(a:text, a:pattern, '', 'g')
+    endif
+endfunction
+function! PatternsOnText#DuplicateLines#Process( startLnum, endLnum, ignorePattern, isIgnorePatternInverted, acceptPattern, isAcceptPatternInverted, Filter, Action )
     let l:ignorePattern = ingo#cmdargs#pattern#ParseUnescaped(a:ignorePattern)
-"****D echomsg '****' string(l:ignorePattern) string(a:acceptPattern)
+"****D echomsg '****' string(l:ignorePattern) a:isIgnorePatternInverted string(a:acceptPattern) a:isAcceptPatternInverted
     " Add the pattern to the search history, like :substitute, :global, etc.
     for l:pattern in filter([l:ignorePattern, a:acceptPattern], '! empty(v:val)')
-	call histadd('search', l:pattern)
+	call histadd('search', escape(l:pattern, '/'))
     endfor
 
     let l:accumulator = {}
     for l:lnum in range(ingo#range#NetStart(a:startLnum), ingo#range#NetEnd(a:endLnum))
 	let l:line = getline(l:lnum)
-	if ! empty(a:acceptPattern) && l:line !~ a:acceptPattern
+	if ! empty(a:acceptPattern) && ! s:Match(l:line, a:acceptPattern, a:isAcceptPatternInverted)
 	    continue
 	endif
 
 	if ! empty(l:ignorePattern)
 	    let l:wasEmpty = empty(l:line)
-	    let l:line = substitute(l:line, l:ignorePattern, '', 'g')
+	    let l:line = s:Extract(l:line, l:ignorePattern, a:isIgnorePatternInverted)
 	    if empty(l:line) && (! l:wasEmpty || '' =~ l:ignorePattern)
 		continue    " Filter out completely ignored lines.
 	    endif

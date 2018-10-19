@@ -6,30 +6,10 @@
 "   - ingo/range.vim autoload script
 "   - PatternsOnText/Selected.vim autoload script
 "
-" Copyright: (C) 2014 Ingo Karkat
+" Copyright: (C) 2014-2017 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   1.40.004	27-Oct-2014	FIX: :SubstituteSubsequent can give "E488:
-"				Trailing characters". Previous search pattern
-"				must be properly escaped in case the separators
-"				are different.
-"   1.36.003	23-Sep-2014	BUG: :SubstituteSubsequent doesn't work
-"				correctly on a closed fold; need to use
-"				ingo#range#NetStart().
-"   1.30.002	11-Mar-2014	Adapt injection of l:fromCurrentPositionExpr to
-"				use \& instead of simple concatentation in order
-"				to support patterns anchored with ^.
-"				Directly put original pattern into the search
-"				history, and remove the full used pattern that
-"				contains the restriction from the history.
-"				ENH: Add custom 'b' blockwise substitution flag
-"				that applies the substitution only in columns on
-"				and after the cursor in *all* lines, not just
-"				the current one.
-"   1.30.001	10-Mar-2014	file creation from plugin/ingocommands.vim.
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -81,7 +61,7 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
 	" search pattern and history; this will only hamper further searches and
 	" command redo.
 	call histdel('search', -1)
-	call histadd('search', l:pattern)
+	call histadd('search', escape(ingo#escape#Unescape(l:pattern, l:separator), '/'))
     endtry
 endfunction
 

@@ -1,24 +1,23 @@
 " PatternsOnText/Execute.vim: Commands to substitute with the result of evaluating an expression.
 "
 " DEPENDENCIES:
-"   - ingo/action.vim autoload script
+"   - PatternsOnText.vim autoload script
+"   - ingo/actions.vim autoload script
 "   - ingo/cmdargs/pattern.vim autoload script
+"   - ingo/cmdargs/substitute.vim autoload script
 "   - ingo/err.vim autoload script
 "   - ingo/escape.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2016 Ingo Karkat
+" Copyright: (C) 2016-2018 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
-"
-" REVISION	DATE		REMARKS
-"   2.00.002	30-Sep-2016	Refactoring: Factor out
-"				PatternsOnText#InitialContext().
-"   2.00.001	29-Sep-2016	file creation from If.vim
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! s:Parse( arguments )
-    let l:flagsAndExprPattern = '\(&\?[cegiInp#lr]*\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)'
+    let l:flagsAndExprPattern = '\(' . ingo#cmdargs#substitute#GetFlags() . '\)\%(\s*$\|\%(^\|\s\+\)\(.*\)\)'
     let l:match = ingo#cmdargs#pattern#RawParse(a:arguments, [], l:flagsAndExprPattern, 2)
     if ! empty(l:match)
 	return l:match
@@ -89,7 +88,10 @@ function! s:Replace( hasValReferenceInExpr )
 
     let s:SubstituteExecute.matchCount += 1
     try
-	let l:expr = (a:hasValReferenceInExpr ? substitute(s:previousExpr, '\C' . ingo#actions#GetValExpr(), 'a:context', 'g') : s:previousExpr)
+	let l:expr = (a:hasValReferenceInExpr ?
+	\   substitute(s:previousExpr, '\C' . ingo#actions#GetValExpr(), 'a:context', 'g') :
+	\   s:previousExpr
+	\)
 	let l:replacement = s:Invoke(l:expr, s:SubstituteExecute)
 
 	if l:replacement !=# submatch(0)
@@ -111,4 +113,6 @@ function! s:Invoke( expr, context )
     return submatch(0)  " Default replacement is no-op.
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

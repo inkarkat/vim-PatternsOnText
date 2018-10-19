@@ -1,0 +1,30 @@
+@Test(priority=10)
+# For every 1 in 1 to 1.
+
+9 + 9 = 9
+
+70) foo
+80) bar
+90) hihi
+100) hoho
+
+@Test(priority=20)
+# Some stuff (12.1)(13.2)(14.3)(15.4).
+# (1.1)b(2.2)(3.3)f(4.4)(5.5)e(6.6)(7.7)cf(8.8)f(9.9)c(11.0)
+
+@Test(priority=30)
+Give me 5.368709e7 and 209701.778227 for 819.095146 or 3.199386 and 0.012497 for 4.88125e-5, for a total of 1.906616e-7.
+
+@Test(priority=40)
+# This is +8 in -7 to 6.
+# Why is 6 afraid of 7? Because 7 8 9.
+# The 100s of 1000s of 999.
+# More 222s in 333s of 111s.
+
+@Test(priority=50)
+So negative like <2> and <4> and <8> for <16> and <32>.
+
+@Test(priority=60)
+
+<64> + <128> = <256>
+No Number found!
