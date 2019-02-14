@@ -23,7 +23,7 @@ let s:previousIsCaseInsensitive = 0
 let s:previousTranslation = ''
 let s:previousItems = []
 let s:items = []
-function! PatternsOnText#Translate#Substitute( range, isClearAssociations, arguments, ... )
+function! PatternsOnText#Translate#Substitute( range, isClearAssociations, arguments )
     call ingo#err#Clear()
 
     if a:isClearAssociations
@@ -136,9 +136,9 @@ function! PatternsOnText#Translate#Translate( range, isClearAssociations, separa
 
     try
 "****D echomsg '****' string([a:separator, a:pattern, s:translation, a:flags])
-	execute printf('%s%s %s%s%s\=s:Replace(%d)%s%s',
-	\   a:range, (a:0 ? a:1 : 'substitute'),
-	\   a:separator, a:pattern, a:separator, l:hasValReferenceInTranslation, a:separator, a:flags
+	execute printf('%ssubstitute%s%s%s\=s:Replace(%d)%s%s',
+	\   a:range, a:separator, a:pattern, a:separator,
+	\   l:hasValReferenceInTranslation, a:separator, a:flags
 	\)
 
 	" :substitute has visited all further matches, but the last replacement
