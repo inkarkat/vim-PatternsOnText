@@ -11,7 +11,7 @@
 "   - ingo/lists.vim autoload script
 "   - ingo/msg.vim autoload script
 "
-" Copyright: (C) 2018 Ingo Karkat
+" Copyright: (C) 2018-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,15 +23,12 @@ let s:previousIsCaseInsensitive = 0
 let s:previousTranslation = ''
 let s:previousItems = []
 let s:items = []
-let s:memoizedTranslations = {}
-let s:SubstituteTranslate = PatternsOnText#InitialContext()
 function! PatternsOnText#Translate#Substitute( range, isClearAssociations, arguments, ... )
     call ingo#err#Clear()
 
     if a:isClearAssociations
 	let s:items = []
 	let s:memoizedTranslations = {}
-	let s:SubstituteTranslate = PatternsOnText#InitialContext()
     endif
 
     let [l:separator, l:pattern, l:translationString, l:flags, l:count] =
@@ -43,7 +40,7 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
     if l:flags . l:count ==# a:arguments
 	" Recall previous translation.
 	if empty(l:flags)
-	    let l:flags = '&'
+	    let l:flags = '&' . (s:previousIsCaseInsensitive ? 'i' : '')
 	elseif l:flags =~# 'i'
 	    let s:previousIsCaseInsensitive = 1
 	endif
@@ -84,15 +81,64 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
 	return 0
     endif
 
-    let s:SubstituteTranslate.missingItems = {}
     let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
-    let l:hasValReferenceInTranslation = (s:previousTranslation =~# ingo#actions#GetValExpr())
+
+    return PatternsOnText#Translate#Translate(a:range, a:isClearAssociations, l:separator, l:pattern, s:previousTranslation, l:flags)
+endfunction
+function! s:FromItems()
+    return (empty(s:items) ? [] : remove(s:items, 0))
+endfunction
+
+
+
+let s:memoizedTranslations = {}
+let s:SubstituteTranslate = PatternsOnText#InitialContext()
+function! PatternsOnText#Translate#Translate( range, isClearAssociations, separator, pattern, Translation, flags )
+"******************************************************************************
+"* PURPOSE:
+"   Within a:range, but each unique match of a:pattern through a:Translation,
+"   and memoize the association, so that further identical matches will
+"   automatically use the same value (without invoking a:Translation).
+"* ASSUMPTIONS / PRECONDITIONS:
+"   May reuse previous associations, depending on a:isClearAssociations.
+"* EFFECTS / POSTCONDITIONS:
+"   Modifies the buffer.
+"* INPUTS:
+"   a:range                 Range in buffer in text form.
+"   a:isClearAssociations   Flag whether associations from a previous run should
+"                           be kept (0) or cleared (1).
+"   a:separator             :substitute separator character
+"   a:pattern               Regular expression for matches, with escaped
+"                           a:separator.
+"   a:Translation           Either a Funcref that takes a single context object,
+"                           or an expression (that can reference the context
+"                           object via v:val).
+"   a:flags                 :substitute flags
+"* RETURN VALUES:
+"   1 if success, 0 if failure; details can then be obtained from
+"   ingo#err#Get().
+"******************************************************************************
+    if a:isClearAssociations
+	let s:memoizedTranslations = {}
+	let s:SubstituteTranslate = PatternsOnText#InitialContext()
+    endif
+
+    let s:SubstituteTranslate.missingItems = {}
+    let s:isCaseInsensitive = (a:flags =~# 'i')
+
+    if type(a:Translation) == type(function('tr'))
+	let s:translation = ingo#funcref#ToString(a:Translation) . '(a:context)'
+	let l:hasValReferenceInTranslation = 0
+    else
+	let s:translation = a:Translation
+	let l:hasValReferenceInTranslation = (s:translation =~# ingo#actions#GetValExpr())
+    endif
 
     try
-"****D echomsg '****' string([l:separator, l:pattern, l:flags, s:previousTranslation])
+"****D echomsg '****' string([a:separator, a:pattern, s:translation, a:flags])
 	execute printf('%s%s %s%s%s\=s:Replace(%d)%s%s',
 	\   a:range, (a:0 ? a:1 : 'substitute'),
-	\   l:separator, l:pattern, l:separator, l:hasValReferenceInTranslation, l:separator, l:flags
+	\   a:separator, a:pattern, a:separator, l:hasValReferenceInTranslation, a:separator, a:flags
 	\)
 
 	" :substitute has visited all further matches, but the last replacement
@@ -114,11 +160,13 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
     catch /^PatternsOnText:/
 	call ingo#err#SetCustomException('PatternsOnText')
 	return 0
+    finally
+	unlet! s:isCaseInsensitive s:translation
     endtry
 endfunction
 function! s:Replace( hasValReferenceInTranslation )
     let l:match = submatch(0)
-    let l:matchKey = ingo#compat#DictKey(s:previousIsCaseInsensitive ? tolower(l:match) : l:match)
+    let l:matchKey = ingo#compat#DictKey(s:isCaseInsensitive ? tolower(l:match) : l:match)
     if has_key(s:memoizedTranslations, l:matchKey)
 	return s:ReplaceReturn(l:match, s:memoizedTranslations[l:matchKey])
     endif
@@ -132,8 +180,8 @@ function! s:Replace( hasValReferenceInTranslation )
     let s:SubstituteTranslate.matchCount += 1
     try
 	let l:translation = (a:hasValReferenceInTranslation ?
-	\   substitute(s:previousTranslation, '\C' . ingo#actions#GetValExpr(), 'a:context', 'g') :
-	\   s:previousTranslation
+	\   substitute(s:translation, '\C' . ingo#actions#GetValExpr(), 'a:context', 'g') :
+	\   s:translation
 	\)
 	let l:replacement = s:Invoke(l:translation, s:SubstituteTranslate)
 "****D echomsg '****' string(l:matchKey) '=>' string(l:replacement)
@@ -163,10 +211,6 @@ endfunction
 function! s:Invoke( expr, context )
     execute 'return' a:expr
     return submatch(0)  " Default replacement is no-op.
-endfunction
-
-function! s:FromItems()
-    return (empty(s:items) ? [] : remove(s:items, 0))
 endfunction
 
 let &cpo = s:save_cpo

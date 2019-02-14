@@ -1,4 +1,4 @@
-PATTERNS ON TEXT   
+PATTERNS ON TEXT
 ===============================================================================
 _by Ingo Karkat_
 
@@ -465,6 +465,11 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 2.11    RELEASEME
+- Extract PatternsOnText#Translate#Translate() API function to allow easier
+  creation of custom translation commands without having to reassemble (and
+  then re-parse) the entire command arguments.
+
 ##### 2.10    19-Oct-2018
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
@@ -494,14 +499,16 @@ HISTORY
   necessary any longer (but now the full /{pattern}/{string}/ needs to be
   given; you cannot omit e.g. the trailing /). This parsing better matches the
   user expectation. :SubstituteWildcard still requires escaping, though.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
 - Move PatternsOnText#DefaultReplacementOnPredicate(),
   PatternsOnText#ReplaceSpecial(), and PatternsOnText#DefaultReplacer() to
   ingo-library.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.032!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.032!__
 
 ##### 2.00    30-Sep-2016
 - Add :SubstituteChoices command.
@@ -511,7 +518,8 @@ HISTORY
   / :SubstituteMultiple.
 - FIX: Minor: With :SubstituteSelected, Cursor jumps to first line if no
   substitution at all ("nnnnn"). Initialize l:lastNum to current line.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.027!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.027!__
 
 ##### 1.51    23-Dec-2014
 - Don't set the buffer 'modified' for :PrintDuplicates and :PrintUniques.
@@ -546,7 +554,8 @@ HISTORY
 - Correctly report :PrintDuplicates on folded lines.
 - Refactoring: Use ingo#cmdargs#pattern#ParseUnescaped().
 - Factor out ingo#range#lines#Get() into ingo-library.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.022!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.022!__
 
 ##### 1.35    25-Apr-2014
 - ENH: Allow to pass multiple ranges to the :\*Ranges commands.
@@ -571,12 +580,16 @@ HISTORY
   recursive use inside it. This has been inspired by
   http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
 - Add :DeleteRanges, :YankRanges, :PrintRanges commands.
-- Handle \r, \n, \t, \b in {string}, too. __You need to update to
+- Handle \r, \n, \t, \b in {string}, too.
+
+__You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.017!__
 
 ##### 1.20    18-Feb-2014
 - ENH: Add :SubstituteWildcard {wildcard}={string} and
-  :SubstituteMultiple /{pattern}/{string}/ commands. __You need to update to
+  :SubstituteMultiple /{pattern}/{string}/ commands.
+
+__You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.016!__
 
 ##### 1.12    21-Nov-2013
@@ -603,7 +616,8 @@ HISTORY
   :SubstituteSelected now consistently set that as the last search pattern.
 - Refactoring: Move functions from ingo/cmdargs.vim to
   ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.007!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.007!__
 
 ##### 1.01    30-May-2013
 - Implement abort on error for :SubstituteExcept, :DeleteExcept,
@@ -616,7 +630,7 @@ HISTORY
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2018 Ingo Karkat -
+Copyright: (C) 2011-2019 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat <ingo@karkat.de>

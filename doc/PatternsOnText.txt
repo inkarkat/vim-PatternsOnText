@@ -490,6 +490,11 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+2.11	RELEASEME
+- Extract PatternsOnText#Translate#Translate() API function to allow easier
+  creation of custom translation commands without having to reassemble (and
+  then re-parse) the entire command arguments.
+
 2.10	19-Oct-2018
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
@@ -641,7 +646,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2018 Ingo Karkat
+Copyright: (C) 2011-2019 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>
