@@ -288,7 +288,24 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			pattern, last used {expr} / {func} / {item1}..., last
 			used |:s_flags| and count.
-
+:[line]PutTranslations [{template-expr}]
+			Put all translations from |:SubstituteTranslate| after
+			[line] (default current line), according to
+			{template-expr}, which can refer to each original
+			match as v:val.match, the associated replacement as
+			v:val.replacement, and the (original) number of
+			translation (which also determines the output order)
+			as v:val.count. The default template associates the
+			replacement with the original match:
+			    repl1: match1 ~
+			    repl2: match2 ~
+:YankTranslations [x] [{template-expr}]
+			Yank all translations from |:SubstituteTranslate|
+			[into register x], according to {template-expr} (see
+			above). The default template creates |:substitute|
+			commands that undo the translation: >
+			    :'[,']substitute/repl1/match1/g
+<
 						      *:PrintDuplicateLinesOf*
 :[range]PrintDuplicateLinesOf[!] [{pattern}]
 :[range]PrintDuplicateLinesOf[!] /{pattern}/
@@ -494,6 +511,8 @@ HISTORY						      *PatternsOnText-history*
 - Extract PatternsOnText#Translate#Translate() API function to allow easier
   creation of custom translation commands without having to reassemble (and
   then re-parse) the entire command arguments.
+- Add :PutTranslations and :YankTranslations companion commands of
+  :SubstituteTranslate.
 
 2.10	19-Oct-2018
 - Add :Renumber command.

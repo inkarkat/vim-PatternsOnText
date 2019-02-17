@@ -92,6 +92,7 @@ endfunction
 
 
 let s:memoizedTranslations = {}
+let s:memoizedMatches = []
 let s:SubstituteTranslate = PatternsOnText#InitialContext()
 function! PatternsOnText#Translate#Translate( range, isClearAssociations, separator, pattern, Translation, flags )
 "******************************************************************************
@@ -120,6 +121,7 @@ function! PatternsOnText#Translate#Translate( range, isClearAssociations, separa
 "******************************************************************************
     if a:isClearAssociations
 	let s:memoizedTranslations = {}
+	let s:memoizedMatches = []
 	let s:SubstituteTranslate = PatternsOnText#InitialContext()
     endif
 
@@ -191,6 +193,7 @@ function! s:Replace( hasValReferenceInTranslation )
 	    return l:match
 	endif
 	let s:memoizedTranslations[l:matchKey] = l:replacement
+	call add(s:memoizedMatches, l:matchKey)
 	return s:ReplaceReturn(l:match, l:replacement)
     catch /^Vim\%((\a\+)\)\=:/
 	let s:SubstituteTranslate.error = ingo#msg#MsgFromVimException()
@@ -211,6 +214,48 @@ endfunction
 function! s:Invoke( expr, context )
     execute 'return' a:expr
     return submatch(0)  " Default replacement is no-op.
+endfunction
+
+
+
+function! s:RenderTranslations( templateExpr )
+    let l:objects = map(
+    \   range(len(s:memoizedMatches)),
+    \   '{"count": (v:val + 1), "match": ingo#compat#FromKey(s:memoizedMatches[v:val]), "replacement": s:memoizedTranslations[s:memoizedMatches[v:val]]}'
+    \)
+    return join(map(l:objects, a:templateExpr), '')
+endfunction
+function! PatternsOnText#Translate#Put( lnum, arguments )
+    try
+	let l:translations = s:RenderTranslations(empty(a:arguments) ? g:PatternsOnText_PutTranslationsTemplateExpr : a:arguments)
+	if empty(l:translations)
+	    call ingo#err#Set('No translations yet')
+	    return 0
+	endif
+
+	call ingo#lines#PutWrapper(a:lnum, 'put', l:translations)
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    endtry
+endfunction
+function! PatternsOnText#Translate#Yank( arguments )
+    try
+	let [l:register, l:templateExpr] = ingo#cmdargs#register#ParsePrependedWritableRegister(a:arguments, '', 0)
+
+	let l:translations = s:RenderTranslations(empty(l:templateExpr) ? g:PatternsOnText_YankTranslationsTemplateExpr : l:templateExpr)
+	if empty(l:translations)
+	    call ingo#err#Set('No translations yet')
+	    return 0
+	endif
+
+	call setreg(l:register, l:translations)
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    endtry
 endfunction
 
 let &cpo = s:save_cpo
