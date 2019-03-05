@@ -9,7 +9,7 @@
 "   - ingo/subst/pairs.vim autoload script
 "   - ingo/subst/replacement.vim autoload script
 "
-" Copyright: (C) 2014-2018 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -159,7 +159,9 @@ function! s:Replace()
     return ''
 endfunction
 function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
-    if a:replacement =~# '^' . a:expr . '$'
+    if a:replacement =~# '^\\='
+	return eval(a:replacement[2:])
+    elseif a:replacement =~# '^' . a:expr . '$'
 	return a:match
     endif
     return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')

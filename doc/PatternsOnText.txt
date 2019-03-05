@@ -221,7 +221,7 @@ USAGE							*PatternsOnText-usage*
 			sequential :s/new/old/ | s/older/newer/ commands. For
 			example, you can swap texts with this.
 			Note: You cannot use capturing groups |/\(| here!
-			Handles & in {string}.
+			Handles & and \= |sub-replace-expression| in {string}.
 :[range]SubstituteMultiple [flags] [count]
 			Repeat the last substitution with the last used search
 			patterns, last used replacement strings, last used
@@ -231,9 +231,9 @@ USAGE							*PatternsOnText-usage*
 			Change (first in the line, with "g" flag all) matches
 			of |wildcard| to {string}. Modeled after the Korn
 			shell's "cd {old} {new}" command.
-			Handles & in {string}. Whitespace in the substitution
-			pairs must be escaped; for a literal backslash search
-			/ replace, use \\:
+			Handles & and \= |sub-replace-expression| in {string}.
+			Whitespace in the substitution pairs must be escaped;
+			for a literal backslash search / replace, use \\:
 			    C:\\=my\ drive ~
 :[range]SubstituteWildcard [flags] [count]
 			Repeat the last substitution with the last used search
@@ -513,6 +513,8 @@ HISTORY						      *PatternsOnText-history*
   then re-parse) the entire command arguments.
 - Add :PutTranslations and :YankTranslations companion commands of
   :SubstituteTranslate.
+- ENH: Also support \= |sub-replace-expression| for :SubstituteMultiple and
+  :SubstituteWildcard.
 
 2.10	19-Oct-2018
 - Add :Renumber command.
