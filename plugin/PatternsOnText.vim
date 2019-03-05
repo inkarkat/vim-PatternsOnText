@@ -79,6 +79,9 @@ command! -range -nargs=? SubstituteChoices
 command! -range -nargs=* SubstituteMultiple
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteMultipleExpr
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Pairs#SubstituteMultipleExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteWildcard
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif

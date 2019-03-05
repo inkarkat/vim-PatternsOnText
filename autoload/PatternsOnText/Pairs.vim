@@ -74,7 +74,13 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
 	let s:replacements = []
     endtry
 endfunction
+
+
+
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
+function! s:IsContainsCaptureGroup( pattern ) abort
+    return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\(')
+endfunction
 function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     let l:argumentsWordSplit = split(a:arguments, '\s\+')
     let [l:flags, l:count] = s:ParseArguments(l:argumentsWordSplit)
@@ -93,7 +99,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     try
 	" Check for forbidden capture groups.
 	for l:splitS in l:splitSubstitutions
-	    if l:splitS[1] =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\('
+	    if s:IsContainsCaptureGroup(l:splitS[1])
 		call ingo#err#Set('Capture groups not allowed in pattern: ' . ingo#escape#Unescape(l:splitS[1], l:splitS[0]))
 		return 0
 	    endif
@@ -165,6 +171,95 @@ function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
 	return a:match
     endif
     return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
+endfunction
+
+
+
+let [s:previousPatternExpr, s:previousReplacementExpr, s:previousMultipleExprFlags, s:previousMultipleExprCount] = ['', '', '', '']
+function! s:EvalIntoList( expr ) abort
+    if empty(a:expr)
+	return []
+    endif
+
+    let l:result = eval(a:expr)
+    return (type(l:result) == type([]) ?
+    \   l:result :
+    \   split(l:result, '\n', 1)
+    \)
+endfunction
+function! PatternsOnText#Pairs#SubstituteMultipleExpr( range, arguments )
+    let [l:separator, l:patternExpr, l:replacementExpr, l:flags, l:count] =
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPatternExpr, 'emptyReplacement': s:previousReplacementExpr, 'defaultReplacement': s:previousReplacementExpr})
+    if empty(l:patternExpr)
+	let l:patternExpr = s:previousPatternExpr
+    endif
+
+    if l:flags . l:count ==# a:arguments
+	if empty(l:flags)
+	    let l:flags = s:previousMultipleExprFlags
+	endif
+	if empty(l:flags)
+	    let l:flags = '&'
+	endif
+	if empty(l:count)
+	    let l:count = s:previousMultipleExprCount
+	endif
+    endif
+
+    try
+	let l:patterns = s:EvalIntoList(l:patternExpr)
+	let s:replacementExpressions = s:EvalIntoList(l:replacementExpr)
+
+	" Check for forbidden capture groups.
+	for l:i in range(len(l:patterns))
+	    if s:IsContainsCaptureGroup(l:patterns[l:i])
+		call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, l:patterns[l:i]))
+		return 0
+	    endif
+	endfor
+
+	if empty(l:patterns)
+	    call ingo#err#Set('No patterns')
+	    return 0
+	endif
+
+	let s:previousPatternExpr = l:patternExpr
+	let s:previousReplacementExpr = l:replacementExpr
+	let s:previousMultipleExprFlags = l:flags
+	let s:previousMultipleExprCount = l:count
+
+	" Remove any atoms changing the magicness, then surround each individual
+	" match with a capturing group, so that we can determine which branch
+	" matched (and use the corresponding replacement).
+	let l:pattern = join(
+	\   map(
+	\       copy(l:patterns),
+	\       '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
+	\   ),
+	\   '\|'
+	\)
+
+	execute printf('%ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
+	\   a:range, l:pattern, len(l:patterns), l:flags, l:count
+	\)
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    finally
+	let s:replacementExpressions = []
+    endtry
+endfunction
+function! s:ReplaceExpression( patternNum )
+    for l:i in range(a:patternNum)
+	if ! empty(submatch(l:i + 1))
+	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), get(s:replacementExpressions, l:i, get(s:replacementExpressions, -1, '')), '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
+	endif
+    endfor
+
+    " Should never happen; one branch always matches, and branches shouldn't be
+    " empty.
+    return ''
 endfunction
 
 let &cpo = s:save_cpo
