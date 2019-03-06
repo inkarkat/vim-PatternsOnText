@@ -129,7 +129,10 @@ function! s:Record( hasValReferenceInExpr ) abort
     endif
 
     let s:SubstituteTransactional.matchCount += 1
-    let l:record = ingo#area#frompattern#GetHere('\C\V' . substitute(escape(submatch(0), '\'), '\n', '\\n', 'g'), line('.'), [])
+    let l:record = (empty(submatch(0)) ?
+    \   repeat([getpos('.')[1:2]], 2) :
+    \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(submatch(0), '\'), '\n', '\\n', 'g'), line('.'), [])
+    \)
     if empty(l:record)
 	let s:SubstituteTransactional.error = printf('Failed to capture match #%d at %s: %s', s:SubstituteTransactional.matchCount, string(getpos('.')[1:2]), submatch(0))
 	return submatch(0)
