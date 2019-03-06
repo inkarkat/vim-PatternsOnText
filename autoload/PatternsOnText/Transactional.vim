@@ -122,20 +122,21 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
     endtry
 endfunction
 function! s:Record( hasValReferenceInExpr ) abort
+    let l:matchText = submatch(0)
     if has_key(s:SubstituteTransactional, 'error')
 	" Short-circuit all further errors; printing the expression error once is
 	" enough.
-	return submatch(0)
+	return l:matchText
     endif
 
     let s:SubstituteTransactional.matchCount += 1
-    let l:record = (empty(submatch(0)) ?
+    let l:record = (empty(l:matchText) ?
     \   repeat([getpos('.')[1:2]], 2) :
-    \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(submatch(0), '\'), '\n', '\\n', 'g'), line('.'), [])
+    \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(l:matchText, '\'), '\n', '\\n', 'g'), line('.'), [])
     \)
     if empty(l:record)
-	let s:SubstituteTransactional.error = printf('Failed to capture match #%d at %s: %s', s:SubstituteTransactional.matchCount, string(getpos('.')[1:2]), submatch(0))
-	return submatch(0)
+	let s:SubstituteTransactional.error = printf('Failed to capture match #%d at %s: %s', s:SubstituteTransactional.matchCount, string(getpos('.')[1:2]), l:matchText)
+	return l:matchText
     endif
 
     try
@@ -147,7 +148,7 @@ function! s:Record( hasValReferenceInExpr ) abort
 	    execute l:expr
 	endif
 
-	call add(l:record, submatch(0))
+	call add(l:record, l:matchText)
 	call add(s:matches, l:record)
     catch /^skip$/
 	let s:SubstituteTransactional.matchCount -= 1
@@ -156,7 +157,7 @@ function! s:Record( hasValReferenceInExpr ) abort
     catch
 	let s:SubstituteTransactional.error = 'Expression threw exception: ' . v:exception
     finally
-	return submatch(0)
+	return l:matchText
     endtry
 endfunction
 function! s:Substitute( match, replacement ) abort
