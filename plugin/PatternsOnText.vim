@@ -1,8 +1,7 @@
 " PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - PatternsOnText/*.vim autoload scripts
-"   - ingo/err.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -85,6 +84,12 @@ command! -range -nargs=* SubstituteWildcard
 command! -range -nargs=* SubstituteMultipleExpr
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#PairsExpr#SubstituteMultipleExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteTransactional
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Transactional#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteTransactionalExpr
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Transactional#SubstituteExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,

@@ -226,19 +226,6 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			patterns, last used replacement strings, last used
 			|:s_flags| and count.
-:[range]SubstituteMultipleExpr /{pattern-expr}/{replacement-expr}/ [flags] [count]
-			Evaluate {pattern-expr}, either as a List of patterns,
-			or else as String, which is then split into lines of
-			patterns. Change any of these pattern given to the
-			corresponding (i.e. with the same index, using the
-			last available if there are fewer replacements
-			available) List element of {replacement-expr}.
-			Note: You cannot use capturing groups |/\(| here!
-			Each replacement handles & and \=.
-:[range]SubstituteMultipleExpr [flags] [count]
-			Repeat the last substitution with the last used search
-			and replacement expressions, last used |:s_flags| and
-			count.
 							 *:SubstituteWildcard*
 :[range]SubstituteWildcard {wildcard}={string} [...] [flags] [count]
 			Change (first in the line, with "g" flag all) matches
@@ -252,6 +239,63 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			pattern, last used wildcard replacements, last used
 			|:s_flags| and count.
+						     *:SubstituteMultipleExpr*
+:[range]SubstituteMultipleExpr /{pattern-expr}/{replacement-expr}/ [flags] [count]
+			Evaluate {pattern-expr}, either as a List of patterns,
+			or else as String, which is then split into lines of
+			patterns. Change any of these patterns given to the
+			corresponding (i.e. with the same index, using the
+			last available if there are fewer replacements
+			available) List element of {replacement-expr}.
+			Note: You cannot use capturing groups |/\(| here!
+			Each replacement handles & and \=.
+:[range]SubstituteMultipleExpr [flags] [count]
+			Repeat the last substitution with the last used search
+			and replacement expressions, last used |:s_flags| and
+			count.
+						    *:SubstituteTransactional*
+:[range]SubstituteTransactional /{pattern}/{string}/ [flags][t/{test-expr}/][u/{update-predicate}/]
+			First record every match of {pattern} without changing
+			anything.
+			The optional {test-expr} is invoked at each match
+			(v:val contains a context Dict |Substitute-v:val| that
+			can be used to store additional information).
+			The optional {update-predicate} is invoked once at the
+			end (and passed that context object as v:val again);
+			it has to return 1 or 0; in the latter case, no
+			replacements are done (the transaction is aborted).
+			In case of 1 (commit), all recorded positions (in
+			reverse order from last to first) are replaced with
+			{string}. Handles & and \= |sub-replace-expression|;
+			in the latter case, the cursor is positioned on the
+			match, and can use the context via v:val.
+:[range]SubstituteTransactional [flags][t/{test-expr}/][u/{update-predicate}/]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement, last used |:s_flags|
+			and {test-expr} / {update-predicate} (unless
+			specified).
+
+						*:SubstituteTransactionalExpr*
+:[range]SubstituteTransactionalExpr /{pattern-expr}/{replacement-expr}/ [flags][s][t/{test-expr}/][u/{update-predicate}/]
+			/{pattern-expr}/{replacement-expr}/ [flags][r] where
+			Evaluate {pattern-expr}, either as a List of patterns,
+			or else as String, which is then split into lines of
+			patterns. First record and then at the end change any
+			of these patterns given to the corresponding (i.e.
+			with the same index, using the last available if there
+			are fewer replacements available) List element of
+			{replacement-expr}, like |:SubstituteTransactional|.
+			Note: You cannot use capturing groups |/\(| here!
+			With the special [s] flag, each pattern is applied
+			separately, not as alternative regexp branches. As the
+			replacements are only done at the very end, this means
+			that _any_ pattern match is recorded and later
+			replaced, not just the first alternative!
+:[range]SubstituteTransactionalExpr [flags][t/{test-expr}/][u/{update-predicate}/]
+			Repeat the last substitution with the last used search
+			and replacement expressions, last used |:s_flags| and
+			{test-expr} / {update-predicate} (unless specified).
+
 							  *:SubstituteExecute*
 :[range]SubstituteExecute/{pattern}/[flags] {expr}
 			Replace matches of {pattern} in the current line /
