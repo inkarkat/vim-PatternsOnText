@@ -46,8 +46,7 @@ function! PatternsOnText#Transactional#ParseArguments( previousPattern, previous
     return [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags] + s:ParseSpecialFlags(l:specialFlags)
 endfunction
 function! s:ParseSpecialFlags( specialFlags ) abort
-    let l:testExpr = ''
-    let l:updatePredicate = ''
+    let l:result = ['', '']
     let l:rest = a:specialFlags
     while 1
 	let l:specialFlagsParse = matchlist(l:rest, '^\s*\([' . s:special . ']\)' . ingo#cmdargs#pattern#PatternExpr(2) . '\(.*\)$')
@@ -55,18 +54,13 @@ function! s:ParseSpecialFlags( specialFlags ) abort
 	    break
 	endif
 
-	if l:specialFlagsParse[1] ==# s:special[0]
-	    let l:testExpr = l:specialFlagsParse[3]
-	elseif l:specialFlagsParse[1] ==# s:special[1]
-	    let l:updatePredicate = l:specialFlagsParse[3]
-	else
-	    throw 'ASSERT: Unexpected flag: ' . l:specialFlagsParse[1]
-	endif
-
+	let l:specialIdx = stridx(s:special, l:specialFlagsParse[1])
+	if l:specialIdx == -1 | throw 'ASSERT: Unexpected flag: ' . l:specialFlagsParse[1] | endif
+	let l:result[l:specialIdx] = l:specialFlagsParse[3]
 	let l:rest = l:specialFlagsParse[4]
     endwhile
 
-    return [l:testExpr, l:updatePredicate]
+    return l:result
 endfunction
 
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
