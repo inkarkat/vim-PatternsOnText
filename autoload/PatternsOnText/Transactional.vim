@@ -75,10 +75,38 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
     let l:hasValReferenceInExpr = (s:testExpr =~# ingo#actions#GetValExpr())
 
     try
-
 	execute printf('%ssubstitute/%s/\=s:Record(%d)/%s',
 	\   a:range, escape(l:unescapedPattern, '/'), l:hasValReferenceInExpr, l:flags
 	\)
+
+	if has_key(s:SubstituteTransactional, 'error')
+	    call ingo#err#Set(s:SubstituteTransactional.error)
+	    return 0
+	endif
+
+	if ! empty(l:updatePredicate) && ! ingo#actions#EvaluateWithVal(l:updatePredicate, s:SubstituteTransactional)
+	    call ingo#err#Set('Substitution aborted by update predicate')
+	    return 0
+	endif
+
+	let l:isReplacementExpression = (l:unescapedReplacement =~# '^\\=')
+	let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:unescapedReplacement =~# ingo#actions#GetValExpr())
+	let l:replacement = (l:hasValReferenceInReplacement ?
+	\   substitute(l:unescapedReplacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#GetContext()', 'g') :
+	\   l:unescapedReplacement
+	\)
+	" Note: The l:replacement is not handled within this script, so we need
+	" to provide a global PatternsOnText#Transactional#GetContext() accessor
+	" for s:SubstituteTransactional that is in scope there.
+
+	for l:match in reverse(s:matches)
+	    if l:isReplacementExpression
+		" Position the cursor on the beginning of the match.
+		call call('cursor', l:match[0])
+	    endif
+
+	    call s:Substitute(l:match, l:replacement)
+	endfor
 
 	" :substitute has visited all further matches, but the last replacement
 	" may have happened before that. Position the cursor on the last
@@ -89,7 +117,6 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
 	    call ingo#err#Set(s:SubstituteTransactional.error)
 	    return 0
 	endif
-
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
@@ -121,6 +148,7 @@ function! s:Record( hasValReferenceInExpr ) abort
 	    execute l:expr
 	endif
 
+	call add(l:record, submatch(0))
 	call add(s:matches, l:record)
     catch /^skip$/
 	let s:SubstituteTransactional.matchCount -= 1
@@ -131,6 +159,25 @@ function! s:Record( hasValReferenceInExpr ) abort
     finally
 	return submatch(0)
     endtry
+endfunction
+function! s:Substitute( match, replacement ) abort
+    let [l:startPos, l:endPos, l:matchText] = a:match
+    let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
+
+    if l:result !=# l:matchText
+	if ! ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
+	    let s:SubstituteTransactional.error = get(s:SubstituteTransactional, 'error', '') . printf("\nCould not replace %s with %s at position %s", strtrans(l:matchText), strtrans(l:result), string(l:startPos))
+	endif
+
+	if ! has_key(s:SubstituteTransactional, 'lastLnum')
+	    " As we're iterating from last match to first, we just need to set the
+	    " value once.
+	    let s:SubstituteTransactional.lastLnum = l:endPos[0]
+	endif
+    endif
+endfunction
+function! PatternsOnText#Transactional#GetContext() abort
+    return s:SubstituteTransactional
 endfunction
 
 function! PatternsOnText#Transactional#SubstituteExpr( range, arguments ) abort
