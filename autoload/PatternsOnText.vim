@@ -5,7 +5,7 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -53,6 +53,15 @@ endfunction
 
 function! PatternsOnText#InitialContext()
     return {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
+endfunction
+
+function! PatternsOnText#ReplaceSpecial( expr, match, replacement )
+    if a:replacement =~# '^\\='
+	return eval(a:replacement[2:])
+    elseif a:replacement =~# '^' . a:expr . '$'
+	return a:match
+    endif
+    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

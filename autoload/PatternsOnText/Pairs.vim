@@ -156,21 +156,13 @@ endfunction
 function! s:Replace()
     for l:i in range(len(s:replacements))
 	if ! empty(submatch(l:i + 1))
-	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
+	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#ReplaceSpecial'))
 	endif
     endfor
 
     " Should never happen; one branch always matches, and branches shouldn't be
     " empty.
     return ''
-endfunction
-function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
-    if a:replacement =~# '^\\='
-	return eval(a:replacement[2:])
-    elseif a:replacement =~# '^' . a:expr . '$'
-	return a:match
-    endif
-    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
 
 
@@ -253,7 +245,7 @@ endfunction
 function! s:ReplaceExpression( patternNum )
     for l:i in range(a:patternNum)
 	if ! empty(submatch(l:i + 1))
-	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), get(s:replacementExpressions, l:i, get(s:replacementExpressions, -1, '')), '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
+	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), get(s:replacementExpressions, l:i, get(s:replacementExpressions, -1, '')), '&', function('PatternsOnText#ReplaceSpecial'))
 	endif
     endfor
 
