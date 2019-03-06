@@ -63,7 +63,74 @@ function! s:ParseSpecialFlags( specialFlags ) abort
     return l:result
 endfunction
 
+let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
+    call ingo#err#Clear()
+    let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags, s:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
+    let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
+    let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/'), l:flags, l:specialFlags]
+    let s:matches = []
+    let s:SubstituteTransactional = PatternsOnText#InitialContext()
+    let l:hasValReferenceInExpr = (s:testExpr =~# ingo#actions#GetValExpr())
+
+    try
+
+	execute printf('%ssubstitute/%s/\=s:Record(%d)/%s',
+	\   a:range, escape(l:unescapedPattern, '/'), l:hasValReferenceInExpr, l:flags
+	\)
+
+	" :substitute has visited all further matches, but the last replacement
+	" may have happened before that. Position the cursor on the last
+	" actually selected match.
+	execute s:SubstituteTransactional.lastLnum . 'normal! ^'
+
+	if has_key(s:SubstituteTransactional, 'error')
+	    call ingo#err#Set(s:SubstituteTransactional.error)
+	    return 0
+	endif
+
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    finally
+	unlet! s:testExpr s:matches s:SubstituteTransactional
+    endtry
+endfunction
+function! s:Record( hasValReferenceInExpr ) abort
+    if has_key(s:SubstituteTransactional, 'error')
+	" Short-circuit all further errors; printing the expression error once is
+	" enough.
+	return submatch(0)
+    endif
+
+    let s:SubstituteTransactional.matchCount += 1
+    let l:record = ingo#area#frompattern#GetHere('\C\V' . substitute(escape(submatch(0), '\'), '\n', '\\n', 'g'), line('.'), [])
+    if empty(l:record)
+	let s:SubstituteTransactional.error = printf('Failed to capture match #%d at %s: %s', s:SubstituteTransactional.matchCount, string(getpos('.')[1:2]), submatch(0))
+	return submatch(0)
+    endif
+
+    try
+	if ! empty(s:testExpr)
+	    let l:expr = (a:hasValReferenceInExpr ?
+	    \   substitute(s:testExpr, '\C' . ingo#actions#GetValExpr(), 's:SubstituteTransactional', 'g') :
+	    \   s:testExpr
+	    \)
+	    execute l:expr
+	endif
+
+	call add(s:matches, l:record)
+    catch /^skip$/
+	let s:SubstituteTransactional.matchCount -= 1
+    catch /^Vim\%((\a\+)\)\=:/
+	let s:SubstituteTransactional.error = ingo#msg#MsgFromVimException()
+    catch
+	let s:SubstituteTransactional.error = 'Expression threw exception: ' . v:exception
+    finally
+	return submatch(0)
+    endtry
 endfunction
 
 function! PatternsOnText#Transactional#SubstituteExpr( range, arguments ) abort
