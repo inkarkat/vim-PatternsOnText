@@ -113,10 +113,6 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
 	" actually selected match.
 	execute s:SubstituteTransactional.lastLnum . 'normal! ^'
 
-	if has_key(s:SubstituteTransactional, 'error')
-	    call ingo#err#Set(s:SubstituteTransactional.error)
-	    return 0
-	endif
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
@@ -165,9 +161,7 @@ function! s:Substitute( match, replacement ) abort
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
 
     if l:result !=# l:matchText
-	if ! ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
-	    let s:SubstituteTransactional.error = get(s:SubstituteTransactional, 'error', '') . printf("\nCould not replace %s with %s at position %s", strtrans(l:matchText), strtrans(l:result), string(l:startPos))
-	endif
+	call ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
 
 	if ! has_key(s:SubstituteTransactional, 'lastLnum')
 	    " As we're iterating from last match to first, we just need to set the
