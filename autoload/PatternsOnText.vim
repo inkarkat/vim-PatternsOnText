@@ -64,4 +64,8 @@ function! PatternsOnText#ReplaceSpecial( expr, match, replacement )
     return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
 
+function! PatternsOnText#IsContainsCaptureGroup( pattern ) abort
+    return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\(')
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

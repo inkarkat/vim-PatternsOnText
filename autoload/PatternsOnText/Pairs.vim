@@ -78,9 +78,6 @@ endfunction
 
 
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
-function! s:IsContainsCaptureGroup( pattern ) abort
-    return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\(')
-endfunction
 function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     let l:argumentsWordSplit = split(a:arguments, '\s\+')
     let [l:flags, l:count] = s:ParseArguments(l:argumentsWordSplit)
@@ -99,7 +96,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     try
 	" Check for forbidden capture groups.
 	for l:splitS in l:splitSubstitutions
-	    if s:IsContainsCaptureGroup(l:splitS[1])
+	    if PatternsOnText#IsContainsCaptureGroup(l:splitS[1])
 		call ingo#err#Set('Capture groups not allowed in pattern: ' . ingo#escape#Unescape(l:splitS[1], l:splitS[0]))
 		return 0
 	    endif
@@ -204,7 +201,7 @@ function! PatternsOnText#Pairs#SubstituteMultipleExpr( range, arguments )
 
 	" Check for forbidden capture groups.
 	for l:i in range(len(l:patterns))
-	    if s:IsContainsCaptureGroup(l:patterns[l:i])
+	    if PatternsOnText#IsContainsCaptureGroup(l:patterns[l:i])
 		call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, l:patterns[l:i]))
 		return 0
 	    endif
