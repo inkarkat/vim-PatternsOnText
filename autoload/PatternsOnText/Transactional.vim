@@ -89,6 +89,7 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
 	    return 0
 	endif
 
+	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
 	let l:isReplacementExpression = (l:unescapedReplacement =~# '^\\=')
 	let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:unescapedReplacement =~# ingo#actions#GetValExpr())
 	let l:replacement = (l:hasValReferenceInReplacement ?
@@ -162,6 +163,12 @@ function! s:Record( hasValReferenceInExpr ) abort
 endfunction
 function! s:Substitute( match, replacement ) abort
     let [l:startPos, l:endPos, l:matchText] = a:match
+
+    " Update the context object with the current match information.
+    let s:SubstituteTransactional.matchText = l:matchText
+    let s:SubstituteTransactional.startPos = l:startPos
+    let s:SubstituteTransactional.endPos = l:endPos
+
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
 
     if l:result !=# l:matchText
@@ -173,6 +180,8 @@ function! s:Substitute( match, replacement ) abort
 	    let s:SubstituteTransactional.lastLnum = l:endPos[0]
 	endif
     endif
+
+    let s:SubstituteTransactional.matchCount -= 1
 endfunction
 function! PatternsOnText#Transactional#GetContext() abort
     return s:SubstituteTransactional

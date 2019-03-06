@@ -259,8 +259,10 @@ USAGE							*PatternsOnText-usage*
 			anything.
 			The optional {test-expr} is invoked at each match
 			(v:val contains a context Dict |Substitute-v:val| that
-			can be used to store additional information). You can
-			skip that match by throwing "skip".
+			can be used to store additional information. It also
+			has the matchCount information (but not
+			replacementCount)). You can skip that match by
+			throwing "skip".
 			The optional {update-predicate} is invoked once at the
 			end (and passed that context object as v:val again);
 			it has to return 1 or 0; in the latter case, no
@@ -269,7 +271,15 @@ USAGE							*PatternsOnText-usage*
 			reverse order from last to first) are replaced with
 			{string}. Handles & and \= |sub-replace-expression|;
 			in the latter case, the cursor is positioned on the
-			match, and can use the context via v:val.
+			match, and can use the context via v:val, which
+			contains the following additional information:
+			    matchNum:	total number of matches
+			    matchCount: number of current match of {pattern};
+					decreases from matchNum to 1
+			    matchText:	matched text (as you cannot use
+					submatch(0) any longer
+			    startPos:	[line, col] of the start of the match
+			    endPos:	[line, col] of the end of the match
 :[range]SubstituteTransactional [flags][t/{test-expr}/][u/{update-predicate}/]
 			Repeat the last substitution with the last used search
 			pattern, last used replacement, last used |:s_flags|
