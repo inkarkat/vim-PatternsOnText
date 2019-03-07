@@ -10,62 +10,9 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:special = 'tu'
-function! s:GetFlagsExpr( captureGroupCnt ) abort
-    return '\(' . ingo#cmdargs#substitute#GetFlags() . '\)\(\%(\s*[' . s:special . ']' . ingo#cmdargs#pattern#PatternExpr(a:captureGroupCnt) . '\)*\)'
-endfunction
-function! PatternsOnText#Transactional#ParseArguments( previousPattern, previousReplacement, previousFlags, previousSpecialFlags, arguments ) abort
-    try
-	let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags] =
-	\   ingo#cmdargs#substitute#Parse(a:arguments, {'flagsExpr': s:GetFlagsExpr(6), 'flagsMatchCount': 2, 'emptyFlags': ['', ''], 'emptyPattern': a:previousPattern, 'emptyReplacement': a:previousReplacement, 'defaultReplacement': a:previousReplacement})
-    catch /^Vim\%((\a\+)\)\=:E65:/ " E65: Illegal back reference
-	" Special case of {flags} without /pat/string/. As we use back
-	" references for the special flags, and ingo#cmdargs#substitute#Parse()
-	" tests the flagsExpr separately in this case, it will fail, and we have
-	" to do the parsing and defaulting on our own.
-	let l:matches = matchlist(a:arguments, '\C^' . s:GetFlagsExpr(3) . '$')
-	let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags] =
-	\   ['/', a:previousPattern, a:previousReplacement, get(l:matches, 1, ''), get(l:matches, 2, '')]
-    endtry
-    if empty(l:pattern)
-	let l:pattern = a:previousPattern
-    endif
-
-    if l:flags . l:specialFlags ==# a:arguments
-	if empty(l:flags)
-	    let l:flags = a:previousFlags
-	endif
-	if empty(l:flags)
-	    let l:flags = '&'
-	endif
-	if empty(l:specialFlags)
-	    let l:specialFlags = a:previousSpecialFlags
-	endif
-    endif
-
-    return [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags] + s:ParseSpecialFlags(l:specialFlags)
-endfunction
-function! s:ParseSpecialFlags( specialFlags ) abort
-    let l:result = ['', '']
-    let l:rest = a:specialFlags
-    while 1
-	let l:specialFlagsParse = matchlist(l:rest, '^\s*\([' . s:special . ']\)' . ingo#cmdargs#pattern#PatternExpr(2) . '\(.*\)$')
-	if empty(l:specialFlagsParse)
-	    break
-	endif
-
-	let l:specialIdx = stridx(s:special, l:specialFlagsParse[1])
-	if l:specialIdx == -1 | throw 'ASSERT: Unexpected flag: ' . l:specialFlagsParse[1] | endif
-	let l:result[l:specialIdx] = l:specialFlagsParse[3]
-	let l:rest = l:specialFlagsParse[4]
-    endwhile
-
-    return l:result
-endfunction
-
 let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
-    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
     let [s:previousPattern, s:previousReplacement] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/')]
@@ -196,7 +143,7 @@ endfunction
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr] = ['', '', '', '']
 function! PatternsOnText#Transactional#SubstituteExpr( range, arguments ) abort
     let [l:separator, s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, l:testExpr, l:updatePredicate] =
-    \   PatternsOnText#Transactional#ParseArguments(s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, a:arguments)
+    \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, a:arguments)
 
     try
 	let l:patterns = PatternsOnText#EvalIntoList(s:previousPatternExpr)
