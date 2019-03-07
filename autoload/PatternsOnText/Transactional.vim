@@ -65,18 +65,23 @@ endfunction
 
 let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
-    call ingo#err#Clear()
-    let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags, s:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
     let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/'), l:flags, l:specialFlags]
+
+    return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:unescapedReplacement, l:flags, l:testExpr, l:updatePredicate)
+endfunction
+function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, replacement, flags, testExpr, updatePredicate ) abort
+    call ingo#err#Clear()
+    let s:testExpr = a:testExpr
     let s:matches = []
     let s:SubstituteTransactional = PatternsOnText#InitialContext()
     let l:hasValReferenceInExpr = (s:testExpr =~# ingo#actions#GetValExpr())
 
     try
 	execute printf('%ssubstitute/%s/\=s:Record(%d)/%s',
-	\   a:range, escape(l:unescapedPattern, '/'), l:hasValReferenceInExpr, l:flags
+	\   a:range, escape(a:pattern, '/'), l:hasValReferenceInExpr, a:flags
 	\)
 
 	if has_key(s:SubstituteTransactional, 'error')
@@ -85,16 +90,16 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
 	endif
 	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
 
-	if ! empty(l:updatePredicate) && ! ingo#actions#EvaluateWithVal(l:updatePredicate, s:SubstituteTransactional)
+	if ! empty(a:updatePredicate) && ! ingo#actions#EvaluateWithVal(a:updatePredicate, s:SubstituteTransactional)
 	    call ingo#err#Set('Substitution aborted by update predicate')
 	    return 0
 	endif
 
-	let l:isReplacementExpression = (l:unescapedReplacement =~# '^\\=')
-	let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:unescapedReplacement =~# ingo#actions#GetValExpr())
+	let l:isReplacementExpression = (a:replacement =~# '^\\=')
+	let l:hasValReferenceInReplacement = (l:isReplacementExpression && a:replacement =~# ingo#actions#GetValExpr())
 	let l:replacement = (l:hasValReferenceInReplacement ?
-	\   substitute(l:unescapedReplacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#GetContext()', 'g') :
-	\   l:unescapedReplacement
+	\   substitute(a:replacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#GetContext()', 'g') :
+	\   a:replacement
 	\)
 	" Note: The l:replacement is not handled within this script, so we need
 	" to provide a global PatternsOnText#Transactional#GetContext() accessor
