@@ -38,7 +38,7 @@ function! PatternsOnText#Transactional#ExprEach#TransactionalSubstitute( range, 
 
     try
 	for l:i in range(len(a:patterns))
-	    execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, l:matches, a:testExpr, %d, 0, %d)/%s',
+	    execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, l:matches, a:testExpr, %d, -1, %d)/%s',
 	    \   a:range, escape(a:patterns[l:i], '/'), l:hasValReferenceInExpr, l:i, a:flags
 	    \)
 	endfor
