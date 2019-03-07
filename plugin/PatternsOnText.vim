@@ -89,7 +89,7 @@ command! -range -nargs=* SubstituteTransactional
 \   if ! PatternsOnText#Transactional#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteTransactionalExpr
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Transactional#SubstituteExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Transactional#Expr#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
