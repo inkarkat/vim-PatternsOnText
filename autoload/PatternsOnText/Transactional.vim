@@ -65,12 +65,12 @@ endfunction
 
 let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
-    let [l:separator, l:pattern, l:replacement, l:flags, l:specialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
-    let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/'), l:flags, l:specialFlags]
+    let [s:previousPattern, s:previousReplacement] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/')]
 
-    return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:unescapedReplacement, l:flags, l:testExpr, l:updatePredicate)
+    return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:unescapedReplacement, s:previousFlags, l:testExpr, l:updatePredicate)
 endfunction
 function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, replacement, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
