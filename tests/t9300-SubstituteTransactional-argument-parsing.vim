@@ -1,7 +1,7 @@
 " Test parsing of :SubstituteTransactional arguments
 
 function! s:Parse( arguments ) abort
-    return PatternsOnText#Transactional#ParseArguments('PP', 'PR', 'PF', 't/PT/u/PU/', a:arguments)
+    return PatternsOnText#Transactional#Common#ParseArguments('PP', 'PR', 'PF', 't/PT/u/PU/', a:arguments)
 endfunction
 
 call vimtest#StartTap()

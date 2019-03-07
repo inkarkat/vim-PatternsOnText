@@ -13,6 +13,7 @@ autoload/PatternsOnText/Renumber.vim
 autoload/PatternsOnText/Selected.vim
 autoload/PatternsOnText/Subsequent.vim
 autoload/PatternsOnText/Transactional.vim
+autoload/PatternsOnText/Transactional/Common.vim
 autoload/PatternsOnText/Translate.vim
 autoload/PatternsOnText/Uniques.vim
 plugin/PatternsOnText.vim

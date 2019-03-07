@@ -11,17 +11,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousMultipleExprFlags, s:previousMultipleExprCount] = ['', '', '', '']
-function! s:EvalIntoList( expr ) abort
-    if empty(a:expr)
-	return []
-    endif
-
-    let l:result = eval(a:expr)
-    return (type(l:result) == type([]) ?
-    \   l:result :
-    \   split(l:result, '\n', 1)
-    \)
-endfunction
 function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( range, arguments )
     let [l:separator, l:patternExpr, l:replacementExpr, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPatternExpr, 'emptyReplacement': s:previousReplacementExpr, 'defaultReplacement': s:previousReplacementExpr})
@@ -42,8 +31,8 @@ function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( range, arguments )
     endif
 
     try
-	let l:patterns = s:EvalIntoList(l:patternExpr)
-	let s:replacementExpressions = s:EvalIntoList(l:replacementExpr)
+	let l:patterns = PatternsOnText#EvalIntoList(l:patternExpr)
+	let s:replacementExpressions = PatternsOnText#EvalIntoList(l:replacementExpr)
 
 	" Check for forbidden capture groups.
 	for l:i in range(len(l:patterns))
