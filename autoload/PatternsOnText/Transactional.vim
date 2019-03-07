@@ -179,11 +179,7 @@ function! s:Substitute( match, replacement ) abort
     if l:result !=# l:matchText
 	call ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
 
-	if ! has_key(s:SubstituteTransactional, 'lastLnum')
-	    " As we're iterating from last match to first, we just need to set the
-	    " value once.
-	    let s:SubstituteTransactional.lastLnum = l:endPos[0]
-	endif
+	let s:SubstituteTransactional.lastLnum = max([s:SubstituteTransactional.lastLnum, l:endPos[0]])
     endif
 
     let s:SubstituteTransactional.matchCount -= 1
