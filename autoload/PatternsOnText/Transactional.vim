@@ -127,8 +127,8 @@ function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, 
 	unlet! s:testExpr s:matches s:SubstituteTransactional
     endtry
 endfunction
-function! s:Record( hasValReferenceInExpr ) abort
-    let l:matchText = submatch(0)
+function! s:Record( hasValReferenceInExpr, ... ) abort
+    let l:matchText = submatch(a:0 ? a:1 + 1 : 0)
     if has_key(s:SubstituteTransactional, 'error')
 	" Short-circuit all further errors; printing the expression error once is
 	" enough.
@@ -155,7 +155,7 @@ function! s:Record( hasValReferenceInExpr ) abort
 	endif
 
 	call add(l:record, l:matchText)
-	call add(s:matches, l:record)
+	call add(s:matches, l:record + a:000)
     catch /^skip$/
 	let s:SubstituteTransactional.matchCount -= 1
     catch /^Vim\%((\a\+)\)\=:/
@@ -167,12 +167,15 @@ function! s:Record( hasValReferenceInExpr ) abort
     endtry
 endfunction
 function! s:Substitute( match, replacement ) abort
-    let [l:startPos, l:endPos, l:matchText] = a:match
+    let [l:startPos, l:endPos, l:matchText] = a:match[0:2]
 
     " Update the context object with the current match information.
     let s:SubstituteTransactional.matchText = l:matchText
     let s:SubstituteTransactional.startPos = l:startPos
     let s:SubstituteTransactional.endPos = l:endPos
+    if len(a:match) >= 4
+	let s:SubstituteTransactional.patternIndex = a:match[3]
+    endif
 
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
 
@@ -188,7 +191,113 @@ function! PatternsOnText#Transactional#GetContext() abort
     return s:SubstituteTransactional
 endfunction
 
+
+
+let [s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr] = ['', '', '', '']
 function! PatternsOnText#Transactional#SubstituteExpr( range, arguments ) abort
+    let [l:separator, s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, l:testExpr, l:updatePredicate] =
+    \   PatternsOnText#Transactional#ParseArguments(s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, a:arguments)
+
+    try
+	let l:patterns = PatternsOnText#EvalIntoList(s:previousPatternExpr)
+	let l:replacementExpressions = PatternsOnText#EvalIntoList(s:previousReplacementExpr)
+
+	return PatternsOnText#Transactional#TransactionalSubstituteExpr(a:range, l:patterns, l:replacementExpressions, s:previousFlagsExpr, l:testExpr, l:updatePredicate)
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    endtry
+endfunction
+function! PatternsOnText#Transactional#TransactionalSubstituteExpr( range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
+    call ingo#err#Clear()
+
+    " Check for forbidden capture groups.
+    for l:i in range(len(a:patterns))
+	if PatternsOnText#IsContainsCaptureGroup(a:patterns[l:i])
+	    call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, a:patterns[l:i]))
+	    return 0
+	endif
+    endfor
+
+    if empty(a:patterns)
+	call ingo#err#Set('No patterns')
+	return 0
+    endif
+
+    " Remove any atoms changing the magicness, then surround each individual
+    " match with a capturing group, so that we can determine which branch
+    " matched (and use the corresponding replacement).
+    let l:pattern = join(
+    \  map(
+    \      copy(a:patterns),
+    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
+    \  ),
+    \  '\|'
+    \)
+
+    let s:testExpr = a:testExpr
+    let s:matches = []
+    let s:SubstituteTransactional = PatternsOnText#InitialContext()
+    let l:hasValReferenceInExpr = (s:testExpr =~# ingo#actions#GetValExpr())
+
+    try
+	execute printf('%ssubstitute/%s/\=s:RecordExpression(%d, %d)/%s',
+	\   a:range, escape(l:pattern, '/'), len(a:patterns), l:hasValReferenceInExpr, a:flags
+	\)
+
+	if has_key(s:SubstituteTransactional, 'error')
+	    call ingo#err#Set(s:SubstituteTransactional.error)
+	    return 0
+	endif
+	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
+
+	if ! empty(a:updatePredicate) && ! ingo#actions#EvaluateWithVal(a:updatePredicate, s:SubstituteTransactional)
+	    call ingo#err#Set('Substitution aborted by update predicate')
+	    return 0
+	endif
+
+	for l:match in reverse(s:matches)
+	    let l:replacement = get(a:replacementExpressions, l:match[3], get(a:replacementExpressions, -1, ''))  " Lookup corresponding replacement based on the matched patternIndex, stored with s:Record().
+	    let l:isReplacementExpression = (l:replacement =~# '^\\=')
+	    let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:replacement =~# ingo#actions#GetValExpr())
+	    let l:replacement = (l:hasValReferenceInReplacement ?
+	    \   substitute(l:replacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#GetContext()', 'g') :
+	    \   l:replacement
+	    \)
+
+	    if l:isReplacementExpression
+		" Position the cursor on the beginning of the match.
+		call call('cursor', l:match[0])
+	    endif
+
+	    call s:Substitute(l:match, l:replacement)
+	endfor
+
+	" :substitute has visited all further matches, but the last replacement
+	" may have happened before that. Position the cursor on the last
+	" actually selected match.
+	execute s:SubstituteTransactional.lastLnum . 'normal! ^'
+
+	return 1
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    finally
+	unlet! s:testExpr s:matches s:SubstituteTransactional
+    endtry
+endfunction
+function! s:RecordExpression( patternNum, hasValReferenceInExpr ) abort
+    for l:i in range(a:patternNum)
+	if ! empty(submatch(l:i + 1))
+	    let s:SubstituteTransactional.patternIndex = l:i
+	    return s:Record(a:hasValReferenceInExpr, l:i)
+	endif
+    endfor
+
+    " Should never happen; one branch always matches, and branches shouldn't be
+    " empty.
+    let s:SubstituteTransactional.error = 'Could not locate matching pattern'
+    return submatch(0)
 endfunction
 
 let &cpo = s:save_cpo
