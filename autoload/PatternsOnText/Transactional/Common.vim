@@ -62,5 +62,66 @@ function! s:ParseSpecialFlags( specialFlags ) abort
     return l:result
 endfunction
 
+function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr, hasValReferenceInExpr, ... ) abort
+    let l:matchText = submatch(a:0 ? a:1 + 1 : 0)
+    if has_key(a:context, 'error')
+	" Short-circuit all further errors; printing the expression error once is
+	" enough.
+	return l:matchText
+    endif
+
+    let a:context.matchCount += 1
+    let l:record = (empty(l:matchText) ?
+    \   repeat([getpos('.')[1:2]], 2) :
+    \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(l:matchText, '\'), '\n', '\\n', 'g'), line('.'), [])
+    \)
+    if empty(l:record)
+	let a:context.error = printf('Failed to capture match #%d at %s: %s', a:context.matchCount, string(getpos('.')[1:2]), l:matchText)
+	return l:matchText
+    endif
+
+    try
+	if ! empty(a:testExpr)
+	    let l:expr = (a:hasValReferenceInExpr ?
+	    \   substitute(a:testExpr, '\C' . ingo#actions#GetValExpr(), 'a:context', 'g') :
+	    \   a:testExpr
+	    \)
+	    execute l:expr
+	endif
+
+	call add(l:record, l:matchText)
+	call add(a:matches, l:record + a:000)
+    catch /^skip$/
+	let a:context.matchCount -= 1
+    catch /^Vim\%((\a\+)\)\=:/
+	let a:context.error = ingo#msg#MsgFromVimException()
+    catch
+	let a:context.error = 'Expression threw exception: ' . v:exception
+    finally
+	return l:matchText
+    endtry
+endfunction
+
+function! PatternsOnText#Transactional#Common#Substitute( context, match, replacement ) abort
+    let [l:startPos, l:endPos, l:matchText] = a:match[0:2]
+
+    " Update the context object with the current match information.
+    let a:context.matchText = l:matchText
+    let a:context.startPos = l:startPos
+    let a:context.endPos = l:endPos
+    if len(a:match) >= 4
+	let a:context.patternIndex = a:match[3]
+    endif
+
+    let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
+
+    if l:result !=# l:matchText
+	call ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
+
+	let a:context.lastLnum = max([a:context.lastLnum, l:endPos[0]])
+    endif
+
+    let a:context.matchCount -= 1
+endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
