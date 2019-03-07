@@ -34,34 +34,13 @@ function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( range, arguments )
 	let l:patterns = PatternsOnText#EvalIntoList(l:patternExpr)
 	let s:replacementExpressions = PatternsOnText#EvalIntoList(l:replacementExpr)
 
-	" Check for forbidden capture groups.
-	for l:i in range(len(l:patterns))
-	    if PatternsOnText#IsContainsCaptureGroup(l:patterns[l:i])
-		call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, l:patterns[l:i]))
-		return 0
-	    endif
-	endfor
-
-	if empty(l:patterns)
-	    call ingo#err#Set('No patterns')
-	    return 0
-	endif
+	let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
+	if empty(l:pattern) | return 0 | endif
 
 	let s:previousPatternExpr = l:patternExpr
 	let s:previousReplacementExpr = l:replacementExpr
 	let s:previousMultipleExprFlags = l:flags
 	let s:previousMultipleExprCount = l:count
-
-	" Remove any atoms changing the magicness, then surround each individual
-	" match with a capturing group, so that we can determine which branch
-	" matched (and use the corresponding replacement).
-	let l:pattern = join(
-	\   map(
-	\       copy(l:patterns),
-	\       '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
-	\   ),
-	\   '\|'
-	\)
 
 	execute printf('%ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
 	\   a:range, l:pattern, len(l:patterns), l:flags, l:count

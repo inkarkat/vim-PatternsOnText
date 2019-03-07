@@ -9,6 +9,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! PatternsOnText#EmulatePreviousReplacement( replacement, previousReplacement )
     " substitute() doesn't support the ~ special character to recall the last
@@ -80,4 +82,32 @@ function! PatternsOnText#EvalIntoList( expr ) abort
     \)
 endfunction
 
+function! PatternsOnText#JoinPatterns( patterns ) abort
+    if empty(a:patterns)
+	call ingo#err#Set('No patterns')
+	return ''
+    endif
+
+    " Check for forbidden capture groups.
+    for l:i in range(len(a:patterns))
+	if PatternsOnText#IsContainsCaptureGroup(a:patterns[l:i])
+	    call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, a:patterns[l:i]))
+	    return ''
+	endif
+    endfor
+
+    " Remove any atoms changing the magicness, then surround each individual
+    " match with a capturing group, so that we can determine which branch
+    " matched (and use the corresponding replacement).
+    return join(
+    \  map(
+    \      copy(a:patterns),
+    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
+    \  ),
+    \  '\|'
+    \)
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
