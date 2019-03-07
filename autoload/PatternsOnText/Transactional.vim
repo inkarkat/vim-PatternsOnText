@@ -41,12 +41,7 @@ function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, 
 	    return 0
 	endif
 
-	let l:isReplacementExpression = (a:replacement =~# '^\\=')
-	let l:hasValReferenceInReplacement = (l:isReplacementExpression && a:replacement =~# ingo#actions#GetValExpr())
-	let l:replacement = (l:hasValReferenceInReplacement ?
-	\   substitute(a:replacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#GetContext()', 'g') :
-	\   a:replacement
-	\)
+	let [l:isReplacementExpression, l:replacement] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(a:replacement, 'PatternsOnText#Transactional#GetContext()')
 	" Note: The l:replacement is not handled within this script, so we need
 	" to provide a global PatternsOnText#Transactional#GetContext() accessor
 	" for s:SubstituteTransactional that is in scope there.

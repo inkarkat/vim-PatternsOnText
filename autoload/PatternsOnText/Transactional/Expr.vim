@@ -53,12 +53,7 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( range, patt
 
 	for l:match in reverse(l:matches)
 	    let l:replacement = get(a:replacementExpressions, l:match[3], get(a:replacementExpressions, -1, ''))  " Lookup corresponding replacement based on the matched patternIndex, stored with PatternsOnText#Transactional#Common#Record().
-	    let l:isReplacementExpression = (l:replacement =~# '^\\=')
-	    let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:replacement =~# ingo#actions#GetValExpr())
-	    let l:replacement = (l:hasValReferenceInReplacement ?
-	    \   substitute(l:replacement, '\C' . ingo#actions#GetValExpr(), 'PatternsOnText#Transactional#Expr#GetContext()', 'g') :
-	    \   l:replacement
-	    \)
+	    let [l:isReplacementExpression, l:replacement] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(l:replacement, 'PatternsOnText#Transactional#Expr#GetContext()')
 
 	    if l:isReplacementExpression
 		" Position the cursor on the beginning of the match.

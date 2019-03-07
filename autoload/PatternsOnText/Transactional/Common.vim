@@ -64,6 +64,15 @@ function! s:ParseSpecialFlags( specialFlags ) abort
     return l:result
 endfunction
 
+function! PatternsOnText#Transactional#Common#ProcessReplacementExpression( replacement, accessor ) abort
+    let l:isReplacementExpression = (a:replacement =~# '^\\=')
+    let l:hasValReferenceInReplacement = (l:isReplacementExpression && a:replacement =~# ingo#actions#GetValExpr())
+    return [l:isReplacementExpression, (l:hasValReferenceInReplacement ?
+    \   substitute(a:replacement, '\C' . ingo#actions#GetValExpr(), a:accessor, 'g') :
+    \   a:replacement
+    \)]
+endfunction
+
 function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr, hasValReferenceInExpr, ... ) abort
     let l:matchText = submatch(a:0 ? a:1 + 1 : 0)
     if has_key(a:context, 'error')
