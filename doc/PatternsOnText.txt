@@ -264,15 +264,16 @@ USAGE							*PatternsOnText-usage*
 			replacementCount)). You can skip that match by
 			throwing "skip".
 			The optional {update-predicate} is invoked once at the
-			end (and passed that context object as v:val again);
-			it has to return 1 or 0; in the latter case, no
-			replacements are done (the transaction is aborted).
-			In case of 1 (commit), all recorded positions (in
-			reverse order from last to first) are replaced with
-			{string}. Handles & and \= |sub-replace-expression|;
-			in the latter case, the cursor is positioned on the
-			match, and can use the context via v:val, which
-			contains the following additional information:
+			end (and passed that context object as v:val again,
+			now also with matchNum information); it has to return
+			1 or 0; in the latter case, no replacements are done
+			(the transaction is aborted). In case of 1 (commit),
+			all recorded positions (in reverse order from last to
+			first) are replaced with {string}, which handles & and
+			\=; with |sub-replace-expression|, the cursor is
+			positioned on the match, and can use the context via
+			v:val, which contains the following additional
+			information:
 			    matchNum:	total number of matches
 			    matchCount: number of current match of {pattern};
 					decreases from matchNum to 1

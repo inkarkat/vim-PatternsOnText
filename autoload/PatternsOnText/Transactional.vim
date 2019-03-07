@@ -83,13 +83,13 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
 	    call ingo#err#Set(s:SubstituteTransactional.error)
 	    return 0
 	endif
+	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
 
 	if ! empty(l:updatePredicate) && ! ingo#actions#EvaluateWithVal(l:updatePredicate, s:SubstituteTransactional)
 	    call ingo#err#Set('Substitution aborted by update predicate')
 	    return 0
 	endif
 
-	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
 	let l:isReplacementExpression = (l:unescapedReplacement =~# '^\\=')
 	let l:hasValReferenceInReplacement = (l:isReplacementExpression && l:unescapedReplacement =~# ingo#actions#GetValExpr())
 	let l:replacement = (l:hasValReferenceInReplacement ?
