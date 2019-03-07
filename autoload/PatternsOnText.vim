@@ -68,4 +68,16 @@ function! PatternsOnText#IsContainsCaptureGroup( pattern ) abort
     return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\(')
 endfunction
 
+function! PatternsOnText#EvalIntoList( expr ) abort
+    if empty(a:expr)
+	return []
+    endif
+
+    let l:result = eval(a:expr)
+    return (type(l:result) == type([]) ?
+    \   l:result :
+    \   split(l:result, '\n', 1)
+    \)
+endfunction
+
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
