@@ -8,6 +8,8 @@
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 "
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:special = 'tu'
 function! s:GetFlagsExpr( captureGroupCnt ) abort
@@ -124,4 +126,6 @@ function! PatternsOnText#Transactional#Common#Substitute( context, match, replac
     let a:context.matchCount -= 1
 endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
