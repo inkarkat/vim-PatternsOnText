@@ -120,8 +120,8 @@ function! PatternsOnText#Transactional#Common#Substitute( context, match, replac
     let a:context.matchText = l:matchText
     let a:context.startPos = l:startPos
     let a:context.endPos = l:endPos
-    if len(a:match) >= 4
-	let a:context.patternIndex = a:match[3]
+    if len(a:match) >= 5
+	let a:context.patternIndex = a:match[4]
     endif
 
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
