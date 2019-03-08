@@ -94,10 +94,13 @@ function! PatternsOnText#Transactional#ExprEach#SortByPosition( m1, m2 ) abort
     endif
 
     let [l:startPos1, l:startPos2] = [a:m1[0], a:m2[0]]
-    return (l:startPos1 == l:startPos2 ?
-    \   0 :
-    \   (ingo#pos#IsBefore(l:startPos1, l:startPos2) ? 1 : -1)
-    \)
+    if l:startPos1 != l:startPos2
+	return (ingo#pos#IsBefore(l:startPos1, l:startPos2) ? 1 : -1)
+    endif
+
+    " Same area: Last patternIndex first.
+    let [l:idx1, l:idx2] = [get(a:m1, 3, -1), get(a:m2, 3, -1)]
+    return (l:idx1 == l:idx2 ? 0 : l:idx1 > l:idx2 ? 1 : -1)
 endfunction
 
 let &cpo = s:save_cpo
