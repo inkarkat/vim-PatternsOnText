@@ -83,7 +83,7 @@ function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr
 
     let a:context.matchCount += 1
     let l:record = (empty(l:matchText) ?
-    \   repeat([getpos('.')[1:2]], 2) :
+    \   ingo#area#EmptyArea(getpos('.')[1:2]) :
     \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(l:matchText, '\'), '\n', '\\n', 'g'), line('.'), [])
     \)
     if empty(l:record)
