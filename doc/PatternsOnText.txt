@@ -243,7 +243,7 @@ USAGE							*PatternsOnText-usage*
 :[range]SubstituteMultipleExpr /{pattern-expr}/{replacement-expr}/ [flags] [count]
 			Evaluate {pattern-expr}, either as a List of patterns,
 			or else as String, which is then split into lines of
-			patterns. Change any of these patterns given to the
+			patterns. Change any of these patterns to the
 			corresponding (i.e. with the same index, using the
 			last available if there are fewer replacements
 			available) List element of {replacement-expr}.
@@ -254,7 +254,8 @@ USAGE							*PatternsOnText-usage*
 			and replacement expressions, last used |:s_flags| and
 			count.
 						    *:SubstituteTransactional*
-:[range]SubstituteTransactional /{pattern}/{string}/ [flags][t/{test-expr}/][u/{update-predicate}/]
+:[range]SubstituteTransactional /{pattern}/{string}/
+				[flags][t/{test-expr}/][u/{update-predicate}/]
 			First record every match of {pattern} without changing
 			anything.
 			The optional {test-expr} is invoked at each match
@@ -270,10 +271,10 @@ USAGE							*PatternsOnText-usage*
 			(the transaction is aborted). In case of 1 (commit),
 			all recorded positions (in reverse order from last to
 			first) are replaced with {string}, which handles & and
-			\=; with |sub-replace-expression|, the cursor is
-			positioned on the match, and can use the context via
-			v:val, which contains the following additional
-			information:
+			also \=; with the latter |sub-replace-expression|, the
+			cursor is positioned on the match, and can use the
+			context via v:val, which contains the following
+			additional information:
 			    matchNum:	total number of matches
 			    matchCount: number of current match of {pattern};
 					decreases from matchNum to 1
@@ -288,7 +289,8 @@ USAGE							*PatternsOnText-usage*
 			specified).
 
 						*:SubstituteTransactionalExpr*
-:[range]SubstituteTransactionalExpr /{pattern-expr}/{replacement-expr}/ [flags][t/{test-expr}/][u/{update-predicate}/]
+:[range]SubstituteTransactionalExpr /{pattern-expr}/{replacement-expr}/
+				[flags][t/{test-expr}/][u/{update-predicate}/]
 			Evaluate {pattern-expr}, either as a List of patterns,
 			or else as String, which is then split into lines of
 			patterns. First record (the optional {test-expr}, and
@@ -305,21 +307,26 @@ USAGE							*PatternsOnText-usage*
 			and replacement expressions, last used |:s_flags| and
 			{test-expr} / {update-predicate} (unless specified).
 					    *:SubstituteTransactionalExprEach*
-:[range]SubstituteTransactionalExprEach /{pattern-expr}/{replacement-expr}/ [flags][t/{test-expr}/][u/{update-predicate}/]
+:[range]SubstituteTransactionalExprEach /{pattern-expr}/{replacement-expr}/
+				[flags][t/{test-expr}/][u/{update-predicate}/]
 			Evaluate {pattern-expr}, either as a List of patterns,
 			or else as String, which is then split into lines of
-			patterns. For each pattern, record matches
-			individually. Then at the end change any of these
-			patterns given to the corresponding (i.e. with the
-			same index, using the last available if there are
-			fewer replacements available) List element of
-			{replacement-expr}, like |:SubstituteTransactional|.
+			patterns. First record (the optional {test-expr}, and
+			a later |sub-replace-expression| have an additional
+			patternIndex that shows which pattern matched) and
+			then at the end change any of these patterns given to
+			the corresponding (i.e. with the same index, using the
+			last available if there are fewer replacements
+			available) List element of {replacement-expr}, like
+			|:SubstituteTransactional|.
 			In contrast to |:SubstituteTransactionalExpr|, each
-			pattern is applied separately, not as alternative
-			regexp branches. As the replacements are only done at
-			the very end, this means that _any_ pattern match is
-			recorded and later replaced, not just the first
-			alternative! (And you can use capturing groups here.)
+			pattern is searched separately, not as alternative
+			regexp branches (where the first branch matches, and
+			other potential matches are eclipsed). As the
+			replacements are only done at the very end, this means
+			that _any_ pattern match is recorded and later
+			replaced, not just the first alternative! (And you can
+			use capturing groups here.)
 :[range]SubstituteTransactionalExprEach [flags][t/{test-expr}/][u/{update-predicate}/]
 			Repeat the last substitution with the last used search
 			and replacement expressions, last used |:s_flags| and
@@ -602,6 +609,7 @@ HISTORY						      *PatternsOnText-history*
 - ENH: Also support \= |sub-replace-expression| for :SubstituteMultiple and
   :SubstituteWildcard.
 - ENH: Add :SubstituteMultipleExpr variant of :SubstituteMultiple.
+- ENH: Add :SubstituteTransactional[Expr[Each]] commands.
 
 2.10	19-Oct-2018
 - Add :Renumber command.

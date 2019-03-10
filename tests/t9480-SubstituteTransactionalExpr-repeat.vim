@@ -1,4 +1,4 @@
-" Test capturing additional information in the test expression and then using that in the update predicate.
+" Test repeating an aborted substitution elsewhere where it passes.
 
 call vimtest#StartTap()
 call vimtap#Plan(2)

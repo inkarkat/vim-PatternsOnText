@@ -83,7 +83,7 @@ function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr
 
     let a:context.matchCount += 1
     let l:record = (empty(l:matchText) ?
-    \   repeat([getpos('.')[1:2]], 2) :
+    \   ingo#area#EmptyArea(getpos('.')[1:2]) :
     \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(l:matchText, '\'), '\n', '\\n', 'g'), line('.'), [])
     \)
     if empty(l:record)
@@ -113,16 +113,19 @@ function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr
     endtry
 endfunction
 
-function! PatternsOnText#Transactional#Common#Substitute( context, match, replacement ) abort
+function! PatternsOnText#Transactional#Common#Substitute( context, match, replacement, additionalAttributes ) abort
     let [l:startPos, l:endPos, l:matchText] = a:match[0:2]
 
     " Update the context object with the current match information.
     let a:context.matchText = l:matchText
     let a:context.startPos = l:startPos
     let a:context.endPos = l:endPos
-    if len(a:match) >= 4
-	let a:context.patternIndex = a:match[3]
-    endif
+    for l:i in range(len(a:additionalAttributes))
+	let l:attribute = a:additionalAttributes[l:i]
+	if ! empty(l:attribute)
+	    let a:context[l:attribute] = a:match[3 + l:i]
+	endif
+    endfor
 
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
 
