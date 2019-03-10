@@ -60,7 +60,7 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( range, patt
 		call call('cursor', l:match[0])
 	    endif
 
-	    call PatternsOnText#Transactional#Common#Substitute(s:SubstituteTransactional, l:match, l:replacement)
+	    call PatternsOnText#Transactional#Common#Substitute(s:SubstituteTransactional, l:match, l:replacement, ['patternIndex'])
 	endfor
 
 	" :substitute has visited all further matches, but the last replacement
