@@ -573,13 +573,13 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 2.11    RELEASEME
+##### 2.11    28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier
   creation of custom translation commands without having to reassemble (and
   then re-parse) the entire command arguments.
 - Add :PutTranslations and :YankTranslations companion commands of
   :SubstituteTranslate.
-- ENH: Also support \= sub-replace-expression for :SubstituteMultiple and
+- ENH: Also support \\= sub-replace-expression for :SubstituteMultiple and
   :SubstituteWildcard.
 - ENH: Add :SubstituteMultipleExpr variant of :SubstituteMultiple.
 - ENH: Add :SubstituteTransactional[Expr[Each]] commands.
@@ -689,12 +689,12 @@ __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scrip
   automatically ignore empty lines any more. Use a {pattern} like ^$ to ignore
   them explicitly.
 - FIX: Wrong use of ingo#escape#Unescape().
-- ENH: Enable use of \= sub-replace-expression in :SubstituteInSearch through
-  emulation, as the command implementation itself uses \=, Vim doesn't allow
+- ENH: Enable use of \\= sub-replace-expression in :SubstituteInSearch through
+  emulation, as the command implementation itself uses \\=, Vim doesn't allow
   recursive use inside it. This has been inspired by
   http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
 - Add :DeleteRanges, :YankRanges, :PrintRanges commands.
-- Handle \r, \n, \t, \b in {string}, too.
+- Handle \\r, \\n, \\t, \\b in {string}, too.
 
 __You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.017!__
@@ -707,18 +707,18 @@ __You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.016!__
 
 ##### 1.12    21-Nov-2013
-- FIX: Use of \v and \V magicness atoms in the pattern for :DeleteExcept and
+- FIX: Use of \\v and \\V magicness atoms in the pattern for :DeleteExcept and
   :SubstituteExcept cause errors like "E54: Unmatched (" and "E486: Pattern
   not found". Revert to the default 'magic' mode after each pattern insertion
   to the workhorse regular expression.
 - FIX: Abort :DeleteExcept / :SubstituteExcept commands when the pattern
-  contains the set start / end match patterns \zs / \ze, as these interfere
+  contains the set start / end match patterns \\zs / \\ze, as these interfere
   with the internal implemenation.
 - Minor: Make substitute() and matchlist() robust against 'ignorecase'.
 
 ##### 1.11    13-Jun-2013
 - FIX: Remove -bar from all commands to correctly handle patterns like
-  foo\|bar without escaping as foo\\|bar.
+  foo\\|bar without escaping as foo\\\\|bar.
 - :SubstituteSelected now positions the cursor on the line where the last
   selected replacement happened, to behave like :substitute.
 
@@ -747,4 +747,4 @@ __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scrip
 Copyright: (C) 2011-2019 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
-Maintainer:     Ingo Karkat <ingo@karkat.de>
+Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;
