@@ -1,15 +1,9 @@
 " PatternsOnText/Pairs.vim: Commands to apply multiple pattern-replace pairs.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/regexp/magic.vim autoload script
-"   - ingo/subst/pairs.vim autoload script
-"   - ingo/subst/replacement.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2014-2018 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -74,6 +68,9 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
 	let s:replacements = []
     endtry
 endfunction
+
+
+
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     let l:argumentsWordSplit = split(a:arguments, '\s\+')
@@ -93,7 +90,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
     try
 	" Check for forbidden capture groups.
 	for l:splitS in l:splitSubstitutions
-	    if l:splitS[1] =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\('
+	    if PatternsOnText#IsContainsCaptureGroup(l:splitS[1])
 		call ingo#err#Set('Capture groups not allowed in pattern: ' . ingo#escape#Unescape(l:splitS[1], l:splitS[0]))
 		return 0
 	    endif
@@ -150,19 +147,13 @@ endfunction
 function! s:Replace()
     for l:i in range(len(s:replacements))
 	if ! empty(submatch(l:i + 1))
-	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#Pairs#ReplaceSpecial'))
+	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#ReplaceSpecial'))
 	endif
     endfor
 
     " Should never happen; one branch always matches, and branches shouldn't be
     " empty.
     return ''
-endfunction
-function! PatternsOnText#Pairs#ReplaceSpecial( expr, match, replacement )
-    if a:replacement =~# '^' . a:expr . '$'
-	return a:match
-    endif
-    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
 endfunction
 
 let &cpo = s:save_cpo

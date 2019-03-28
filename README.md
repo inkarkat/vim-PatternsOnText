@@ -1,4 +1,4 @@
-PATTERNS ON TEXT   
+PATTERNS ON TEXT
 ===============================================================================
 _by Ingo Karkat_
 
@@ -206,7 +206,7 @@ USAGE
                             sequential :s/new/old/ | s/older/newer/ commands. For
                             example, you can swap texts with this.
                             Note: You cannot use capturing groups /\( here!
-                            Handles & in {string}.
+                            Handles & and \= sub-replace-expression in {string}.
     :[range]SubstituteMultiple [flags] [count]
                             Repeat the last substitution with the last used search
                             patterns, last used replacement strings, last used
@@ -216,14 +216,105 @@ USAGE
                             Change (first in the line, with "g" flag all) matches
                             of wildcard to {string}. Modeled after the Korn
                             shell's "cd {old} {new}" command.
-                            Handles & in {string}. Whitespace in the substitution
-                            pairs must be escaped; for a literal backslash search
-                            / replace, use \\:
+                            Handles & and \= sub-replace-expression in {string}.
+                            Whitespace in the substitution pairs must be escaped;
+                            for a literal backslash search / replace, use \\:
                                 C:\\=my\ drive
     :[range]SubstituteWildcard [flags] [count]
                             Repeat the last substitution with the last used search
                             pattern, last used wildcard replacements, last used
                             :s_flags and count.
+
+    :[range]SubstituteMultipleExpr /{pattern-expr}/{replacement-expr}/ [flags] [count]
+                            Evaluate {pattern-expr}, either as a List of patterns,
+                            or else as String, which is then split into lines of
+                            patterns. Change any of these patterns to the
+                            corresponding (i.e. with the same index, using the
+                            last available if there are fewer replacements
+                            available) List element of {replacement-expr}.
+                            Note: You cannot use capturing groups /\( here!
+                            Each replacement handles & and \=.
+    :[range]SubstituteMultipleExpr [flags] [count]
+                            Repeat the last substitution with the last used search
+                            and replacement expressions, last used :s_flags and
+                            count.
+
+    :[range]SubstituteTransactional /{pattern}/{string}/
+                                    [flags][t/{test-expr}/][u/{update-predicate}/]
+                            First record every match of {pattern} without changing
+                            anything.
+                            The optional {test-expr} is invoked at each match
+                            (v:val contains a context Dict Substitute-v:val that
+                            can be used to store additional information. It also
+                            has the matchCount information (but not
+                            replacementCount)). You can skip that match by
+                            throwing "skip".
+                            The optional {update-predicate} is invoked once at the
+                            end (and passed that context object as v:val again,
+                            now also with matchNum information); it has to return
+                            1 or 0; in the latter case, no replacements are done
+                            (the transaction is aborted). In case of 1 (commit),
+                            all recorded positions (in reverse order from last to
+                            first) are replaced with {string}, which handles & and
+                            also \=; with the latter sub-replace-expression, the
+                            cursor is positioned on the match, and can use the
+                            context via v:val, which contains the following
+                            additional information:
+                                matchNum:   total number of matches
+                                matchCount: number of current match of {pattern};
+                                            decreases from matchNum to 1
+                                matchText:  matched text (as you cannot use
+                                            submatch(0) any longer
+                                startPos:   [line, col] of the start of the match
+                                endPos:     [line, col] of the end of the match
+    :[range]SubstituteTransactional [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Repeat the last substitution with the last used search
+                            pattern, last used replacement, last used :s_flags
+                            and {test-expr} / {update-predicate} (unless
+                            specified).
+
+    :[range]SubstituteTransactionalExpr /{pattern-expr}/{replacement-expr}/
+                                    [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Evaluate {pattern-expr}, either as a List of patterns,
+                            or else as String, which is then split into lines of
+                            patterns. First record (the optional {test-expr}, and
+                            a later sub-replace-expression have an additional
+                            patternIndex that shows which pattern matched) and
+                            then at the end change any of these patterns given to
+                            the corresponding (i.e. with the same index, using the
+                            last available if there are fewer replacements
+                            available) List element of {replacement-expr}, like
+                            :SubstituteTransactional.
+                            Note: You cannot use capturing groups /\( here!
+    :[range]SubstituteTransactionalExpr [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Repeat the last substitution with the last used search
+                            and replacement expressions, last used :s_flags and
+                            {test-expr} / {update-predicate} (unless specified).
+
+    :[range]SubstituteTransactionalExprEach /{pattern-expr}/{replacement-expr}/
+                                    [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Evaluate {pattern-expr}, either as a List of patterns,
+                            or else as String, which is then split into lines of
+                            patterns. First record (the optional {test-expr}, and
+                            a later sub-replace-expression have an additional
+                            patternIndex that shows which pattern matched) and
+                            then at the end change any of these patterns given to
+                            the corresponding (i.e. with the same index, using the
+                            last available if there are fewer replacements
+                            available) List element of {replacement-expr}, like
+                            :SubstituteTransactional.
+                            In contrast to :SubstituteTransactionalExpr, each
+                            pattern is searched separately, not as alternative
+                            regexp branches (where the first branch matches, and
+                            other potential matches are eclipsed). As the
+                            replacements are only done at the very end, this means
+                            that _any_ pattern match is recorded and later
+                            replaced, not just the first alternative! (And you can
+                            use capturing groups here.)
+    :[range]SubstituteTransactionalExprEach [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Repeat the last substitution with the last used search
+                            and replacement expressions, last used :s_flags and
+                            {test-expr} / {update-predicate} (unless specified).
 
     :[range]SubstituteExecute/{pattern}/[flags] {expr}
                             Replace matches of {pattern} in the current line /
@@ -273,6 +364,23 @@ USAGE
                             Repeat the last substitution with the last used search
                             pattern, last used {expr} / {func} / {item1}..., last
                             used :s_flags and count.
+    :[line]PutTranslations [{template-expr}]
+                            Put all translations from :SubstituteTranslate after
+                            [line] (default current line), according to
+                            {template-expr}, which can refer to each original
+                            match as v:val.match, the associated replacement as
+                            v:val.replacement, and the (original) number of
+                            translation (which also determines the output order)
+                            as v:val.count. The default template associates the
+                            replacement with the original match:
+                                repl1: match1
+                                repl2: match2
+    :YankTranslations [x] [{template-expr}]
+                            Yank all translations from :SubstituteTranslate
+                            [into register x], according to {template-expr} (see
+                            above). The default template creates :substitute
+                            commands that undo the translation:
+                                :'[,']substitute/repl1/match1/g
 
     :[range]PrintDuplicateLinesOf[!] [{pattern}]
     :[range]PrintDuplicateLinesOf[!] /{pattern}/
@@ -465,6 +573,17 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 2.11    28-Mar-2019
+- Extract PatternsOnText#Translate#Translate() API function to allow easier
+  creation of custom translation commands without having to reassemble (and
+  then re-parse) the entire command arguments.
+- Add :PutTranslations and :YankTranslations companion commands of
+  :SubstituteTranslate.
+- ENH: Also support \\= sub-replace-expression for :SubstituteMultiple and
+  :SubstituteWildcard.
+- ENH: Add :SubstituteMultipleExpr variant of :SubstituteMultiple.
+- ENH: Add :SubstituteTransactional[Expr[Each]] commands.
+
 ##### 2.10    19-Oct-2018
 - Add :Renumber command.
 - Add :DeleteAllDuplicates command, a variant of :DeleteDuplicates and inverse
@@ -494,14 +613,16 @@ HISTORY
   necessary any longer (but now the full /{pattern}/{string}/ needs to be
   given; you cannot omit e.g. the trailing /). This parsing better matches the
   user expectation. :SubstituteWildcard still requires escaping, though.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.035!__
 
 ##### 2.01    15-Aug-2017
 - Add :SubstituteUnless variant of :SubstituteIf.
 - Move PatternsOnText#DefaultReplacementOnPredicate(),
   PatternsOnText#ReplaceSpecial(), and PatternsOnText#DefaultReplacer() to
   ingo-library.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.032!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.032!__
 
 ##### 2.00    30-Sep-2016
 - Add :SubstituteChoices command.
@@ -511,7 +632,8 @@ HISTORY
   / :SubstituteMultiple.
 - FIX: Minor: With :SubstituteSelected, Cursor jumps to first line if no
   substitution at all ("nnnnn"). Initialize l:lastNum to current line.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.027!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.027!__
 
 ##### 1.51    23-Dec-2014
 - Don't set the buffer 'modified' for :PrintDuplicates and :PrintUniques.
@@ -546,7 +668,8 @@ HISTORY
 - Correctly report :PrintDuplicates on folded lines.
 - Refactoring: Use ingo#cmdargs#pattern#ParseUnescaped().
 - Factor out ingo#range#lines#Get() into ingo-library.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.022!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.022!__
 
 ##### 1.35    25-Apr-2014
 - ENH: Allow to pass multiple ranges to the :\*Ranges commands.
@@ -566,32 +689,36 @@ HISTORY
   automatically ignore empty lines any more. Use a {pattern} like ^$ to ignore
   them explicitly.
 - FIX: Wrong use of ingo#escape#Unescape().
-- ENH: Enable use of \= sub-replace-expression in :SubstituteInSearch through
-  emulation, as the command implementation itself uses \=, Vim doesn't allow
+- ENH: Enable use of \\= sub-replace-expression in :SubstituteInSearch through
+  emulation, as the command implementation itself uses \\=, Vim doesn't allow
   recursive use inside it. This has been inspired by
   http://stackoverflow.com/questions/21588649/increment-numbers-between-delimiters-in-vim
 - Add :DeleteRanges, :YankRanges, :PrintRanges commands.
-- Handle \r, \n, \t, \b in {string}, too. __You need to update to
+- Handle \\r, \\n, \\t, \\b in {string}, too.
+
+__You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.017!__
 
 ##### 1.20    18-Feb-2014
 - ENH: Add :SubstituteWildcard {wildcard}={string} and
-  :SubstituteMultiple /{pattern}/{string}/ commands. __You need to update to
+  :SubstituteMultiple /{pattern}/{string}/ commands.
+
+__You need to update to
   ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.016!__
 
 ##### 1.12    21-Nov-2013
-- FIX: Use of \v and \V magicness atoms in the pattern for :DeleteExcept and
+- FIX: Use of \\v and \\V magicness atoms in the pattern for :DeleteExcept and
   :SubstituteExcept cause errors like "E54: Unmatched (" and "E486: Pattern
   not found". Revert to the default 'magic' mode after each pattern insertion
   to the workhorse regular expression.
 - FIX: Abort :DeleteExcept / :SubstituteExcept commands when the pattern
-  contains the set start / end match patterns \zs / \ze, as these interfere
+  contains the set start / end match patterns \\zs / \\ze, as these interfere
   with the internal implemenation.
 - Minor: Make substitute() and matchlist() robust against 'ignorecase'.
 
 ##### 1.11    13-Jun-2013
 - FIX: Remove -bar from all commands to correctly handle patterns like
-  foo\|bar without escaping as foo\\|bar.
+  foo\\|bar without escaping as foo\\\\|bar.
 - :SubstituteSelected now positions the cursor on the line where the last
   selected replacement happened, to behave like :substitute.
 
@@ -603,7 +730,8 @@ HISTORY
   :SubstituteSelected now consistently set that as the last search pattern.
 - Refactoring: Move functions from ingo/cmdargs.vim to
   ingo/cmdargs/pattern.vim and ingo/cmdargs/substitute.vim.
-  __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.007!__
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.007!__
 
 ##### 1.01    30-May-2013
 - Implement abort on error for :SubstituteExcept, :DeleteExcept,
@@ -616,7 +744,7 @@ HISTORY
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2018 Ingo Karkat -
+Copyright: (C) 2011-2019 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
-Maintainer:     Ingo Karkat <ingo@karkat.de>
+Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;

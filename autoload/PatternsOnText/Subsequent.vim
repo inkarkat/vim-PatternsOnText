@@ -6,7 +6,7 @@
 "   - ingo/range.vim autoload script
 "   - PatternsOnText/Selected.vim autoload script
 "
-" Copyright: (C) 2014-2017 Ingo Karkat
+" Copyright: (C) 2014-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,7 +23,7 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
     let l:isBlockwise = 0
     if l:substituteFlags =~# 'b'
 	let l:isBlockwise = 1
-	let l:substituteFlags = substitute(l:substituteFlags, '\Cb', '', 'g')
+	let l:substituteFlags = ingo#str#trd(l:substituteFlags, 'b')
     endif
 
     let s:previousAnswers = l:answers

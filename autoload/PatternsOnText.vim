@@ -5,10 +5,12 @@
 "   - ingo/msg.vim autoload script
 "   - ingo/escape.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 function! PatternsOnText#EmulatePreviousReplacement( replacement, previousReplacement )
     " substitute() doesn't support the ~ special character to recall the last
@@ -55,4 +57,57 @@ function! PatternsOnText#InitialContext()
     return {'matchCount': 0, 'replacementCount': 0, 'lastLnum': line('.'), 'n': 0, 'm': 1, 'l': [], 'd': {}, 's': ''}
 endfunction
 
+function! PatternsOnText#ReplaceSpecial( expr, match, replacement )
+    if a:replacement =~# '^\\='
+	return eval(a:replacement[2:])
+    elseif a:replacement =~# '^' . a:expr . '$'
+	return a:match
+    endif
+    return ingo#escape#UnescapeExpr(a:replacement, '\%(\\\|' . a:expr . '\)')
+endfunction
+
+function! PatternsOnText#IsContainsCaptureGroup( pattern ) abort
+    return (a:pattern =~# '\%(\%(^\|[^\\]\)\%(\\\\\)*\\\)\@<!\\(')
+endfunction
+
+function! PatternsOnText#EvalIntoList( expr ) abort
+    if empty(a:expr)
+	return []
+    endif
+
+    let l:result = eval(a:expr)
+    return (type(l:result) == type([]) ?
+    \   l:result :
+    \   split(l:result, '\n', 1)
+    \)
+endfunction
+
+function! PatternsOnText#JoinPatterns( patterns ) abort
+    if empty(a:patterns)
+	call ingo#err#Set('No patterns')
+	return ''
+    endif
+
+    " Check for forbidden capture groups.
+    for l:i in range(len(a:patterns))
+	if PatternsOnText#IsContainsCaptureGroup(a:patterns[l:i])
+	    call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, a:patterns[l:i]))
+	    return ''
+	endif
+    endfor
+
+    " Remove any atoms changing the magicness, then surround each individual
+    " match with a capturing group, so that we can determine which branch
+    " matched (and use the corresponding replacement).
+    return join(
+    \  map(
+    \      copy(a:patterns),
+    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
+    \  ),
+    \  '\|'
+    \)
+endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

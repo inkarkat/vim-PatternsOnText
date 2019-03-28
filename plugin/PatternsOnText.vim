@@ -1,10 +1,9 @@
 " PatternsOnText.vim: Advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - PatternsOnText/*.vim autoload scripts
-"   - ingo/err.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2019 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -16,6 +15,18 @@ endif
 let g:loaded_PatternsOnText = 1
 let s:save_cpo = &cpo
 set cpo&vim
+
+"- configuration ---------------------------------------------------------------
+
+if ! exists('g:PatternsOnText_PutTranslationsTemplateExpr')
+    let g:PatternsOnText_PutTranslationsTemplateExpr = 'v:val.replacement . ": " . v:val.match . "\n"'
+endif
+if ! exists('g:PatternsOnText_YankTranslationsTemplateExpr')
+    let g:PatternsOnText_YankTranslationsTemplateExpr = '":''[,'']substitute/" . ingo#regexp#EscapeLiteralText(v:val.replacement, "/") . "/" . escape(v:val.match, "/\\' . (&magic ? '&~' : '') . '") . "/g\n"'
+endif
+
+
+"- commands --------------------------------------------------------------------
 
 command! -range -nargs=? SubstituteExcept
 \   call setline(<line1>, getline(<line1>)) |
@@ -51,9 +62,16 @@ command! -range -nargs=? -complete=expression SubstituteUnless
 command! -range -nargs=? -complete=command    SubstituteExecute
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+
 command! -bang -range -nargs=? -complete=expression SubstituteTranslate
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Translate#Substitute('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
+command! -range=-1 -nargs=? PutTranslations
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Translate#Put((<line2> == 1 ? <line1> : <line2>), <q-args>) | echoerr ingo#err#Get() | endif
+command! -nargs=* YankTranslations
+\   if ! PatternsOnText#Translate#Yank(<q-args>) | echoerr ingo#err#Get() | endif
+
 command! -range -nargs=? SubstituteChoices
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
@@ -63,6 +81,18 @@ command! -range -nargs=* SubstituteMultiple
 command! -range -nargs=* SubstituteWildcard
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteMultipleExpr
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#PairsExpr#SubstituteMultipleExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteTransactional
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Transactional#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteTransactionalExpr
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Transactional#Expr#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* SubstituteTransactionalExprEach
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#Transactional#ExprEach#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,

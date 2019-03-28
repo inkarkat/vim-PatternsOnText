@@ -7,10 +7,15 @@ autoload/PatternsOnText/Execute.vim
 autoload/PatternsOnText/If.vim
 autoload/PatternsOnText/InSearch.vim
 autoload/PatternsOnText/Pairs.vim
+autoload/PatternsOnText/PairsExpr.vim
 autoload/PatternsOnText/Ranges.vim
 autoload/PatternsOnText/Renumber.vim
 autoload/PatternsOnText/Selected.vim
 autoload/PatternsOnText/Subsequent.vim
+autoload/PatternsOnText/Transactional.vim
+autoload/PatternsOnText/Transactional/Common.vim
+autoload/PatternsOnText/Transactional/Expr.vim
+autoload/PatternsOnText/Transactional/ExprEach.vim
 autoload/PatternsOnText/Translate.vim
 autoload/PatternsOnText/Uniques.vim
 plugin/PatternsOnText.vim
