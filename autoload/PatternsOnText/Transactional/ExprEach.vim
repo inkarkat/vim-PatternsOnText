@@ -29,7 +29,7 @@ function! PatternsOnText#Transactional#ExprEach#TransactionalSubstitute( range, 
     call ingo#err#Clear()
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
-	return ''
+	return 0
     endif
 
     let l:matches = []
