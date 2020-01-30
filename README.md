@@ -573,6 +573,10 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
+##### 2.12    RELEASEME
+- Adapt: :PutTranslations and :Renumber need to check &lt;count&gt; == -1 instead of
+  &lt;line2&gt; to support current line as well as a lnum of 0 (since Vim 8.1.1241).
+
 ##### 2.11    28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier
   creation of custom translation commands without having to reassemble (and
@@ -744,7 +748,7 @@ __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scrip
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2019 Ingo Karkat -
+Copyright: (C) 2011-2020 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;

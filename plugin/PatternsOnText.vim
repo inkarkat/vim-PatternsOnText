@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2019 Ingo Karkat
+" Copyright: (C) 2011-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -68,7 +68,7 @@ command! -bang -range -nargs=? -complete=expression SubstituteTranslate
 \   if ! PatternsOnText#Translate#Substitute('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range=-1 -nargs=? PutTranslations
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Translate#Put((<line2> == 1 ? <line1> : <line2>), <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Translate#Put((<count> == -1 ? <line1> : <line2>), <q-args>) | echoerr ingo#err#Get() | endif
 command! -nargs=* YankTranslations
 \   if ! PatternsOnText#Translate#Yank(<q-args>) | echoerr ingo#err#Get() | endif
 
@@ -245,7 +245,7 @@ command! -bang -range=% -nargs=+ RangeDo
 
 command! -range=-1 -nargs=? Renumber
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), (<count> == -1 && <line2> == 1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
+\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), (<count> == -1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 
