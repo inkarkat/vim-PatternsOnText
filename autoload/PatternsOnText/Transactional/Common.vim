@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,6 +11,10 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! PatternsOnText#Transactional#Common#InitialContext() abort
+    let l:context = PatternsOnText#InitialContext()
+    return l:context
+endfunction
 let s:special = 'tu'
 function! s:GetFlagsExpr( captureGroupCnt ) abort
     return '\(' . ingo#cmdargs#substitute#GetFlags() . '\)\(\%(\s*[' . s:special . ']' . ingo#cmdargs#pattern#PatternExpr(a:captureGroupCnt) . '\)*\)'
@@ -82,6 +86,7 @@ function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr
     endif
 
     let a:context.matchCount += 1
+    call add(a:context.matches, l:matchText)
     let l:record = (empty(l:matchText) ?
     \   ingo#area#EmptyArea(getpos('.')[1:2]) :
     \   ingo#area#frompattern#GetHere('\C\V' . substitute(escape(l:matchText, '\'), '\n', '\\n', 'g'), line('.'), [])
