@@ -13,6 +13,7 @@ set cpo&vim
 
 function! PatternsOnText#Transactional#Common#InitialContext() abort
     let l:context = PatternsOnText#InitialContext()
+    let l:context.matches = ['']    " Initialize with empty zero'th match to be able to use the context.matchCount for indexing.
     return l:context
 endfunction
 let s:special = 'tu'
