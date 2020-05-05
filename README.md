@@ -263,6 +263,9 @@ USAGE
                                 matchNum:   total number of matches
                                 matchCount: number of current match of {pattern};
                                             decreases from matchNum to 1
+                                matches:    List of all recorded matches, index
+                                            with matchCount to obtain the current
+                                            one
                                 matchText:  matched text (as you cannot use
                                             submatch(0) any longer
                                 startPos:   [line, col] of the start of the match
@@ -315,6 +318,25 @@ USAGE
                             Repeat the last substitution with the last used search
                             and replacement expressions, last used :s_flags and
                             {test-expr} / {update-predicate} (unless specified).
+
+    :[range]SubstituteRotate /{pattern}[/{shift-value}]/[+-]N/[flags]
+    :[range]SubstituteRotate /{pattern}[/\={shift-value-expr}]/[+-]N/[flags]
+                            [t/{test-expr}/][u/{update-predicate}/]
+                            Replace every match of {pattern} with the preceding
+                            (+N) / following (-N) one. A given {shift-value} is
+                            used for the first / last match(es) (which are then
+                            put into the default register), and a
+                            {shift-value-expr} can refer to the context via v:val;
+                            else, matches will rotate, and the [+N] first are
+                            taken from behind / the [-N] last are taken from the
+                            front.
+                            For {test-expr} and {update-predicate} see
+                            :SubstituteTransactional.
+    :[range]SubstituteRotate [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Repeat the last substitution with the last used search
+                            pattern, last used {shift-value} / [+-]N, last used
+                            :s_flags and {test-expr} / {update-predicate}
+                            (unless specified).
 
     :[range]SubstituteExecute/{pattern}/[flags] {expr}
                             Replace matches of {pattern} in the current line /
@@ -576,6 +598,11 @@ HISTORY
 ##### 2.12    RELEASEME
 - Adapt: :PutTranslations and :Renumber need to check &lt;count&gt; == -1 instead of
   &lt;line2&gt; to support current line as well as a lnum of 0 (since Vim 8.1.1241).
+- ENH: :SubstituteTransactional\* additionally support arbitrary access of
+  matched texts via v:val.matches context.
+- ENH: Add :SubstituteRotate for the special case of using
+  :SubstituteTransactional for rotating or shifting matches; i.e. replacing
+  with preceding or following matches to make space for something new.
 
 ##### 2.11    28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier

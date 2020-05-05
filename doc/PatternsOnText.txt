@@ -623,10 +623,13 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY						      *PatternsOnText-history*
 
 2.12	RELEASEME
-- ENH: :SubstituteTransactional* additionally support arbitrary access of
-  matched texts via v:val.matches context.
 - Adapt: :PutTranslations and :Renumber need to check <count> == -1 instead of
   <line2> to support current line as well as a lnum of 0 (since Vim 8.1.1241).
+- ENH: :SubstituteTransactional* additionally support arbitrary access of
+  matched texts via v:val.matches context.
+- ENH: Add :SubstituteRotate for the special case of using
+  :SubstituteTransactional for rotating or shifting matches; i.e. replacing
+  with preceding or following matches to make space for something new.
 
 2.11	28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier
