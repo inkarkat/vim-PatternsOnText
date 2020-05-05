@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -32,7 +32,7 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( range, patt
     if empty(l:pattern) | return 0 | endif
 
     let l:matches = []
-    let s:SubstituteTransactional = PatternsOnText#InitialContext()
+    let s:SubstituteTransactional = PatternsOnText#Transactional#Common#InitialContext()
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try

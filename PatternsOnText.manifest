@@ -10,6 +10,7 @@ autoload/PatternsOnText/Pairs.vim
 autoload/PatternsOnText/PairsExpr.vim
 autoload/PatternsOnText/Ranges.vim
 autoload/PatternsOnText/Renumber.vim
+autoload/PatternsOnText/Rotate.vim
 autoload/PatternsOnText/Selected.vim
 autoload/PatternsOnText/Subsequent.vim
 autoload/PatternsOnText/Transactional.vim
