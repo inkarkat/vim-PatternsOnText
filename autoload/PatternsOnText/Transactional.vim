@@ -20,31 +20,41 @@ function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
     return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:unescapedReplacement, s:previousFlags, l:testExpr, l:updatePredicate)
 endfunction
 function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, replacement, flags, testExpr, updatePredicate ) abort
-    call ingo#err#Clear()
-    let l:matches = []
     let s:SubstituteTransactional = PatternsOnText#Transactional#Common#InitialContext()
+    try
+	return PatternsOnText#Transactional#TransactionalSubstituteWithContext(
+	\   function('PatternsOnText#Transactional#GetContext'),
+	\   a:range, a:pattern, a:replacement, a:flags, a:testExpr, a:updatePredicate
+	\)
+    finally
+	unlet! s:SubstituteTransactional
+    endtry
+endfunction
+function! PatternsOnText#Transactional#TransactionalSubstituteWithContext( ContextFunction, range, pattern, replacement, flags, testExpr, updatePredicate ) abort
+    call ingo#err#Clear()
+    let l:context = call(a:ContextFunction, [])
+    let l:matches = []
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try
-	execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, l:matches, a:testExpr, %d)/%s',
+	execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(l:context, l:matches, a:testExpr, %d)/%s',
 	\   a:range, escape(a:pattern, '/'), l:hasValReferenceInExpr, a:flags
 	\)
 
-	if has_key(s:SubstituteTransactional, 'error')
-	    call ingo#err#Set(s:SubstituteTransactional.error)
+	if has_key(l:context, 'error')
+	    call ingo#err#Set(l:context.error)
 	    return 0
 	endif
-	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
+	let l:context.matchNum = l:context.matchCount
 
-	if ! empty(a:updatePredicate) && ! ingo#actions#EvaluateWithVal(a:updatePredicate, s:SubstituteTransactional)
+	if ! empty(a:updatePredicate) && ! ingo#actions#EvaluateWithVal(a:updatePredicate, l:context)
 	    call ingo#err#Set('Substitution aborted by update predicate')
 	    return 0
 	endif
 
-	let [l:isReplacementExpression, l:replacement] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(a:replacement, 'PatternsOnText#Transactional#GetContext()')
+	let [l:isReplacementExpression, l:replacement] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(a:replacement, ingo#funcref#ToString(a:ContextFunction).'()')
 	" Note: The l:replacement is not handled within this script, so we need
-	" to provide a global PatternsOnText#Transactional#GetContext() accessor
-	" for s:SubstituteTransactional that is in scope there.
+	" to provide a global accessor for l:context that is in scope there.
 
 	for l:match in reverse(l:matches)
 	    if l:isReplacementExpression
@@ -52,20 +62,18 @@ function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, 
 		call call('cursor', l:match[0])
 	    endif
 
-	    call PatternsOnText#Transactional#Common#Substitute(s:SubstituteTransactional, l:match, l:replacement, [])
+	    call PatternsOnText#Transactional#Common#Substitute(l:context, l:match, l:replacement, [])
 	endfor
 
 	" :substitute has visited all further matches, but the last replacement
 	" may have happened before that. Position the cursor on the last
 	" actually selected match.
-	execute s:SubstituteTransactional.lastLnum . 'normal! ^'
+	execute l:context.lastLnum . 'normal! ^'
 
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
-    finally
-	unlet! s:SubstituteTransactional
     endtry
 endfunction
 function! PatternsOnText#Transactional#GetContext() abort
