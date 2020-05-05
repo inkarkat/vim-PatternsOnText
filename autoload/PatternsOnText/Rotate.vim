@@ -35,7 +35,7 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
 endfunction
 
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
-    return a:context.matches[(((a:context.matchCount + s:previousOffset - 1) % a:context.matchNum) + a:context.matchNum) % a:context.matchNum + 1]
+    return a:context.matches[(((a:context.matchCount - s:previousOffset - 1) % a:context.matchNum) + a:context.matchNum) % a:context.matchNum + 1]
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
