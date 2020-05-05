@@ -7,6 +7,8 @@
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
+let s:save_cpo = &cpo
+set cpo&vim
 
 let s:NO_SHIFT_VALUE = []
 let [s:previousPattern, s:previousShiftValue, s:previousOffset, s:previousFlags, s:previousSpecialFlags] = ['', s:NO_SHIFT_VALUE, 0, '', '']
@@ -33,7 +35,15 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     \   '\=PatternsOnText#Rotate#ShiftExpr(v:val)'
     \)
 
-    return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate)
+    let s:SubstituteRotate = PatternsOnText#Transactional#Common#InitialContext()
+    try
+	return PatternsOnText#Transactional#TransactionalSubstituteWithContext(
+	\   function('PatternsOnText#Rotate#GetContext'),
+	\   a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate
+	\)
+    finally
+	unlet! s:SubstituteRotate
+    endtry
 endfunction
 
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
@@ -43,7 +53,7 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     let l:index = a:context.matchCount - s:previousOffset
     if l:index < 1 || l:index > a:context.matchNum
 	if s:previousShiftValue =~# '^\\='
-	    let [l:isReplacementExpression, l:replacementExpression] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Transactional#GetContext()')
+	    let [l:isReplacementExpression, l:replacementExpression] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Rotate#GetContext()')
 	    return eval(l:replacementExpression[2:])
 	else
 	    return s:previousShiftValue
@@ -52,5 +62,10 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
 	return a:context.matches[l:index]
     endif
 endfunction
+function! PatternsOnText#Rotate#GetContext() abort
+    return s:SubstituteRotate
+endfunction
 
+let &cpo = s:save_cpo
+unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
