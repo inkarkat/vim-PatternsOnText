@@ -137,7 +137,7 @@ function! PatternsOnText#Transactional#Common#Substitute( context, match, replac
     let l:result = ingo#subst#replacement#ReplaceSpecial(l:matchText, a:replacement, '&', function('PatternsOnText#ReplaceSpecial'))
 
     if l:result !=# l:matchText
-	call ingo#text#replace#Between(l:startPos, l:endPos, l:result)[2]
+	call ingo#text#replace#Between(l:startPos, l:endPos, l:result)
 
 	let a:context.lastLnum = max([a:context.lastLnum, l:endPos[0]])
     endif
