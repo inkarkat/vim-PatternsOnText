@@ -54,20 +54,15 @@ function! s:Substitute( shiftExpr, rotateExpr, range, arguments ) abort
 	unlet! s:SubstituteRotate
     endtry
 endfunction
-
-function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
-    return s:Substitute(
-    \   'PatternsOnText#Rotate#ShiftExpr',
-    \   'PatternsOnText#Rotate#RotateExpr',
-    \   a:range, a:arguments
-    \)
+function! PatternsOnText#Rotate#GetContext() abort
+    return s:SubstituteRotate
 endfunction
-function! PatternsOnText#Rotate#RotateExpr( context ) abort
-    return a:context.matches[(((a:context.matchCount - s:previousOffset - 1) % a:context.matchNum) + a:context.matchNum) % a:context.matchNum + 1]
+function! s:RotateExpr( count, num, context ) abort
+    return a:context.matches[(((a:count - s:previousOffset - 1) % a:num) + a:num) % a:num + 1]
 endfunction
-function! PatternsOnText#Rotate#ShiftExpr( context ) abort
-    let l:index = a:context.matchCount - s:previousOffset
-    if l:index < 1 || l:index > a:context.matchNum
+function! s:ShiftExpr( count, num, context ) abort
+    let l:index = a:count - s:previousOffset
+    if l:index < 1 || l:index > a:num
 	if s:previousShiftValue =~# '^\\='
 	    let [l:isReplacementExpression, l:replacementExpression] =
 	    \   PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Rotate#GetContext()')
@@ -79,8 +74,19 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
 	return a:context.matches[l:index]
     endif
 endfunction
-function! PatternsOnText#Rotate#GetContext() abort
-    return s:SubstituteRotate
+
+function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
+    return s:Substitute(
+    \   'PatternsOnText#Rotate#ShiftExpr',
+    \   'PatternsOnText#Rotate#RotateExpr',
+    \   a:range, a:arguments
+    \)
+endfunction
+function! PatternsOnText#Rotate#RotateExpr( context ) abort
+    return s:RotateExpr(a:context.matchCount, a:context.matchNum, a:context)
+endfunction
+function! PatternsOnText#Rotate#ShiftExpr( context ) abort
+    return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)
 endfunction
 
 let &cpo = s:save_cpo
