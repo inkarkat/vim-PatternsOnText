@@ -29,9 +29,13 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
 	return 0
     endif
 
-    let l:rotatingReplacementExpression = printf('\=v:val.matches[(((v:val.matchCount + %d - 1) %% v:val.matchNum) + v:val.matchNum) %% v:val.matchNum + 1]', s:previousOffset)
+    let l:rotatingReplacementExpression = '\=PatternsOnText#Rotate#RotateExpr(v:val)'
 
     return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate)
+endfunction
+
+function! PatternsOnText#Rotate#RotateExpr( context ) abort
+    return a:context.matches[(((a:context.matchCount + s:previousOffset - 1) % a:context.matchNum) + a:context.matchNum) % a:context.matchNum + 1]
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
