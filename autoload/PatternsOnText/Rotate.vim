@@ -30,17 +30,28 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
 	return 0
     endif
 
-    let l:rotatingReplacementExpression = (s:previousShiftValue is# s:NO_SHIFT_VALUE ?
-    \   '\=PatternsOnText#Rotate#RotateExpr(v:val)' :
-    \   '\=PatternsOnText#Rotate#ShiftExpr(v:val)'
+    let l:isShift = (s:previousShiftValue isnot# s:NO_SHIFT_VALUE)
+    let l:rotatingReplacementExpression = (l:isShift ?
+    \   '\=PatternsOnText#Rotate#ShiftExpr(v:val)' :
+    \   '\=PatternsOnText#Rotate#RotateExpr(v:val)'
     \)
 
     let s:SubstituteRotate = PatternsOnText#Transactional#Common#InitialContext()
     try
-	return PatternsOnText#Transactional#TransactionalSubstituteWithContext(
+	let l:success = PatternsOnText#Transactional#TransactionalSubstituteWithContext(
 	\   function('PatternsOnText#Rotate#GetContext'),
 	\   a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate
 	\)
+
+	if l:isShift && s:previousOffset != 0
+	    let l:missedMatches = (s:previousOffset > 0 ?
+	    \   s:SubstituteRotate.matches[max([1, s:SubstituteRotate.matchNum - s:previousOffset + 1]):] :
+	    \   s:SubstituteRotate.matches[1:(-1 * s:previousOffset)]
+	    \)
+	    call setreg('', join(l:missedMatches, "\n") . (len(l:missedMatches) > 1 ? "\n" : ''))
+	endif
+
+	return l:success
     finally
 	unlet! s:SubstituteRotate
     endtry
