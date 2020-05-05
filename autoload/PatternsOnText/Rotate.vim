@@ -12,7 +12,7 @@ set cpo&vim
 
 let s:NO_SHIFT_VALUE = []
 let [s:previousPattern, s:previousShiftValue, s:previousOffset, s:previousFlags, s:previousSpecialFlags] = ['', s:NO_SHIFT_VALUE, 0, '', '']
-function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
+function! s:Substitute( shiftExpr, rotateExpr, range, arguments ) abort
     let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, '', s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
@@ -32,10 +32,7 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     endif
 
     let l:isShift = (s:previousShiftValue isnot# s:NO_SHIFT_VALUE)
-    let l:rotatingReplacementExpression = (l:isShift ?
-    \   '\=PatternsOnText#Rotate#ShiftExpr(v:val)' :
-    \   '\=PatternsOnText#Rotate#RotateExpr(v:val)'
-    \)
+    let l:rotatingReplacementExpression = '\=' . (l:isShift ? a:shiftExpr : a:rotateExpr) . '(v:val)'
 
     let s:SubstituteRotate = PatternsOnText#Transactional#Common#InitialContext()
     try
@@ -58,6 +55,13 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     endtry
 endfunction
 
+function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
+    return s:Substitute(
+    \   'PatternsOnText#Rotate#ShiftExpr',
+    \   'PatternsOnText#Rotate#RotateExpr',
+    \   a:range, a:arguments
+    \)
+endfunction
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
     return a:context.matches[(((a:context.matchCount - s:previousOffset - 1) % a:context.matchNum) + a:context.matchNum) % a:context.matchNum + 1]
 endfunction
