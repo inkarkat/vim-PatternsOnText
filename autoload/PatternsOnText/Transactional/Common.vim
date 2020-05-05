@@ -110,6 +110,7 @@ function! PatternsOnText#Transactional#Common#Record( context, matches, testExpr
 	call add(a:matches, l:record + a:000)
     catch /^skip$/
 	let a:context.matchCount -= 1
+	call remove(a:context.matches, -1)
     catch /^Vim\%((\a\+)\)\=:/
 	let a:context.error = ingo#msg#MsgFromVimException()
     catch
