@@ -89,6 +89,30 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)
 endfunction
 
+function! PatternsOnText#Rotate#SubstituteMemoized( range, arguments ) abort
+    let s:uniqueMatches = []
+    let l:status = s:Substitute(
+    \   'PatternsOnText#Rotate#MemoizedShiftExpr',
+    \   'PatternsOnText#Rotate#MemoizedRotateExpr',
+    \   a:range, a:arguments
+    \)
+    unlet! s:uniqueMatches
+    return l:status
+endfunction
+function! s:InitializeUniqueMatches( context ) abort
+    if empty(s:uniqueMatches)
+	let s:uniqueMatches = [''] + ingo#collections#UniqueStable(a:context.matches[1:])
+    endif
+endfunction
+function! PatternsOnText#Rotate#MemoizedRotateExpr( context ) abort
+    call s:InitializeUniqueMatches(a:context)
+    return s:RotateExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)
+endfunction
+function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
+    call s:InitializeUniqueMatches(a:context)
+    return s:ShiftExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

@@ -353,6 +353,20 @@ USAGE							*PatternsOnText-usage*
 			pattern, last used {shift-value} / [+-]N, last used
 			|:s_flags| and {test-expr} / {update-predicate}
 			(unless specified).
+						   *:SubstituteRotateMemoized*
+:[range]SubstituteRotateMemoized[!] /{pattern}[/{shift-value}]/[+-]N/[flags]
+:[range]SubstituteRotateMemoized[!] /{pattern}[/\={shift-value-expr}]/[+-]N/[flags]
+			[t/{test-expr}/][u/{update-predicate}/]
+:[range]SubstituteRotateMemoized[!] [flags][t/{test-expr}/][u/{update-predicate}/]
+			Replace every match of {pattern} with the preceding
+			(+N) / following (-N) one, and do the same replacement
+			for further identical matches (instead of taking a
+			possibly different neighbor there). Everything else
+			works like |:SubstituteRotate|. Useful to make space
+			in a list of matches in a consistent way. This
+			persists across invocations (so you can apply the same
+			rotation on multiple ranges / buffers); use ! to clear
+			any stored associations and reset the context object.
 
 							  *:SubstituteExecute*
 :[range]SubstituteExecute/{pattern}/[flags] {expr}
