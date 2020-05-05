@@ -334,6 +334,22 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			and replacement expressions, last used |:s_flags| and
 			{test-expr} / {update-predicate} (unless specified).
+							   *:SubstituteRotate*
+:[range]SubstituteRotate /{pattern}[/{shift-value}]/[+-]N/[flags]
+			[t/{test-expr}/][u/{update-predicate}/]
+			Replace every match of {pattern} with the preceding
+			(+N) / following (-N) one. A given {shift-value} is
+			used for the first / last match(es) (which are then
+			put into the default register); else, matches will
+			rotate, and the [+N] first are taken from behind / the
+			[-N] last are taken from the front.
+			For {test-expr} and {update-predicate} see
+			|:SubstituteTransactional|.
+:[range]SubstituteRotate [flags][t/{test-expr}/][u/{update-predicate}/]
+			Repeat the last substitution with the last used search
+			pattern, last used {shift-value} / [+-]N, last used
+			|:s_flags| and {test-expr} / {update-predicate}
+			(unless specified).
 
 							  *:SubstituteExecute*
 :[range]SubstituteExecute/{pattern}/[flags] {expr}
