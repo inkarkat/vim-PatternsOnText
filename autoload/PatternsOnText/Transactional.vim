@@ -12,7 +12,8 @@ set cpo&vim
 
 let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
 function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
-    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
+    \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
     let [s:previousPattern, s:previousReplacement] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/')]
@@ -52,7 +53,8 @@ function! PatternsOnText#Transactional#TransactionalSubstituteWithContext( Conte
 	    return 0
 	endif
 
-	let [l:isReplacementExpression, l:replacement] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(a:replacement, ingo#funcref#ToString(a:ContextFunction).'()')
+	let [l:isReplacementExpression, l:replacement] =
+	\   PatternsOnText#Transactional#Common#ProcessReplacementExpression(a:replacement, ingo#funcref#ToString(a:ContextFunction).'()')
 	" Note: The l:replacement is not handled within this script, so we need
 	" to provide a global accessor for l:context that is in scope there.
 

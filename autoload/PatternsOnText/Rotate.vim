@@ -13,7 +13,8 @@ set cpo&vim
 let s:NO_SHIFT_VALUE = []
 let [s:previousPattern, s:previousShiftValue, s:previousOffset, s:previousFlags, s:previousSpecialFlags] = ['', s:NO_SHIFT_VALUE, 0, '', '']
 function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
-    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] = PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, '', s:previousFlags, s:previousSpecialFlags, a:arguments)
+    let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
+    \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, '', s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let s:previousPattern = escape(l:unescapedPattern, '/')
     if ! empty(l:replacement)
@@ -64,7 +65,8 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     let l:index = a:context.matchCount - s:previousOffset
     if l:index < 1 || l:index > a:context.matchNum
 	if s:previousShiftValue =~# '^\\='
-	    let [l:isReplacementExpression, l:replacementExpression] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Rotate#GetContext()')
+	    let [l:isReplacementExpression, l:replacementExpression] =
+	    \   PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Rotate#GetContext()')
 	    return eval(l:replacementExpression[2:])
 	else
 	    return s:previousShiftValue
