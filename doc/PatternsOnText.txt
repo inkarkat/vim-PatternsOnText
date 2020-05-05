@@ -336,13 +336,16 @@ USAGE							*PatternsOnText-usage*
 			{test-expr} / {update-predicate} (unless specified).
 							   *:SubstituteRotate*
 :[range]SubstituteRotate /{pattern}[/{shift-value}]/[+-]N/[flags]
+:[range]SubstituteRotate /{pattern}[/\={shift-value-expr}]/[+-]N/[flags]
 			[t/{test-expr}/][u/{update-predicate}/]
 			Replace every match of {pattern} with the preceding
 			(+N) / following (-N) one. A given {shift-value} is
 			used for the first / last match(es) (which are then
-			put into the default register); else, matches will
-			rotate, and the [+N] first are taken from behind / the
-			[-N] last are taken from the front.
+			put into the default register), and a
+			{shift-value-expr} can refer to the context via v:val;
+			else, matches will rotate, and the [+N] first are
+			taken from behind / the [-N] last are taken from the
+			front.
 			For {test-expr} and {update-predicate} see
 			|:SubstituteTransactional|.
 :[range]SubstituteRotate [flags][t/{test-expr}/][u/{update-predicate}/]

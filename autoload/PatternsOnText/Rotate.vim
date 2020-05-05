@@ -41,10 +41,16 @@ function! PatternsOnText#Rotate#RotateExpr( context ) abort
 endfunction
 function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     let l:index = a:context.matchCount - s:previousOffset
-    return (l:index < 1 || l:index > a:context.matchNum ?
-    \   s:previousShiftValue :
-    \   a:context.matches[l:index]
-    \)
+    if l:index < 1 || l:index > a:context.matchNum
+	if s:previousShiftValue =~# '^\\='
+	    let [l:isReplacementExpression, l:replacementExpression] = PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Transactional#GetContext()')
+	    return eval(l:replacementExpression[2:])
+	else
+	    return s:previousShiftValue
+	endif
+    else
+	return a:context.matches[l:index]
+    endif
 endfunction
 
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :
