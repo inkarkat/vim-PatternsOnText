@@ -338,6 +338,20 @@ USAGE
                             :s_flags and {test-expr} / {update-predicate}
                             (unless specified).
 
+    :[range]SubstituteRotateMemoized[!] /{pattern}[/{shift-value}]/[+-]N/[flags]
+    :[range]SubstituteRotateMemoized[!] /{pattern}[/\={shift-value-expr}]/[+-]N/[flags]
+                            [t/{test-expr}/][u/{update-predicate}/]
+    :[range]SubstituteRotateMemoized[!] [flags][t/{test-expr}/][u/{update-predicate}/]
+                            Replace every match of {pattern} with the preceding
+                            (+N) / following (-N) one, and do the same replacement
+                            for further identical matches (instead of taking a
+                            possibly different neighbor there). Everything else
+                            works like :SubstituteRotate. Useful to make space
+                            in a list of matches in a consistent way. This
+                            persists across invocations (so you can apply the same
+                            rotation on multiple ranges / buffers); use ! to clear
+                            any stored associations and reset the context object.
+
     :[range]SubstituteExecute/{pattern}/[flags] {expr}
                             Replace matches of {pattern} in the current line /
                             [range] with whatever {expr} |:return|s.
@@ -600,9 +614,11 @@ HISTORY
   &lt;line2&gt; to support current line as well as a lnum of 0 (since Vim 8.1.1241).
 - ENH: :SubstituteTransactional\* additionally support arbitrary access of
   matched texts via v:val.matches context.
-- ENH: Add :SubstituteRotate for the special case of using
+- ENH: Add :SubstituteRotate[Memoized] for the special case of using
   :SubstituteTransactional for rotating or shifting matches; i.e. replacing
-  with preceding or following matches to make space for something new.
+  with preceding or following matches to make space for something new. Comes
+  as both a stateless variant and :SubstituteRotateMemoized that keeps the
+  mappings from old match to new, similar to what :SubstituteTranslate does.
 
 ##### 2.11    28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier
