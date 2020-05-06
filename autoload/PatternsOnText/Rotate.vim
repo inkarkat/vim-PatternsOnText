@@ -93,7 +93,12 @@ function! s:MissingShiftsExpr()
     \)
 endfunction
 
+let s:memoizedTranslations = {}
 function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
+    if a:isClearAssociations
+	let s:memoizedTranslations = {}
+    endif
+
     let s:uniqueMatches = []
     let l:status = s:Substitute(
     \   's:MemoizedMissingShiftsExpr',
@@ -112,10 +117,19 @@ function! s:InitializeUniqueMatches( context ) abort
 endfunction
 function! PatternsOnText#Rotate#MemoizedRotateExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
-    return s:uniqueMatches[s:Rotate(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1)]
+
+    if ! has_key(s:memoizedTranslations, a:context.matchText)
+	let s:memoizedTranslations[a:context.matchText] =
+	\   s:uniqueMatches[s:Rotate(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1)]
+    endif
+    return s:memoizedTranslations[a:context.matchText]
 endfunction
 function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
+    if has_key(s:memoizedTranslations, a:context.matchText)
+	return s:memoizedTranslations[a:context.matchText]
+    endif
+
     let l:count = index(s:uniqueMatches, a:context.matchText)
 
     let [l:isFound, l:value] = s:ShiftOrValue(l:count, len(s:uniqueMatches) - 1, a:context)
@@ -126,6 +140,7 @@ function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
 	    call remove(s:uniqueMissingMatches, l:matchIndex)
 	endif
     endif
+    let s:memoizedTranslations[a:context.matchText] = l:value
     return l:value
 endfunction
 function! s:MemoizedMissingShiftsExpr()
