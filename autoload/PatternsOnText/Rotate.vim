@@ -54,10 +54,10 @@ endfunction
 function! PatternsOnText#Rotate#GetContext() abort
     return s:SubstituteRotate
 endfunction
-function! s:RotateExpr( count, num, context ) abort
+function! s:Rotate( count, num ) abort
     return (((a:count - s:previousOffset - 1) % a:num) + a:num) % a:num + 1
 endfunction
-function! s:ShiftExpr( count, num, context ) abort
+function! s:ShiftOrValue( count, num, context ) abort
     let l:index = a:count - s:previousOffset
     if l:index < 1 || l:index > a:num
 	if s:previousShiftValue =~# '^\\='
@@ -81,10 +81,10 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     \)
 endfunction
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
-    return a:context.matches[s:RotateExpr(a:context.matchCount, a:context.matchNum, a:context)]
+    return a:context.matches[s:Rotate(a:context.matchCount, a:context.matchNum)]
 endfunction
 function! PatternsOnText#Rotate#ShiftExpr( context ) abort
-    return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)[1]
+    return s:ShiftOrValue(a:context.matchCount, a:context.matchNum, a:context)[1]
 endfunction
 function! s:MissingShiftsExpr()
     return (s:previousOffset > 0 ?
@@ -112,13 +112,13 @@ function! s:InitializeUniqueMatches( context ) abort
 endfunction
 function! PatternsOnText#Rotate#MemoizedRotateExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
-    return s:uniqueMatches[s:RotateExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)]
+    return s:uniqueMatches[s:Rotate(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1)]
 endfunction
 function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
     let l:count = index(s:uniqueMatches, a:context.matchText)
 
-    let [l:isFound, l:value] = s:ShiftExpr(l:count, len(s:uniqueMatches) - 1, a:context)
+    let [l:isFound, l:value] = s:ShiftOrValue(l:count, len(s:uniqueMatches) - 1, a:context)
     if l:isFound
 	let l:value = a:context.matches[index(a:context.matches, a:context.matchText) - s:previousOffset]
 	let l:matchIndex = index(s:uniqueMissingMatches, l:value)
