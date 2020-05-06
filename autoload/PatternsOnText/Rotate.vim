@@ -58,7 +58,7 @@ function! PatternsOnText#Rotate#GetContext() abort
     return s:SubstituteRotate
 endfunction
 function! s:RotateExpr( count, num, context ) abort
-    return a:context.matches[(((a:count - s:previousOffset - 1) % a:num) + a:num) % a:num + 1]
+    return (((a:count - s:previousOffset - 1) % a:num) + a:num) % a:num + 1
 endfunction
 function! s:ShiftExpr( count, num, context ) abort
     let l:index = a:count - s:previousOffset
@@ -66,12 +66,12 @@ function! s:ShiftExpr( count, num, context ) abort
 	if s:previousShiftValue =~# '^\\='
 	    let [l:isReplacementExpression, l:replacementExpression] =
 	    \   PatternsOnText#Transactional#Common#ProcessReplacementExpression(s:previousShiftValue, 'PatternsOnText#Rotate#GetContext()')
-	    return eval(l:replacementExpression[2:])
+	    return [0, eval(l:replacementExpression[2:])]
 	else
-	    return s:previousShiftValue
+	    return [0, s:previousShiftValue]
 	endif
     else
-	return a:context.matches[l:index]
+	return [1, a:context.matches[l:index]]
     endif
 endfunction
 
@@ -83,10 +83,10 @@ function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     \)
 endfunction
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
-    return s:RotateExpr(a:context.matchCount, a:context.matchNum, a:context)
+    return a:context.matches[s:RotateExpr(a:context.matchCount, a:context.matchNum, a:context)]
 endfunction
 function! PatternsOnText#Rotate#ShiftExpr( context ) abort
-    return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)
+    return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)[1]
 endfunction
 
 function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
@@ -106,11 +106,14 @@ function! s:InitializeUniqueMatches( context ) abort
 endfunction
 function! PatternsOnText#Rotate#MemoizedRotateExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
-    return s:RotateExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)
+    return s:uniqueMatches[s:RotateExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)]
 endfunction
 function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
     call s:InitializeUniqueMatches(a:context)
-    return s:ShiftExpr(index(s:uniqueMatches, a:context.matchText), len(s:uniqueMatches) - 1, a:context)
+    let l:count = index(s:uniqueMatches, a:context.matchText)
+
+    let [l:isFound, l:value] = s:ShiftExpr(l:count, len(s:uniqueMatches) - 1, a:context)
+    return (l:isFound ? a:context.matches[index(a:context.matches, a:context.matchText) - s:previousOffset] : l:value)
 endfunction
 
 let &cpo = s:save_cpo
