@@ -43,7 +43,7 @@ function! s:Substitute( shiftExpr, rotateExpr, range, arguments ) abort
 
 	if l:isShift && s:previousOffset != 0
 	    let l:missedMatches = (s:previousOffset > 0 ?
-	    \   s:SubstituteRotate.matches[max([1, s:SubstituteRotate.matchNum - s:previousOffset + 1]):] :
+	    \   s:SubstituteRotate.matches[max([1, len(s:SubstituteRotate.matches) - s:previousOffset]):] :
 	    \   s:SubstituteRotate.matches[1:(-1 * s:previousOffset)]
 	    \)
 	    call setreg('', join(l:missedMatches, "\n") . (len(l:missedMatches) > 1 ? "\n" : ''))
