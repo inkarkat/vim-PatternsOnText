@@ -16,8 +16,7 @@ call vimtap#Plan(1)
 
 1normal! gUU
 2,15SubstituteRotateMemoized /\[\w\+\]/[???]/2/g
-"TODO call vimtap#Is(@", "[five]\n[six]\n", 'missed last two matches')
-call vimtap#Is(@", @", 'missed last two matches')
+call vimtap#Is(@", "[one]\n[three]\n", 'missed two matches')
 
 call vimtest#SaveOut()
 call vimtest#Quit()

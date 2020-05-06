@@ -11,7 +11,7 @@ call vimtap#Is(@", '[ten]', 'missed last match')
 call vimtap#Is(@", "[two]\n[four]\n[eight]\n", 'missed last three matches')
 
 11,12SubstituteRotateMemoized! /\[\w\+\]//2/g
-call vimtap#Is(@", "[five]\n[ten]\n", 'missed last two matches')
+call vimtap#Is(@", "[seven]\n[nine]\n[ten]\n", 'missed last three matches')
 
 14SubstituteRotateMemoized! /\[\w\+\]/?/+2/g
 call vimtap#Is(@", "[nine]\n[ten]\n", 'missed last two matches')

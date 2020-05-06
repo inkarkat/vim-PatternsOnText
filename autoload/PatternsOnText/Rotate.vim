@@ -96,16 +96,18 @@ endfunction
 function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
     let s:uniqueMatches = []
     let l:status = s:Substitute(
+    \   's:MemoizedMissingShiftsExpr',
     \   'PatternsOnText#Rotate#MemoizedShiftExpr',
     \   'PatternsOnText#Rotate#MemoizedRotateExpr',
     \   a:range, a:arguments
     \)
-    unlet! s:uniqueMatches
+    unlet! s:uniqueMatches s:uniqueMissingMatches
     return l:status
 endfunction
 function! s:InitializeUniqueMatches( context ) abort
     if empty(s:uniqueMatches)
-	let s:uniqueMatches = [''] + ingo#collections#UniqueStable(a:context.matches[1:])
+	let s:uniqueMissingMatches = ingo#collections#UniqueStable(a:context.matches[1:])
+	let s:uniqueMatches = [''] + copy(s:uniqueMissingMatches)
     endif
 endfunction
 function! PatternsOnText#Rotate#MemoizedRotateExpr( context ) abort
@@ -117,7 +119,17 @@ function! PatternsOnText#Rotate#MemoizedShiftExpr( context ) abort
     let l:count = index(s:uniqueMatches, a:context.matchText)
 
     let [l:isFound, l:value] = s:ShiftExpr(l:count, len(s:uniqueMatches) - 1, a:context)
-    return (l:isFound ? a:context.matches[index(a:context.matches, a:context.matchText) - s:previousOffset] : l:value)
+    if l:isFound
+	let l:value = a:context.matches[index(a:context.matches, a:context.matchText) - s:previousOffset]
+	let l:matchIndex = index(s:uniqueMissingMatches, l:value)
+	if l:matchIndex != -1
+	    call remove(s:uniqueMissingMatches, l:matchIndex)
+	endif
+    endif
+    return l:value
+endfunction
+function! s:MemoizedMissingShiftsExpr()
+    return s:uniqueMissingMatches
 endfunction
 
 let &cpo = s:save_cpo
