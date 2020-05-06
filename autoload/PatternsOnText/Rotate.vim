@@ -12,7 +12,7 @@ set cpo&vim
 
 let s:NO_SHIFT_VALUE = []
 let [s:previousPattern, s:previousShiftValue, s:previousOffset, s:previousFlags, s:previousSpecialFlags] = ['', s:NO_SHIFT_VALUE, 0, '', '']
-function! s:Substitute( shiftExpr, rotateExpr, range, arguments ) abort
+function! s:Substitute( missingShiftsExpr, shiftExpr, rotateExpr, range, arguments ) abort
     let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, '', s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
@@ -42,10 +42,7 @@ function! s:Substitute( shiftExpr, rotateExpr, range, arguments ) abort
 	\)
 
 	if l:isShift && s:previousOffset != 0
-	    let l:missedMatches = (s:previousOffset > 0 ?
-	    \   s:SubstituteRotate.matches[max([1, len(s:SubstituteRotate.matches) - s:previousOffset]):] :
-	    \   s:SubstituteRotate.matches[1:(-1 * s:previousOffset)]
-	    \)
+	    let l:missedMatches = call(a:missingShiftsExpr, [])
 	    call setreg('', join(l:missedMatches, "\n") . (len(l:missedMatches) > 1 ? "\n" : ''))
 	endif
 
@@ -77,6 +74,7 @@ endfunction
 
 function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
     return s:Substitute(
+    \   's:MissingShiftsExpr',
     \   'PatternsOnText#Rotate#ShiftExpr',
     \   'PatternsOnText#Rotate#RotateExpr',
     \   a:range, a:arguments
@@ -87,6 +85,12 @@ function! PatternsOnText#Rotate#RotateExpr( context ) abort
 endfunction
 function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)[1]
+endfunction
+function! s:MissingShiftsExpr()
+    return (s:previousOffset > 0 ?
+    \   s:SubstituteRotate.matches[max([1, len(s:SubstituteRotate.matches) - s:previousOffset]):] :
+    \   s:SubstituteRotate.matches[1:(-1 * s:previousOffset)]
+    \)
 endfunction
 
 function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
