@@ -89,7 +89,7 @@ function! PatternsOnText#Rotate#ShiftExpr( context ) abort
     return s:ShiftExpr(a:context.matchCount, a:context.matchNum, a:context)
 endfunction
 
-function! PatternsOnText#Rotate#SubstituteMemoized( range, arguments ) abort
+function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
     let s:uniqueMatches = []
     let l:status = s:Substitute(
     \   'PatternsOnText#Rotate#MemoizedShiftExpr',

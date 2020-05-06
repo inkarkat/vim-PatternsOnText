@@ -96,9 +96,9 @@ command! -range -nargs=* SubstituteTransactionalExprEach
 command! -range -nargs=* SubstituteRotate
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Rotate#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
-command! -range -nargs=* SubstituteRotateMemoized
+command! -bang -range -nargs=* SubstituteRotateMemoized
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Rotate#SubstituteMemoized('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Rotate#SubstituteMemoized('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
