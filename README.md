@@ -590,7 +590,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.035 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.043 or
   higher.
 
 KNOWN PROBLEMS
@@ -619,6 +619,8 @@ HISTORY
   with preceding or following matches to make space for something new. Comes
   as both a stateless variant and :SubstituteRotateMemoized that keeps the
   mappings from old match to new, similar to what :SubstituteTranslate does.
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.043!__
 
 ##### 2.11    28-Mar-2019
 - Extract PatternsOnText#Translate#Translate() API function to allow easier

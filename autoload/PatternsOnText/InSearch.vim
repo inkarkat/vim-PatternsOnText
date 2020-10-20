@@ -1,14 +1,9 @@
 " PatternsOnText/InSearch.vim: Commands to substitute only within search matches.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - PatternsOnText/Except.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/msg.vim autoload script
-"   - ingo/subst/expr/emulation.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2020 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -17,12 +12,7 @@ set cpo&vim
 
 function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
     let s:didInnerSubstitution = 1
-    if a:sub =~# '^\\='
-	" Recursive use of \= is not allowed, so we need to emulate it:
-	let l:replacement = ingo#subst#expr#emulation#Substitute(a:expr, a:pat, a:sub, a:flags)
-    else
-	let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
-    endif
+    let l:replacement = ingo#compat#substitution#RecursiveSubstitutionExpression(a:expr, a:pat, a:sub, a:flags)
     if a:expr !=# l:replacement
 	let s:innerSubstitutionCnt += 1
 	let s:innerSubstitutionLnums[line('.')] = 1
