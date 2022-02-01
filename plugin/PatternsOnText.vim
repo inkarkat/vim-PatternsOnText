@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2020 Ingo Karkat
+" Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -22,7 +22,7 @@ if ! exists('g:PatternsOnText_PutTranslationsTemplateExpr')
     let g:PatternsOnText_PutTranslationsTemplateExpr = 'v:val.replacement . ": " . v:val.match . "\n"'
 endif
 if ! exists('g:PatternsOnText_YankTranslationsTemplateExpr')
-    let g:PatternsOnText_YankTranslationsTemplateExpr = '":''[,'']substitute/" . ingo#regexp#EscapeLiteralText(v:val.replacement, "/") . "/" . escape(v:val.match, "/\\' . (&magic ? '&~' : '') . '") . "/g\n"'
+    let g:PatternsOnText_YankTranslationsTemplateExpr = '":''[,'']substitute/" . ingo#regexp#EscapeLiteralText(v:val.replacement, "/") . "/" . ingo#regexp#EscapeLiteralReplacement(v:val.match, "/") . "/g\n"'
 endif
 
 
