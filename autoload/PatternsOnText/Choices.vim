@@ -1,17 +1,9 @@
 " PatternsOnText/Choices.vim: Commands to substitute from a set of choices.
 "
 " DEPENDENCIES:
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/print.vim autoload script
-"   - ingo/query.vim autoload script
-"   - ingo/query/confirm.vim autoload script
-"   - ingo/query/fromlist.vim autoload script
-"   - ingo/query/get.vim autoload script
-"   - ingo/subst/replacement.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2016-2018 Ingo Karkat
+" Copyright: (C) 2016-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -156,11 +148,11 @@ function! s:ConfirmQuery( what, list, ... )
 	    " Return predefined choice.
 	    let l:choice = remove(g:IngoLibrary_QueryChoices, 0)
 	    return (type(l:choice) == type(0) ?
-	\	l:choice :
-	\	(l:choice == '' ?
-	\	    0 :
-	\	    index(l:plainChoices, l:choice)
-	\	)
+	    \	l:choice :
+	    \	(l:choice ==# '' ?
+	    \	    0 :
+	    \	    index(l:plainChoices, l:choice)
+	    \	)
 	    \)
 	endif
 
