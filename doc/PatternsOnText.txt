@@ -125,6 +125,15 @@ USAGE							*PatternsOnText-usage*
 			pattern, last used replacement string, last used
 			|:s_flags|, and last used answers.
 
+						      *:SubstituteUnderCursor*
+:SubstituteUnderCursor/{pattern}/{string}/[flags]
+			Replace a match of {pattern} if the cursor is
+			(somewhere) on the match. Stuff excluded by |/\zs| and
+			|/\ze| still counts a match.
+:SubstituteUnderCursor [flags]
+			Repeat the last substitution with the last used search
+			pattern, last used replacement string, and last used
+			|:s_flags|.
 							 *:SubstituteInSearch*
 :[range]SubstituteInSearch/{pattern}/{string}/[flags] [count]
 			Within the current search pattern matches, replace all
@@ -646,6 +655,8 @@ HISTORY						      *PatternsOnText-history*
   with preceding or following matches to make space for something new. Comes
   as both a stateless variant and :SubstituteRotateMemoized that keeps the
   mappings from old match to new, similar to what :SubstituteTranslate does.
+- ENH: Add :SubstituteUnderCursor for applying {pattern} only at the cursor
+  position.
   *** You need to update to ingo-library (vimscript #4433) version 1.043! ***
 
 2.11	28-Mar-2019
@@ -810,7 +821,7 @@ First published version.
 Started development as part of my custom ingocommands.
 
 ==============================================================================
-Copyright: (C) 2011-2020 Ingo Karkat
+Copyright: (C) 2011-2022 Ingo Karkat
 The VIM LICENSE applies to this plugin; see |copyright|.
 
 Maintainer:	Ingo Karkat <ingo@karkat.de>

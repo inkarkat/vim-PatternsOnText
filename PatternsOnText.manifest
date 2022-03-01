@@ -18,6 +18,7 @@ autoload/PatternsOnText/Transactional/Common.vim
 autoload/PatternsOnText/Transactional/Expr.vim
 autoload/PatternsOnText/Transactional/ExprEach.vim
 autoload/PatternsOnText/Translate.vim
+autoload/PatternsOnText/UnderCursor.vim
 autoload/PatternsOnText/Uniques.vim
 plugin/PatternsOnText.vim
 doc/PatternsOnText.txt

@@ -46,6 +46,10 @@ command! -range -nargs=? SubstituteSubsequent
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
+command! -nargs=? SubstituteUnderCursor
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#UnderCursor#Substitute(<q-args>) | echoerr ingo#err#Get() | endif
+
 command! -range -nargs=? SubstituteInSearch
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
