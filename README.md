@@ -630,6 +630,7 @@ HISTORY
   mappings from old match to new, similar to what :SubstituteTranslate does.
 - ENH: Add :SubstituteUnderCursor for applying {pattern} only at the cursor
   position.
+- All commands support prepended command modifiers (like :keeppatterns).
 
 __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.043!__
 

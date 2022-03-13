@@ -9,7 +9,7 @@
 "   - ingo/range/lines.vim autoload script
 "   - PatternsOnText.vim autoload script
 "
-" Copyright: (C) 2014-2018 Ingo Karkat
+" Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -50,7 +50,7 @@ function! s:PrintLines( lnums )
     " Position the cursor on the last line of the last range.
     call cursor(l:lnum, 1)
 endfunction
-function! s:DoCommandOverLines( doCommand, lnums )
+function! s:DoCommandOverLines( mods, doCommand, lnums )
     " To deal with added / removed lines by a:doCommand, use the :global
     " command's such capabilities. For that, the passed line numbers need to be
     " converted to a regular expression.
@@ -59,14 +59,14 @@ function! s:DoCommandOverLines( doCommand, lnums )
     \   '\|'
     \)
     try
-	execute printf('global/%s/%s', l:lnumExpr, a:doCommand)
+	execute printf('%s global/%s/%s', a:mods, l:lnumExpr, a:doCommand)
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     endtry
 endfunction
-function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatchingLines, arguments )
+function! PatternsOnText#Ranges#Command( command, mods, startLnum, endLnum, isNonMatchingLines, arguments )
     if a:command ==# 'do'
 	let l:ranges = []
 	let l:arguments = a:arguments
@@ -111,7 +111,7 @@ function! PatternsOnText#Ranges#Command( command, startLnum, endLnum, isNonMatch
     elseif a:command ==# 'print'
 	call s:PrintLines(l:lnums)
     elseif a:command ==# 'do'
-	let l:isSuccess = s:DoCommandOverLines(l:doCommand, l:lnums)
+	let l:isSuccess = s:DoCommandOverLines(a:mods, l:doCommand, l:lnums)
 	let l:isClearSearchHistory = 1  " This always uses :global.
     else
 	call s:YankLines(l:lnums, (empty(l:register) ? '"' : l:register))

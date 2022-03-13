@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2020 Ingo Karkat
+" Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -21,7 +21,7 @@ function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
 endfunction
 let s:previousPattern = ''
 let s:previousReplacement = ''
-function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLine, arguments ) range
+function! PatternsOnText#InSearch#Substitute( isOutsideSearch, mods, firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
     let l:parts = matchlist(l:replacement,
@@ -65,8 +65,8 @@ function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLi
 	" substitutions.
 	" The separation character must not appear (unescaped) in the expression, so
 	" we use the original separator.
-	silent execute printf('%d,%dsubstitute %s%s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
-	\   a:firstLine, a:lastLine,
+	silent execute printf('%s %d,%dsubstitute %s%s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
+	\   a:mods, a:firstLine, a:lastLine,
 	\   l:separator, l:search, l:separator,
 	\   string(l:pattern),
 	\   string(l:replacement),

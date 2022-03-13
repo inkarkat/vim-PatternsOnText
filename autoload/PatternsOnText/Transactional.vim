@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019-2020 Ingo Karkat
+" Copyright: (C) 2019-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,35 +11,35 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let [s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags] = ['', '', '', '']
-function! PatternsOnText#Transactional#Substitute( range, arguments ) abort
+function! PatternsOnText#Transactional#Substitute( mods, range, arguments ) abort
     let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, s:previousReplacement, s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
     let l:unescapedReplacement = ingo#escape#Unescape(l:replacement, l:separator)
     let [s:previousPattern, s:previousReplacement] = [escape(l:unescapedPattern, '/'), escape(l:unescapedReplacement, '/')]
 
-    return PatternsOnText#Transactional#TransactionalSubstitute(a:range, l:unescapedPattern, l:unescapedReplacement, s:previousFlags, l:testExpr, l:updatePredicate)
+    return PatternsOnText#Transactional#TransactionalSubstitute(a:mods, a:range, l:unescapedPattern, l:unescapedReplacement, s:previousFlags, l:testExpr, l:updatePredicate)
 endfunction
-function! PatternsOnText#Transactional#TransactionalSubstitute( range, pattern, replacement, flags, testExpr, updatePredicate ) abort
+function! PatternsOnText#Transactional#TransactionalSubstitute( mods, range, pattern, replacement, flags, testExpr, updatePredicate ) abort
     let s:SubstituteTransactional = PatternsOnText#Transactional#Common#InitialContext()
     try
 	return PatternsOnText#Transactional#TransactionalSubstituteWithContext(
 	\   function('PatternsOnText#Transactional#GetContext'),
-	\   a:range, a:pattern, a:replacement, a:flags, a:testExpr, a:updatePredicate
+	\   a:mods, a:range, a:pattern, a:replacement, a:flags, a:testExpr, a:updatePredicate
 	\)
     finally
 	unlet! s:SubstituteTransactional
     endtry
 endfunction
-function! PatternsOnText#Transactional#TransactionalSubstituteWithContext( ContextFunction, range, pattern, replacement, flags, testExpr, updatePredicate ) abort
+function! PatternsOnText#Transactional#TransactionalSubstituteWithContext( ContextFunction, mods, range, pattern, replacement, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
     let l:context = call(a:ContextFunction, [])
     let l:matches = []
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try
-	execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(l:context, l:matches, a:testExpr, %d)/%s',
-	\   a:range, escape(a:pattern, '/'), l:hasValReferenceInExpr, a:flags
+	execute printf('%s %ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(l:context, l:matches, a:testExpr, %d)/%s',
+	\   a:mods, a:range, escape(a:pattern, '/'), l:hasValReferenceInExpr, a:flags
 	\)
 
 	if has_key(l:context, 'error')

@@ -6,7 +6,7 @@
 "   - ingo/collections.vim autoload script
 "   - ingo/range.vim autoload script
 "
-" Copyright: (C) 2013-2018 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -17,7 +17,7 @@ function! PatternsOnText#Duplicates#FilterDuplicates( accumulator )
     call filter(a:accumulator, 'v:val.cnt > 1')
 endfunction
 
-function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filter, OnDuplicateAction, ReportAction )
+function! PatternsOnText#Duplicates#Process( mods, startLnum, endLnum, arguments, Filter, OnDuplicateAction, ReportAction )
     if empty(a:arguments)
 	let [l:separator, l:pattern] = ['/', @/]
     else
@@ -26,8 +26,8 @@ function! PatternsOnText#Duplicates#Process( startLnum, endLnum, arguments, Filt
 
     let l:accumulator = {}
     try
-	execute printf('silent %d,%dsubstitute %s%s%s\=s:Collect(l:accumulator%s)%sg%s',
-	\   a:startLnum, a:endLnum, l:separator, l:pattern, l:separator,
+	execute printf('silent %s %d,%dsubstitute %s%s%s\=s:Collect(l:accumulator%s)%sg%s',
+	\   a:mods, a:startLnum, a:endLnum, l:separator, l:pattern, l:separator,
 	\   (empty(a:OnDuplicateAction) ? '' : ', ' . string(a:OnDuplicateAction)),
 	\   l:separator,
 	\   (empty(a:OnDuplicateAction) ? 'n' : '')

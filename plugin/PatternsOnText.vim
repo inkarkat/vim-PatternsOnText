@@ -30,46 +30,46 @@ endif
 
 command! -range -nargs=? SubstituteExcept
 \   call setline(<line1>, getline(<line1>)) |
-\   call PatternsOnText#Except#Substitute('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+\   call PatternsOnText#Except#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 command! -range -nargs=? DeleteExcept
 \   call setline(<line1>, getline(<line1>)) |
-\   call PatternsOnText#Except#Delete('<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
+\   call PatternsOnText#Except#Delete(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | let @/ = histget('search', -1) | if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteSelected
 \   call setline(<line1>, getline(<line1>)) |
-\   call PatternsOnText#Selected#Substitute('<line1>,<line2>', <q-args>) |
+\   call PatternsOnText#Selected#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) |
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteSubsequent
 \   call setline(<line1>, getline(<line1>)) |
-\   call PatternsOnText#Subsequent#Substitute('substitute', 'SubstituteSelected', <line1>, <line2>, <q-args>) |
+\   call PatternsOnText#Subsequent#Substitute('substitute', 'SubstituteSelected', ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>) |
 \   let @/ = histget('search', -1) |
 \   if ingo#err#IsSet() | echoerr ingo#err#Get() | endif
 
 command! -nargs=? SubstituteUnderCursor
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#UnderCursor#Substitute(<q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#UnderCursor#Substitute(ingo#compat#command#Mods('<mods>'), <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? SubstituteInSearch
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#InSearch#Substitute(0, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#InSearch#Substitute(0, ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? SubstituteNotInSearch
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#InSearch#Substitute(1, <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#InSearch#Substitute(1, ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -range -nargs=? -complete=expression SubstituteIf
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#If#Substitute(0, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#If#Substitute(0, ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? -complete=expression SubstituteUnless
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#If#Substitute(1, '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#If#Substitute(1, ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=? -complete=command    SubstituteExecute
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Execute#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Execute#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range -nargs=? -complete=expression SubstituteTranslate
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Translate#Substitute('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Translate#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 command! -range=-1 -nargs=? PutTranslations
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Translate#Put((<count> == -1 ? <line1> : <line2>), <q-args>) | echoerr ingo#err#Get() | endif
@@ -78,31 +78,31 @@ command! -nargs=* YankTranslations
 
 command! -range -nargs=? SubstituteChoices
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Choices#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Choices#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteMultiple
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Pairs#SubstituteMultiple('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Pairs#SubstituteMultiple(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteWildcard
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Pairs#SubstituteWildcard('<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Pairs#SubstituteWildcard(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteMultipleExpr
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#PairsExpr#SubstituteMultipleExpr('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#PairsExpr#SubstituteMultipleExpr(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteTransactional
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Transactional#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Transactional#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteTransactionalExpr
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Transactional#Expr#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Transactional#Expr#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteTransactionalExprEach
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Transactional#ExprEach#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Transactional#ExprEach#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteRotate
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Rotate#Substitute('<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Rotate#Substitute(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -bang -range -nargs=* SubstituteRotateMemoized
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Rotate#SubstituteMemoized('<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
+\   if ! PatternsOnText#Rotate#SubstituteMemoized(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <bang>0, <q-args>) | echoerr ingo#err#Get() | endif
 
 command! -bang -range=% -nargs=? PrintDuplicateLinesOf
 \   if ! PatternsOnText#DuplicateLines#Process(<line1>, <line2>,
@@ -192,7 +192,8 @@ command! -bang -range=% -nargs=? DeleteAllDuplicateLinesIgnoring
 \   endif
 
 command! -bang -range -nargs=? PrintDuplicates
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\   if ! PatternsOnText#Duplicates#Process(
+\       ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>,
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
@@ -200,7 +201,8 @@ command! -bang -range -nargs=? PrintDuplicates
 \       echoerr 'No duplicates' |
 \   endif
 command! -bang -range -nargs=? PrintUniques
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\   if ! PatternsOnText#Duplicates#Process(
+\       ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>,
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Duplicates#PrintMatches')
@@ -209,7 +211,8 @@ command! -bang -range -nargs=? PrintUniques
 \   endif
 command! -bang -range -nargs=? DeleteDuplicates
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\   if ! PatternsOnText#Duplicates#Process(
+\       ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>,
 \       function('PatternsOnText#Duplicates#FilterDuplicates'),
 \       function('PatternsOnText#Duplicates#DeleteMatches'),
 \       function('PatternsOnText#Duplicates#ReportDeletedMatches')
@@ -218,7 +221,8 @@ command! -bang -range -nargs=? DeleteDuplicates
 \   endif
 command! -bang -range -nargs=? DeleteAllDuplicates
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\   if ! PatternsOnText#Duplicates#Process(
+\       ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>,
 \       function('PatternsOnText#Uniques#FilterNonUnique'),
 \       '',
 \       function('PatternsOnText#Uniques#DeleteNonUnique')
@@ -227,7 +231,8 @@ command! -bang -range -nargs=? DeleteAllDuplicates
 \   endif
 command! -bang -range -nargs=? DeleteUniques
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Duplicates#Process(<line1>, <line2>, <q-args>,
+\   if ! PatternsOnText#Duplicates#Process(
+\       ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <q-args>,
 \       function('PatternsOnText#Uniques#FilterUnique'),
 \       '',
 \       function('PatternsOnText#Uniques#DeleteUnique')
@@ -237,25 +242,25 @@ command! -bang -range -nargs=? DeleteUniques
 
 command! -bang -range=% -nargs=+ DeleteRanges
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Ranges#Command('delete', <line1>, <line2>, <bang>0, <q-args>) |
+\   if ! PatternsOnText#Ranges#Command('delete', ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <bang>0, <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 command! -bang -range=% -nargs=+ YankRanges
-\   if ! PatternsOnText#Ranges#Command('yank', <line1>, <line2>, <bang>0, <q-args>) |
+\   if ! PatternsOnText#Ranges#Command('yank', ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <bang>0, <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 command! -bang -range=% -nargs=+ PrintRanges
-\   if ! PatternsOnText#Ranges#Command('print', <line1>, <line2>, <bang>0, <q-args>) |
+\   if ! PatternsOnText#Ranges#Command('print', ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <bang>0, <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 command! -bang -range=% -nargs=+ RangeDo
-\   if ! PatternsOnText#Ranges#Command('do', <line1>, <line2>, <bang>0, <q-args>) |
+\   if ! PatternsOnText#Ranges#Command('do', ingo#compat#command#Mods('<mods>'), <line1>, <line2>, <bang>0, <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 
 command! -range=-1 -nargs=? Renumber
 \   call setline(<line1>, getline(<line1>)) |
-\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), (<count> == -1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
+\   if ! PatternsOnText#Renumber#Renumber((<count> == 0), ingo#compat#command#Mods('<mods>'), (<count> == -1 ? '1,' . line('$') : '<line1>,<line2>'), <q-args>) |
 \       echoerr ingo#err#Get() |
 \   endif
 

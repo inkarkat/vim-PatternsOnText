@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019-2020 Ingo Karkat
+" Copyright: (C) 2019-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,7 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr] = ['', '', '', '']
-function! PatternsOnText#Transactional#Expr#Substitute( range, arguments ) abort
+function! PatternsOnText#Transactional#Expr#Substitute( mods, range, arguments ) abort
     let [l:separator, s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, a:arguments)
 
@@ -19,13 +19,13 @@ function! PatternsOnText#Transactional#Expr#Substitute( range, arguments ) abort
 	let l:patterns = PatternsOnText#EvalIntoList(s:previousPatternExpr)
 	let l:replacementExpressions = PatternsOnText#EvalIntoList(s:previousReplacementExpr)
 
-	return PatternsOnText#Transactional#Expr#TransactionalSubstitute(a:range, l:patterns, l:replacementExpressions, s:previousFlagsExpr, l:testExpr, l:updatePredicate)
+	return PatternsOnText#Transactional#Expr#TransactionalSubstitute(a:mods, a:range, l:patterns, l:replacementExpressions, s:previousFlagsExpr, l:testExpr, l:updatePredicate)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     endtry
 endfunction
-function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
+function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
 
     let l:pattern = PatternsOnText#JoinPatterns(a:patterns)
@@ -36,8 +36,8 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( range, patt
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try
-	execute printf('%ssubstitute/%s/\=s:RecordExpression(l:matches, %d, a:testExpr, %d)/%s',
-	\   a:range, escape(l:pattern, '/'), len(a:patterns), l:hasValReferenceInExpr, a:flags
+	execute printf('%s %ssubstitute/%s/\=s:RecordExpression(l:matches, %d, a:testExpr, %d)/%s',
+	\   a:mods, a:range, escape(l:pattern, '/'), len(a:patterns), l:hasValReferenceInExpr, a:flags
 	\)
 
 	if has_key(s:SubstituteTransactional, 'error')

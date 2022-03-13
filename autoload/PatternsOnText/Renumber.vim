@@ -5,7 +5,7 @@
 "   - ingo/err.vim autoload script
 "   - ingo/str.vim autoload script
 "
-" Copyright: (C) 2017-2018 Ingo Karkat
+" Copyright: (C) 2017-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -16,7 +16,7 @@ let s:numberExpr = '[+-]\?\d\+\%(\.\d\+\%([eE][+-]\?\d\+\)\?\)\?'
 function! s:IsFloat( num )
     return (a:num =~# '\.')
 endfunction
-function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
+function! PatternsOnText#Renumber#Renumber( isPriming, mods, range, arguments )
     if a:arguments !=# '&'
 	let [l:startNum, l:subArguments, l:multiplicator, l:offset] =
 	\   matchlist(a:arguments, '^\(' . s:numberExpr . '\)\?\(.\{-}\)\%(\(\*\)\?\(' . s:numberExpr . '\)\)\?$')[1:4]
@@ -51,8 +51,8 @@ function! PatternsOnText#Renumber#Renumber( isPriming, range, arguments )
 
     call ingo#err#Clear()
     try
-	execute printf('%ssubstitute%s%s%s\=s:Renumber()%s%s',
-	\   a:range, s:separator, s:pattern, s:separator,
+	execute printf('%s %ssubstitute%s%s%s\=s:Renumber()%s%s',
+	\   a:mods, a:range, s:separator, s:pattern, s:separator,
 	\   s:separator, s:flags
 	\)
 

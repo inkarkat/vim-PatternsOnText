@@ -657,6 +657,7 @@ HISTORY						      *PatternsOnText-history*
   mappings from old match to new, similar to what :SubstituteTranslate does.
 - ENH: Add :SubstituteUnderCursor for applying {pattern} only at the cursor
   position.
+- All commands support prepended command modifiers (like :keeppatterns).
   *** You need to update to ingo-library (vimscript #4433) version 1.043! ***
 
 2.11	28-Mar-2019

@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2020 Ingo Karkat
+" Copyright: (C) 2020-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -12,7 +12,7 @@ set cpo&vim
 
 let s:NO_SHIFT_VALUE = []
 let [s:previousPattern, s:previousShiftValue, s:previousOffset, s:previousFlags, s:previousSpecialFlags] = ['', s:NO_SHIFT_VALUE, 0, '', '']
-function! s:Substitute( missingShiftsExpr, shiftExpr, rotateExpr, range, arguments ) abort
+function! s:Substitute( missingShiftsExpr, shiftExpr, rotateExpr, mods, range, arguments ) abort
     let [l:separator, l:pattern, l:replacement, s:previousFlags, s:previousSpecialFlags, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPattern, '', s:previousFlags, s:previousSpecialFlags, a:arguments)
     let l:unescapedPattern = ingo#escape#Unescape(l:pattern, l:separator)
@@ -38,7 +38,7 @@ function! s:Substitute( missingShiftsExpr, shiftExpr, rotateExpr, range, argumen
     try
 	let l:success = PatternsOnText#Transactional#TransactionalSubstituteWithContext(
 	\   function('PatternsOnText#Rotate#GetContext'),
-	\   a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate
+	\   a:mods, a:range, l:unescapedPattern, l:rotatingReplacementExpression, s:previousFlags, l:testExpr, l:updatePredicate
 	\)
 
 	if l:isShift && s:previousOffset != 0
@@ -72,12 +72,12 @@ function! s:ShiftOrValue( count, num, context ) abort
     endif
 endfunction
 
-function! PatternsOnText#Rotate#Substitute( range, arguments ) abort
+function! PatternsOnText#Rotate#Substitute( mods, range, arguments ) abort
     return s:Substitute(
     \   's:MissingShiftsExpr',
     \   'PatternsOnText#Rotate#ShiftExpr',
     \   'PatternsOnText#Rotate#RotateExpr',
-    \   a:range, a:arguments
+    \   a:mods, a:range, a:arguments
     \)
 endfunction
 function! PatternsOnText#Rotate#RotateExpr( context ) abort
@@ -94,7 +94,7 @@ function! s:MissingShiftsExpr()
 endfunction
 
 let s:memoizedTranslations = {}
-function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, arguments ) abort
+function! PatternsOnText#Rotate#SubstituteMemoized( mods, range, isClearAssociations, arguments ) abort
     if a:isClearAssociations
 	let s:memoizedTranslations = {}
     endif
@@ -104,7 +104,7 @@ function! PatternsOnText#Rotate#SubstituteMemoized( range, isClearAssociations, 
     \   's:MemoizedMissingShiftsExpr',
     \   'PatternsOnText#Rotate#MemoizedShiftExpr',
     \   'PatternsOnText#Rotate#MemoizedRotateExpr',
-    \   a:range, a:arguments
+    \   a:mods, a:range, a:arguments
     \)
     unlet! s:uniqueMatches s:uniqueMissingMatches
     return l:status

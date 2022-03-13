@@ -10,7 +10,7 @@
 
 let s:previousPattern = ''
 let s:previousChoices = []
-function! PatternsOnText#Choices#Substitute( range, arguments, ... )
+function! PatternsOnText#Choices#Substitute( mods, range, arguments, ... )
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPattern})
 
@@ -47,8 +47,8 @@ function! PatternsOnText#Choices#Substitute( range, arguments, ... )
     unlet! s:predefinedChoice
     try
 "****D echomsg '****' string([l:separator, l:pattern, l:choices, l:flags, l:count])
-	execute printf('%s%s %s%s%s\=s:Replace(%s, l:choices)%s%s%s',
-	\   a:range, (a:0 ? a:1 : 'substitute'),
+	execute printf('%s %s%s %s%s%s\=s:Replace(%s, l:choices)%s%s%s',
+	\   a:mods, a:range, (a:0 ? a:1 : 'substitute'),
 	\   l:separator, l:pattern, l:separator,
 	\   string(l:queryFunction),
 	\   l:separator, l:flags, l:count

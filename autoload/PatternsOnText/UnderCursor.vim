@@ -11,7 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:previousPattern = ''
-function! PatternsOnText#UnderCursor#Substitute( arguments ) abort
+function! PatternsOnText#UnderCursor#Substitute( mods, arguments ) abort
     call ingo#err#Clear()
 
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
@@ -31,8 +31,8 @@ function! PatternsOnText#UnderCursor#Substitute( arguments ) abort
 
     let l:underCursorPattern = ingo#regexp#build#UnderCursor(l:pattern)
     try
-	execute printf('substitute%s%s%s%s%s%s',
-	\   l:separator, l:underCursorPattern, l:separator, l:replacement, l:separator, l:flags
+	execute printf('%s substitute%s%s%s%s%s%s',
+	\   a:mods, l:separator, l:underCursorPattern, l:separator, l:replacement, l:separator, l:flags
 	\)
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
