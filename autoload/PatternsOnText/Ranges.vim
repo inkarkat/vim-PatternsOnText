@@ -1,13 +1,7 @@
 " PatternsOnText/Ranges.vim: Commands to work on sub-ranges of the buffer.
 "
 " DEPENDENCIES:
-"   - ingo/cmdargs/range.vim autoload script
-"   - ingo/cmdargs/register.vim autoload script
-"   - ingo/collections.vim autoload script
-"   - ingo/print.vim autoload script
-"   - ingo/range.vim autoload script
-"   - ingo/range/lines.vim autoload script
-"   - PatternsOnText.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

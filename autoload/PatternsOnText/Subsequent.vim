@@ -1,10 +1,7 @@
 " PatternsOnText/Subsequent.vim: Commands to substitute matches after the cursor only.
 "
 " DEPENDENCIES:
-"   - ingo/cursor.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/range.vim autoload script
-"   - PatternsOnText/Selected.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

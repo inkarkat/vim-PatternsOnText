@@ -1,10 +1,9 @@
 " PatternsOnText/DuplicateLines.vim: Commands to work on duplicate lines.
 "
 " DEPENDENCIES:
-"   - ingo/cmdargs/pattern.vim autoload script
-"   - ingo/collections.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2013-2017 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>

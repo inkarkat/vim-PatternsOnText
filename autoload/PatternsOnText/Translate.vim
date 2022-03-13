@@ -1,15 +1,7 @@
 " PatternsOnText/Translate.vim: Commands to translate each unique match to a fixed item.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - ingo/actions.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/funcref.vim autoload script
-"   - ingo/lists.vim autoload script
-"   - ingo/msg.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2018-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

@@ -1,11 +1,9 @@
 " PatternsOnText.vim: Common functions for the advanced commands to apply regular expressions.
 "
 " DEPENDENCIES:
-"   - ingo/collections.vim autoload script
-"   - ingo/msg.vim autoload script
-"   - ingo/escape.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2013-2019 Ingo Karkat
+" Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>

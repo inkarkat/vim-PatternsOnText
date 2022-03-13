@@ -1,9 +1,7 @@
 " PatternsOnText/Renumber.vim: Commands to renumber matches.
 "
 " DEPENDENCIES:
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/str.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2017-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

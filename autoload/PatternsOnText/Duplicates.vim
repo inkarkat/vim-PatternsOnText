@@ -1,10 +1,7 @@
 " PatternsOnText/Duplicates.vim: Commands to work on duplicates.
 "
 " DEPENDENCIES:
-"   - ingo/msg.vim autoload script
-"   - ingo/cmdargs/pattern.vim autoload script
-"   - ingo/collections.vim autoload script
-"   - ingo/range.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2013-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

@@ -1,13 +1,7 @@
 " PatternsOnText/If.vim: Commands to substitute if a predicate matches.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - ingo/action.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/msg.vim autoload script
-"   - ingo/subst/replacement.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2016-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.

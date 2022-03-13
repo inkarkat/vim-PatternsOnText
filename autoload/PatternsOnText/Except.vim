@@ -1,10 +1,7 @@
 " PatternsOnText/Except.vim: Commands to substitute where the pattern does not match.
 "
 " DEPENDENCIES:
-"   - ingo/err.vim autoload script
-"   - ingo/cmdargs/pattern.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/cmdargs.vim autoload script
+"   - ingo-library.vim plugin
 "
 " Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
