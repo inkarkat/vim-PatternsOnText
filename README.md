@@ -618,7 +618,7 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 2.12    RELEASEME
+##### 2.20    RELEASEME
 - Adapt: :PutTranslations and :Renumber need to check &lt;count&gt; == -1 instead of
   &lt;line2&gt; to support current line as well as a lnum of 0 (since Vim 8.1.1241).
 - ENH: :SubstituteTransactional\* additionally support arbitrary access of
