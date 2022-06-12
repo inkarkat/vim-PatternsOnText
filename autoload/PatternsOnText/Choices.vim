@@ -168,49 +168,44 @@ function! s:ConfirmQuery( what, list, ... )
 	endif
 
 	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
-	if l:count == 0
-	    if l:choice =~# '^\d$'
-		let l:count = str2nr(l:choice)
-		if l:maxNum > 10 * l:count
-		    " Need to query more numbers to be able to address all choices.
-		    echon ' ' . l:count
+	if l:count == 0 && l:choice =~# '^\d$'
+	    let l:count = str2nr(l:choice)
+	    if l:maxNum > 10 * l:count
+		" Need to query more numbers to be able to address all choices.
+		echon ' ' . l:count
 
-		    let l:leadingZeroCnt = (l:choice ==# '0')
-		    while l:maxNum > 10 * l:count
-			let l:char = nr2char(getchar())
-			if l:char ==# "\<CR>"
-			    break
-			elseif l:char !~# '\d'
-			    redraw | echo ''
+		let l:leadingZeroCnt = (l:choice ==# '0')
+		while l:maxNum > 10 * l:count
+		    let l:char = nr2char(getchar())
+		    if l:char ==# "\<CR>"
+			break
+		    elseif l:char !~# '\d'
+			redraw | echo ''
+			return -1
+		    endif
+
+		    echon l:char
+		    if l:char ==# '0' && l:count == 0
+			let l:leadingZeroCnt += 1
+			if l:leadingZeroCnt >= len(l:maxNum)
 			    return -1
 			endif
-
-			echon l:char
-			if l:char ==# '0' && l:count == 0
-			    let l:leadingZeroCnt += 1
-			    if l:leadingZeroCnt >= len(l:maxNum)
-				return -1
-			    endif
-			else
-			    let l:count = 10 * l:count + str2nr(l:char)
-			    if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
-				break
-			    endif
+		    else
+			let l:count = 10 * l:count + str2nr(l:char)
+			if l:leadingZeroCnt + len(l:count) >= len(l:maxNum)
+			    break
 			endif
-		    endwhile
-		endif
-	    else
-		execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
-		redraw
-		return call('s:ConfirmQuery', [a:what, a:list] + a:000)
+		    endif
+		endwhile
 	    endif
 	endif
 
-	if l:count < 1 || l:count > l:maxNum
-	    redraw | echo ''
-	    return -1
+	if l:count > 0 && l:count <= l:maxNum
+	    return l:count - 1
+	else
+	    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+	    redraw
 	endif
-	return l:count - 1
     endwhile
 endfunction
 
