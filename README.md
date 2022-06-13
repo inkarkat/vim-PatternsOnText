@@ -624,6 +624,8 @@ HISTORY
 - :SubstituteChoices: Show the [part of the] current line with the current
   match highlighted with IncSearch, and other matches with Search, for a
   better overview of where we are. Thanks to Vitaly for the suggestion.
+- :SubstituteChoices: BUG: 10th, 20th, etc. entry cannot be selected by number
+  if it is the last.
 
 __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.045!__
 
