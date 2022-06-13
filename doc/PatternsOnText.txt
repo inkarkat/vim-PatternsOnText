@@ -645,6 +645,10 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 ==============================================================================
 HISTORY						      *PatternsOnText-history*
 
+2.21	RELEASEME
+- :SubstituteChoices: CHG: Beep and continue querying on invalid accelerator
+  key or number; only <Esc> or Ctrl-C abort.
+
 2.20	13-Jun-2022
 - Adapt: :PutTranslations and :Renumber need to check <count> == -1 instead of
   <line2> to support current line as well as a lnum of 0 (since Vim 8.1.1241).

@@ -158,13 +158,16 @@ function! s:ConfirmQuery( what, list, ... )
 
 	let l:maxNum = len(l:originalList)
 	let l:choice = ingo#query#get#Char()
-	if l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
+	if empty(l:choice) || l:choice ==# "\<C-c>"
+	    redraw | echo ''
+	    return -1
+	elseif l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
 	    execute 'normal!' l:choice
 	    redraw
 	    continue
 	endif
 
-	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
+	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	if l:count == 0 && l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
 	    if l:maxNum > 10 * l:count
@@ -197,11 +200,12 @@ function! s:ConfirmQuery( what, list, ... )
 	    endif
 	endif
 
-	if l:count < 1 || l:count > l:maxNum
-	    redraw | echo ''
-	    return -1
+	if l:count > 0 && l:count <= l:maxNum
+	    return l:count - 1
+	else
+	    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+	    redraw
 	endif
-	return l:count - 1
     endwhile
 endfunction
 
