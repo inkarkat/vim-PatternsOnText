@@ -1,17 +1,9 @@
 " PatternsOnText/Translate.vim: Commands to translate each unique match to a fixed item.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - ingo/actions.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/compat.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/funcref.vim autoload script
-"   - ingo/lists.vim autoload script
-"   - ingo/msg.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2018-2019 Ingo Karkat
+" Copyright: (C) 2018-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,7 +15,7 @@ let s:previousIsCaseInsensitive = 0
 let s:previousTranslation = ''
 let s:previousItems = []
 let s:items = []
-function! PatternsOnText#Translate#Substitute( range, isClearAssociations, arguments )
+function! PatternsOnText#Translate#Substitute( mods, range, isClearAssociations, arguments )
     call ingo#err#Clear()
 
     if a:isClearAssociations
@@ -83,7 +75,7 @@ function! PatternsOnText#Translate#Substitute( range, isClearAssociations, argum
 
     let s:previousPattern = escape(ingo#escape#Unescape(l:pattern, l:separator), '/')
 
-    return PatternsOnText#Translate#Translate(a:range, a:isClearAssociations, l:separator, l:pattern, s:previousTranslation, l:flags)
+    return PatternsOnText#Translate#Translate(a:mods, a:range, a:isClearAssociations, l:separator, l:pattern, s:previousTranslation, l:flags)
 endfunction
 function! s:FromItems()
     return (empty(s:items) ? [] : remove(s:items, 0))
@@ -94,7 +86,7 @@ endfunction
 let s:memoizedTranslations = {}
 let s:memoizedMatches = []
 let s:SubstituteTranslate = PatternsOnText#InitialContext()
-function! PatternsOnText#Translate#Translate( range, isClearAssociations, separator, pattern, Translation, flags )
+function! PatternsOnText#Translate#Translate( mods, range, isClearAssociations, separator, pattern, Translation, flags )
 "******************************************************************************
 "* PURPOSE:
 "   Within a:range, but each unique match of a:pattern through a:Translation,
@@ -105,6 +97,7 @@ function! PatternsOnText#Translate#Translate( range, isClearAssociations, separa
 "* EFFECTS / POSTCONDITIONS:
 "   Modifies the buffer.
 "* INPUTS:
+"   a:mods                  Command modifiers (like :keeppatterns).
 "   a:range                 Range in buffer in text form.
 "   a:isClearAssociations   Flag whether associations from a previous run should
 "                           be kept (0) or cleared (1).
@@ -138,8 +131,8 @@ function! PatternsOnText#Translate#Translate( range, isClearAssociations, separa
 
     try
 "****D echomsg '****' string([a:separator, a:pattern, s:translation, a:flags])
-	execute printf('%ssubstitute%s%s%s\=s:Replace(%d)%s%s',
-	\   a:range, a:separator, a:pattern, a:separator,
+	execute printf('%s %ssubstitute%s%s%s\=s:Replace(%d)%s%s',
+	\   a:mods, a:range, a:separator, a:pattern, a:separator,
 	\   l:hasValReferenceInTranslation, a:separator, a:flags
 	\)
 

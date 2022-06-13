@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2014-2019 Ingo Karkat
+" Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,7 +23,7 @@ function! s:ParseArguments( arguments )
     return [l:flags, l:count]
 endfunction
 let [s:previousSplitPairs, s:previousWildcardFlags, s:previousWildcardCount] = [[], '', '']
-function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
+function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
     let l:pairs = copy(a:000)
     let [l:flags, l:count] = s:ParseArguments(l:pairs)
     try
@@ -54,8 +54,8 @@ function! PatternsOnText#Pairs#SubstituteWildcard( range, ... )
 	let l:pattern = join(map(copy(l:splitPairs), '"\\(" . escape(v:val[0], "/") . "\\)"'), '\|')
 	let s:replacements = map(copy(l:splitPairs), 'v:val[1]')    " No escaping, returned by sub-replace-expression.
 
-	execute printf('%ssubstitute/%s/\=s:Replace()/%s %s',
-	\   a:range, l:pattern, l:flags, l:count
+	execute printf('%s %ssubstitute/%s/\=s:Replace()/%s %s',
+	\   a:mods, a:range, l:pattern, l:flags, l:count
 	\)
 	return 1
     catch /^Substitute:/
@@ -72,7 +72,7 @@ endfunction
 
 
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
-function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
+function! PatternsOnText#Pairs#SubstituteMultiple( mods, range, arguments )
     let l:argumentsWordSplit = split(a:arguments, '\s\+')
     let [l:flags, l:count] = s:ParseArguments(l:argumentsWordSplit)
     let l:substitutions = (empty(l:flags) && empty(l:count) ?
@@ -132,8 +132,8 @@ function! PatternsOnText#Pairs#SubstituteMultiple( range, arguments )
 	\   'ingo#escape#Unescape(v:val[2], v:val[0])'
 	\)  " No escaping, returned by sub-replace-expression.
 
-	execute printf('%ssubstitute/%s/\=s:Replace()/%s %s',
-	\   a:range, l:pattern, l:flags, l:count
+	execute printf('%s %ssubstitute/%s/\=s:Replace()/%s %s',
+	\   a:mods, a:range, l:pattern, l:flags, l:count
 	\)
 	return 1
     catch /^Vim\%((\a\+)\)\=:/

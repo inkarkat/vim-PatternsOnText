@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2014-2019 Ingo Karkat
+" Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,7 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousMultipleExprFlags, s:previousMultipleExprCount] = ['', '', '', '']
-function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( range, arguments )
+function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( mods, range, arguments )
     let [l:separator, l:patternExpr, l:replacementExpr, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPatternExpr, 'emptyReplacement': s:previousReplacementExpr, 'defaultReplacement': s:previousReplacementExpr})
     if empty(l:patternExpr)
@@ -42,8 +42,8 @@ function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( range, arguments )
 	let s:previousMultipleExprFlags = l:flags
 	let s:previousMultipleExprCount = l:count
 
-	execute printf('%ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
-	\   a:range, l:pattern, len(l:patterns), l:flags, l:count
+	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
+	\   a:mods, a:range, l:pattern, len(l:patterns), l:flags, l:count
 	\)
 	return 1
     catch /^Vim\%((\a\+)\)\=:/

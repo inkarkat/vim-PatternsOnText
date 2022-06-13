@@ -1,12 +1,9 @@
 " PatternsOnText/Except.vim: Commands to substitute where the pattern does not match.
 "
 " DEPENDENCIES:
-"   - ingo/err.vim autoload script
-"   - ingo/cmdargs/pattern.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/cmdargs.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2017 Ingo Karkat
+" Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -23,11 +20,11 @@ function! PatternsOnText#Except#GetInvertedPattern( separator, pattern )
     \   a:pattern, a:pattern, a:pattern
     \)
 endfunction
-function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, count )
+function! s:InvertedSubstitute( mods, range, separator, pattern, replacement, flags, count )
     call ingo#err#Clear()
     try
-	execute printf('%ssubstitute %s%s%s%s%s%s%s',
-	\   a:range, a:separator,
+	execute printf('%s %ssubstitute %s%s%s%s%s%s%s',
+	\   a:mods, a:range, a:separator,
 	\   PatternsOnText#Except#GetInvertedPattern(a:separator, a:pattern),
 	\   a:separator, a:replacement, a:separator,
 	\   a:flags . (&gdefault || a:flags =~# '^&\|g' ? '' : 'g'), a:count
@@ -47,15 +44,15 @@ function! s:InvertedSubstitute( range, separator, pattern, replacement, flags, c
 	call histadd('search', escape(ingo#escape#Unescape(a:pattern, a:separator), '/'))
     endtry
 endfunction
-function! PatternsOnText#Except#Substitute( range, arguments )
+function! PatternsOnText#Except#Substitute( mods, range, arguments )
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] = ingo#cmdargs#substitute#Parse(a:arguments, {'emptyPattern': @/})
 "****D echomsg '****' string([l:separator, l:pattern, l:replacement, l:flags, l:count])
-    return s:InvertedSubstitute(a:range, l:separator, l:pattern, l:replacement, l:flags, l:count)
+    return s:InvertedSubstitute(a:mods, a:range, l:separator, l:pattern, l:replacement, l:flags, l:count)
 endfunction
-function! PatternsOnText#Except#Delete( range, arguments )
+function! PatternsOnText#Except#Delete( mods, range, arguments )
     let [l:separator, l:pattern, l:flags] = ingo#cmdargs#pattern#Parse(a:arguments, '\(.*\)')
 
-    return s:InvertedSubstitute(a:range, (empty(l:pattern) ? '/' : l:separator), (empty(l:pattern) ? @/ : l:pattern), '', l:flags, '')
+    return s:InvertedSubstitute(a:mods, a:range, (empty(l:pattern) ? '/' : l:separator), (empty(l:pattern) ? @/ : l:pattern), '', l:flags, '')
 endfunction
 
 let &cpo = s:save_cpo

@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019 Ingo Karkat
+" Copyright: (C) 2019-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -11,7 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr] = ['', '', '', '']
-function! PatternsOnText#Transactional#ExprEach#Substitute( range, arguments ) abort
+function! PatternsOnText#Transactional#ExprEach#Substitute( mods, range, arguments ) abort
     let [l:separator, s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, l:testExpr, l:updatePredicate] =
     \   PatternsOnText#Transactional#Common#ParseArguments(s:previousPatternExpr, s:previousReplacementExpr, s:previousFlagsExpr, s:previousSpecialFlagsExpr, a:arguments)
 
@@ -19,28 +19,28 @@ function! PatternsOnText#Transactional#ExprEach#Substitute( range, arguments ) a
 	let l:patterns = PatternsOnText#EvalIntoList(s:previousPatternExpr)
 	let l:replacementExpressions = PatternsOnText#EvalIntoList(s:previousReplacementExpr)
 
-	return PatternsOnText#Transactional#ExprEach#TransactionalSubstitute(a:range, l:patterns, l:replacementExpressions, s:previousFlagsExpr, l:testExpr, l:updatePredicate)
+	return PatternsOnText#Transactional#ExprEach#TransactionalSubstitute(a:mods, a:range, l:patterns, l:replacementExpressions, s:previousFlagsExpr, l:testExpr, l:updatePredicate)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
     endtry
 endfunction
-function! PatternsOnText#Transactional#ExprEach#TransactionalSubstitute( range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
+function! PatternsOnText#Transactional#ExprEach#TransactionalSubstitute( mods, range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
-	return ''
+	return 0
     endif
 
     let l:matches = []
-    let s:SubstituteTransactional = PatternsOnText#InitialContext()
+    let s:SubstituteTransactional = PatternsOnText#Transactional#Common#InitialContext()
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try
 	for l:i in range(len(a:patterns))
 	    let s:SubstituteTransactional.patternIndex = l:i
-	    execute printf('%ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, l:matches, a:testExpr, %d, -1, %d)/%s',
-	    \   a:range, escape(a:patterns[l:i], '/'), l:hasValReferenceInExpr, l:i, a:flags
+	    execute printf('%s %ssubstitute/%s/\=PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, l:matches, a:testExpr, %d, -1, %d)/%s',
+	    \   a:mods, a:range, escape(a:patterns[l:i], '/'), l:hasValReferenceInExpr, l:i, a:flags
 	    \)
 	endfor
 

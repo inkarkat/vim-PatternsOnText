@@ -1,14 +1,9 @@
 " PatternsOnText/InSearch.vim: Commands to substitute only within search matches.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - PatternsOnText/Except.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/msg.vim autoload script
-"   - ingo/subst/expr/emulation.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -17,12 +12,7 @@ set cpo&vim
 
 function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
     let s:didInnerSubstitution = 1
-    if a:sub =~# '^\\='
-	" Recursive use of \= is not allowed, so we need to emulate it:
-	let l:replacement = ingo#subst#expr#emulation#Substitute(a:expr, a:pat, a:sub, a:flags)
-    else
-	let l:replacement = substitute(a:expr, a:pat, a:sub, a:flags)
-    endif
+    let l:replacement = ingo#compat#substitution#RecursiveSubstitutionExpression(a:expr, a:pat, a:sub, a:flags)
     if a:expr !=# l:replacement
 	let s:innerSubstitutionCnt += 1
 	let s:innerSubstitutionLnums[line('.')] = 1
@@ -31,7 +21,7 @@ function! PatternsOnText#InSearch#InnerSubstitute( expr, pat, sub, flags )
 endfunction
 let s:previousPattern = ''
 let s:previousReplacement = ''
-function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLine, arguments ) range
+function! PatternsOnText#InSearch#Substitute( isOutsideSearch, mods, firstLine, lastLine, arguments ) range
     let [l:separator, l:pattern, l:replacement, l:flags, l:count] =
     \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'f', 'emptyPattern': s:previousPattern})
     let l:parts = matchlist(l:replacement,
@@ -75,8 +65,8 @@ function! PatternsOnText#InSearch#Substitute( isOutsideSearch, firstLine, lastLi
 	" substitutions.
 	" The separation character must not appear (unescaped) in the expression, so
 	" we use the original separator.
-	silent execute printf('%d,%dsubstitute %s%s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
-	\   a:firstLine, a:lastLine,
+	silent execute printf('%s %d,%dsubstitute %s%s%s\=PatternsOnText#InSearch#InnerSubstitute(submatch(0), %s, %s, %s)%s%s%s',
+	\   a:mods, a:firstLine, a:lastLine,
 	\   l:separator, l:search, l:separator,
 	\   string(l:pattern),
 	\   string(l:replacement),

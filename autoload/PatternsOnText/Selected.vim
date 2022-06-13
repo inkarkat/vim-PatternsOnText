@@ -1,13 +1,9 @@
 " PatternsOnText/Selected.vim: Commands to substitute only selected matches.
 "
 " DEPENDENCIES:
-"   - PatternsOnText.vim autoload script
-"   - ingo/cmdargs/substitute.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/escape.vim autoload script
-"   - ingo/subst/replacement.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2018 Ingo Karkat
+" Copyright: (C) 2011-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -114,7 +110,7 @@ function! PatternsOnText#Selected#Parse( arguments, previousAnswers, ... )
 
     return [l:separator, l:pattern, l:replacement, l:substituteFlags, l:answers]
 endfunction
-function! PatternsOnText#Selected#Substitute( range, arguments, ... )
+function! PatternsOnText#Selected#Substitute( mods, range, arguments, ... )
     call ingo#err#Clear()
     let s:SubstituteSelected = {'count': 0, 'lastLnum': line('.')}
     let [l:separator, l:pattern, l:replacement, l:substituteFlags, l:answers] = PatternsOnText#Selected#Parse(a:arguments, s:previousAnswers)
@@ -130,8 +126,8 @@ function! PatternsOnText#Selected#Substitute( range, arguments, ... )
     try
 	let s:SubstituteSelected.answers = PatternsOnText#Selected#CreateAnswers(l:answers)
 "****D echomsg '****' string([l:separator, l:pattern, s:SubstituteSelected.replacement, l:substituteFlags, l:answers, s:SubstituteSelected.answers])
-	execute printf('%s%s %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
-	\   a:range, (a:0 ? a:1 : 'substitute'),
+	execute printf('%s %s%s %s%s%s\=PatternsOnText#Selected#CountedReplace()%s%s',
+	\   a:mods, a:range, (a:0 ? a:1 : 'substitute'),
 	\   l:separator, l:pattern, l:separator, l:separator, l:substituteFlags
 	\)
 

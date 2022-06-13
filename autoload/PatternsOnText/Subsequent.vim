@@ -1,12 +1,9 @@
 " PatternsOnText/Subsequent.vim: Commands to substitute matches after the cursor only.
 "
 " DEPENDENCIES:
-"   - ingo/cursor.vim autoload script
-"   - ingo/err.vim autoload script
-"   - ingo/range.vim autoload script
-"   - PatternsOnText/Selected.vim autoload script
+"   - ingo-library.vim plugin
 "
-" Copyright: (C) 2014-2019 Ingo Karkat
+" Copyright: (C) 2014-2022 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -14,7 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:previousAnswers = ''
-function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, startLnum, endLnum, arguments )
+function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, mods, startLnum, endLnum, arguments )
     call ingo#err#Clear()
     let l:startColumn = virtcol('.')
     let [l:separator, l:pattern, l:replacement, l:substituteFlags, l:answers] = PatternsOnText#Selected#Parse(a:arguments, s:previousAnswers, 'b')
@@ -41,8 +38,8 @@ function! PatternsOnText#Subsequent#Substitute( globalCommand, selectedCommand, 
     endif
 
     try
-	execute printf('%d,%d%s%s%s\&\%%(%s\)%s%s%s%s %s',
-	\   a:startLnum, a:endLnum,
+	execute printf('%s %d,%d%s%s%s\&\%%(%s\)%s%s%s%s %s',
+	\   a:mods, a:startLnum, a:endLnum,
 	\   (empty(l:answers) ? a:globalCommand : a:selectedCommand),
 	\   l:separator, l:fromCurrentPositionExpr, l:pattern, l:separator, l:replacement, l:separator, l:substituteFlags, l:answers
 	\)
