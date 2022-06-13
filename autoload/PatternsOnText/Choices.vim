@@ -67,19 +67,10 @@ function! PatternsOnText#Choices#Substitute( mods, range, arguments, ... )
     endtry
 endfunction
 
-function! s:ShowContext( currentLnum, isSameLineAsPrevious )
-    if a:isSameLineAsPrevious
-	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
-    else
-	" Show the current line; unfortunately, :substitute doesn't update each
-	" individual replacement, so a refresh once per line is sufficient.
-	if &cursorline && foldclosed(a:currentLnum) == -1
-	    redraw!
-	else
-	    redraw
-	    call ingo#print#Number(a:currentLnum)
-	endif
-    endif
+function! s:ShowContext( lnum, col )
+    let l:highlights = ingo#text#searchhighlights#GetForLine(a:lnum, a:col, @/)
+    redraw
+    call ingo#print#highlighted#Line(a:lnum, a:col, '', l:highlights)
 endfunction
 function! s:Replace( QueryFuncref, choices )
     let l:currentLnum = line('.')
@@ -91,7 +82,7 @@ function! s:Replace( QueryFuncref, choices )
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
-	call s:ShowContext(l:currentLnum, l:isSameLineAsPrevious)
+	call s:ShowContext(l:currentLnum, col('.'))
 	let l:choiceIdx = call(a:QueryFuncref, [printf('replacement of match %s', s:matchesInLineCnt), a:choices])
     endif
 

@@ -599,7 +599,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.043 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.045 or
   higher.
 
 KNOWN PROBLEMS
@@ -621,6 +621,11 @@ HISTORY
 ##### 2.21    RELEASEME
 - :SubstituteChoices: CHG: Beep and continue querying on invalid accelerator
   key or number; only &lt;Esc&gt; or Ctrl-C abort.
+- :SubstituteChoices: Show the [part of the] current line with the current
+  match highlighted with IncSearch, and other matches with Search, for a
+  better overview of where we are. Thanks to Vitaly for the suggestion.
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.045!__
 
 ##### 2.20    13-Jun-2022
 - Adapt: :PutTranslations and :Renumber need to check &lt;count&gt; == -1 instead of
