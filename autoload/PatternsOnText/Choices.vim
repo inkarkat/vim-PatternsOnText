@@ -117,7 +117,7 @@ function! s:ConfirmQuery( what, list, ... )
 
     " Duplicated to +ingo#query#fromlist#Query ../../../vim-ingo-library/autoload/ingo/query/fromlist.vim
     let l:defaultIndex = (a:0 ? a:1 : -1)
-    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1)
+    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1, '0123456789')
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%d:')
 
@@ -159,8 +159,7 @@ function! s:ConfirmQuery( what, list, ... )
 	    continue
 	endif
 
-	let l:count = index(l:accelerators, l:choice, 0, 1) + 1
-	if l:count == 0 && l:choice =~# '^\d$'
+	if l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
 	    if l:maxNum >= 10 * l:count
 		" Need to query more numbers to be able to address all choices.
@@ -190,6 +189,8 @@ function! s:ConfirmQuery( what, list, ... )
 		    endif
 		endwhile
 	    endif
+	else
+	    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	endif
 
 	if l:count > 0 && l:count <= l:maxNum

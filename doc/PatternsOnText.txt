@@ -653,6 +653,8 @@ HISTORY						      *PatternsOnText-history*
   better overview of where we are. Thanks to Vitaly for the suggestion.
 - :SubstituteChoices: BUG: 10th, 20th, etc. entry cannot be selected by number
   if it is the last.
+- :SubstituteChoices: BUG: Don't add accelerators for numbers, as those
+  interfere with the by-count selection.
   *** You need to update to ingo-library (vimscript #4433) version 1.045! ***
 
 2.20	13-Jun-2022
