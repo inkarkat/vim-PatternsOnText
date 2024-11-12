@@ -67,19 +67,10 @@ function! PatternsOnText#Choices#Substitute( mods, range, arguments, ... )
     endtry
 endfunction
 
-function! s:ShowContext( currentLnum, isSameLineAsPrevious )
-    if a:isSameLineAsPrevious
-	redraw " If we let the previous query linger, the actual buffer contents will slowly scroll out of view.
-    else
-	" Show the current line; unfortunately, :substitute doesn't update each
-	" individual replacement, so a refresh once per line is sufficient.
-	if &cursorline && foldclosed(a:currentLnum) == -1
-	    redraw!
-	else
-	    redraw
-	    call ingo#print#Number(a:currentLnum)
-	endif
-    endif
+function! s:ShowContext( lnum, col )
+    let l:highlights = ingo#text#searchhighlights#GetForLine(a:lnum, a:col, @/)
+    redraw
+    call ingo#print#highlighted#Line(a:lnum, a:col, '', l:highlights)
 endfunction
 function! s:Replace( QueryFuncref, choices )
     let l:currentLnum = line('.')
@@ -91,7 +82,7 @@ function! s:Replace( QueryFuncref, choices )
     if exists('s:predefinedChoice')
 	let l:choiceIdx = s:predefinedChoice
     else
-	call s:ShowContext(l:currentLnum, l:isSameLineAsPrevious)
+	call s:ShowContext(l:currentLnum, col('.'))
 	let l:choiceIdx = call(a:QueryFuncref, [printf('replacement of match %s', s:matchesInLineCnt), a:choices])
     endif
 
@@ -124,8 +115,9 @@ function! s:ConfirmQuery( what, list, ... )
     endif
     let l:originalList = a:list + s:additionalOptions
 
+    " Duplicated to +ingo#query#fromlist#Query ../../../vim-ingo-library/autoload/ingo/query/fromlist.vim
     let l:defaultIndex = (a:0 ? a:1 : -1)
-    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1)
+    let l:confirmList = ingo#query#confirm#AutoAccelerators(copy(l:originalList), -1, '0123456789')
     let l:accelerators = map(copy(l:confirmList), 'matchstr(v:val, "&\\zs.")')
     let l:list = ingo#query#fromlist#RenderList(l:confirmList, l:defaultIndex, '%d:')
 
@@ -158,21 +150,23 @@ function! s:ConfirmQuery( what, list, ... )
 
 	let l:maxNum = len(l:originalList)
 	let l:choice = ingo#query#get#Char()
-	if l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
+	if empty(l:choice) || l:choice ==# "\<C-c>"
+	    redraw | echo ''
+	    return -1
+	elseif l:choice ==# "\<C-e>" || l:choice ==# "\<C-y>"
 	    execute 'normal!' l:choice
 	    redraw
 	    continue
 	endif
 
-	let l:count = (empty(l:choice) ? -1 : index(l:accelerators, l:choice, 0, 1)) + 1
-	if l:count == 0 && l:choice =~# '^\d$'
+	if l:choice =~# '^\d$'
 	    let l:count = str2nr(l:choice)
-	    if l:maxNum > 10 * l:count
+	    if l:maxNum >= 10 * l:count
 		" Need to query more numbers to be able to address all choices.
 		echon ' ' . l:count
 
 		let l:leadingZeroCnt = (l:choice ==# '0')
-		while l:maxNum > 10 * l:count
+		while l:maxNum >= 10 * l:count
 		    let l:char = nr2char(getchar())
 		    if l:char ==# "\<CR>"
 			break
@@ -195,13 +189,16 @@ function! s:ConfirmQuery( what, list, ... )
 		    endif
 		endwhile
 	    endif
+	else
+	    let l:count = index(l:accelerators, l:choice, 0, 1) + 1
 	endif
 
-	if l:count < 1 || l:count > l:maxNum
-	    redraw | echo ''
-	    return -1
+	if l:count > 0 && l:count <= l:maxNum
+	    return l:count - 1
+	else
+	    execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+	    redraw
 	endif
-	return l:count - 1
     endwhile
 endfunction
 
