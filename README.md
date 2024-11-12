@@ -618,7 +618,7 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 HISTORY
 ------------------------------------------------------------------------------
 
-##### 2.21    RELEASEME
+##### 2.21    12-Nov-2024
 - :SubstituteChoices: CHG: Beep and continue querying on invalid accelerator
   key or number; only &lt;Esc&gt; or Ctrl-C abort.
 - :SubstituteChoices: Show the [part of the] current line with the current
@@ -818,7 +818,7 @@ __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scrip
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2022 Ingo Karkat -
+Copyright: (C) 2011-2024 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;
