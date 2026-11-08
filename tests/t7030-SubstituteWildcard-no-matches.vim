@@ -4,6 +4,6 @@ call vimtest#StartTap()
 call vimtap#Plan(1)
 
 edit text.txt
-call vimtap#err#ErrorsLike('^E486: .*: \\(\\VdoesNotExist\\)', '%SubstituteWildcard doesNotExist=XXX', 'Pattern not found error shown')
+call vimtap#err#ErrorsLike('^E486: .*: \\(\\VdoesNotExist\\m\\)', '%SubstituteWildcard doesNotExist=XXX', 'Pattern not found error shown')
 
 call vimtest#Quit()

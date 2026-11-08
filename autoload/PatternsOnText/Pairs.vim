@@ -3,33 +3,34 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2014-2022 Ingo Karkat
+" Copyright: (C) 2014-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:ParseArguments( arguments )
+function! s:ParseArguments( arguments, ... )
     let l:count = ''
     let l:flags = ''
     if get(a:arguments, -1, '') =~# '^\d\+$'
 	let l:count = remove(a:arguments, -1)
     endif
-    if get(a:arguments, -1, '.') =~# '^' . ingo#cmdargs#substitute#GetFlags() . '\d*$'
+    if get(a:arguments, -1, '.') =~# '^' . call(function('ingo#cmdargs#substitute#GetFlags'), a:000) . '\d*$'
 	let l:flags = remove(a:arguments, -1)
     endif
 
     return [l:flags, l:count]
 endfunction
-let [s:previousSplitPairs, s:previousWildcardFlags, s:previousWildcardCount] = [[], '', '']
+let [s:previousPairs, s:previousWildcardFlags, s:previousWildcardCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
     let l:pairs = copy(a:000)
-    let [l:flags, l:count] = s:ParseArguments(l:pairs)
+    let [l:flags, l:count] = s:ParseArguments(l:pairs, 'wW')
     try
-	let l:splitPairs = ingo#subst#pairs#Split(l:pairs)
+	let l:splitPairs = ingo#subst#pairs#Split(copy(l:pairs))
 	if empty(l:splitPairs)
-	    let l:splitPairs = s:previousSplitPairs
+	    let l:pairs = s:previousPairs
+	    let l:splitPairs = ingo#subst#pairs#Split(copy(l:pairs))
 	    if empty(l:flags)
 		let l:flags = s:previousWildcardFlags
 	    endif
@@ -44,9 +45,23 @@ function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
 	    call ingo#err#Set('No pairs')
 	    return 0
 	endif
-	let s:previousSplitPairs = l:splitPairs
+	let s:previousPairs = l:pairs
 	let s:previousWildcardFlags = l:flags
 	let s:previousWildcardCount = l:count
+
+	" Handle custom substitution flags.
+	let l:Transformer = ''
+	if l:flags =~# 'w'
+	    let l:flags = ingo#str#trd(l:flags, 'w')
+	    let l:Transformer = function('ingo#regexp#MakeWholeWordSearch')
+	elseif l:flags =~# 'W'
+	    let l:flags = ingo#str#trd(l:flags, 'W')
+	    let l:Transformer = function('ingo#regexp#MakeWholeWORDSearch')
+	endif
+	if ! empty(l:Transformer)
+	    " Re-parse the pairs, this time with the pattern transformer.
+	    let l:splitPairs = ingo#subst#pairs#Split(copy(l:pairs), {'PatternTransformer': l:Transformer})
+	endif
 
 	" Surround each individual match with a capturing group, so that we can
 	" determine which branch matched (and use the corresponding
