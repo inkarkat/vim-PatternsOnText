@@ -130,12 +130,11 @@ endfunction
 
 
 
-function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
+function! s:HandleCustomSubstitutionFlags( patterns, replacements, flags ) abort
     let l:patterns = a:patterns
     let l:replacements = a:replacements
     let l:flags = a:flags
 
-    " Handle custom substitution flags.
     if l:flags =~# 'P'
 	let l:flags = ingo#str#trd(l:flags, 'P')
 	let l:patterns = map(l:patterns, 'ingo#regexp#EscapeLiteralText(v:val)')
@@ -156,6 +155,10 @@ function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacem
 	let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
     endif
 
+    return [l:patterns, l:replacements, l:flags]
+endfunction
+function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
+    let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags)
     let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '/')
     if empty(l:pattern) | return 0 | endif
 
