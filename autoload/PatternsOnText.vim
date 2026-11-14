@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2013-2022 Ingo Karkat
+" Copyright: (C) 2013-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -80,7 +80,7 @@ function! PatternsOnText#EvalIntoList( expr ) abort
     \)
 endfunction
 
-function! PatternsOnText#JoinPatterns( patterns ) abort
+function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters ) abort
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
 	return ''
@@ -100,7 +100,7 @@ function! PatternsOnText#JoinPatterns( patterns ) abort
     return join(
     \  map(
     \      copy(a:patterns),
-    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), "/") . "\\)"'
+    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), a:additionalEscapeCharacters) . "\\)"'
     \  ),
     \  '\|'
     \)

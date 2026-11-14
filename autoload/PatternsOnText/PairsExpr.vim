@@ -156,7 +156,7 @@ function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacem
 	let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
     endif
 
-    let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
+    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '/')
     if empty(l:pattern) | return 0 | endif
 
     try
