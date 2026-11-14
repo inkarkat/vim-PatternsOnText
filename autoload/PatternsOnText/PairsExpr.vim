@@ -83,27 +83,6 @@ function! PatternsOnText#PairsExpr#SubstituteExpr( mods, range, arguments )
 	let s:previousExprFlags = l:flags
 	let s:previousExprCount = l:count
 
-	" Handle custom substitution flags.
-	if l:flags =~# 'P'
-	    let l:flags = ingo#str#trd(l:flags, 'P')
-	    let l:patterns = map(l:patterns, 'ingo#regexp#EscapeLiteralText(v:val)')
-	elseif l:flags =~# 'w'
-	    let l:flags = ingo#str#trd(l:flags, 'w')
-	    let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWordSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
-	elseif l:flags =~# 'W'
-	    let l:flags = ingo#str#trd(l:flags, 'W')
-	    let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWORDSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
-	elseif l:flags =~# 'L'
-	    let l:flags = ingo#str#trd(l:flags, 'L')
-	    let l:patterns = map(l:patterns, '"^\\s*" . ingo#regexp#EscapeLiteralText(v:val) . "\\s*$"')
-	elseif l:flags =~# 'E'
-	    let l:flags = ingo#str#trd(l:flags, 'E')
-	    let l:patterns = map(l:patterns, '"^" . ingo#regexp#EscapeLiteralText(v:val) . "$"')
-	elseif l:flags =~# 'R'
-	    let l:flags = ingo#str#trd(l:flags, 'R')
-	    let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
-	endif
-
 	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, l:patterns, l:replacements, l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
@@ -116,7 +95,7 @@ endfunction
 let [s:previousPatternExpr, s:previousReplacementExpr, s:previousMultipleExprFlags, s:previousMultipleExprCount] = ['', '', '', '']
 function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( mods, range, arguments )
     let [l:separator, l:patternExpr, l:replacementExpr, l:flags, l:count] =
-    \   ingo#cmdargs#substitute#Parse(a:arguments, {'emptyFlags': ['', ''], 'emptyPattern': s:previousPatternExpr, 'emptyReplacement': s:previousReplacementExpr, 'defaultReplacement': s:previousReplacementExpr})
+    \   ingo#cmdargs#substitute#Parse(a:arguments, {'additionalFlags': 'PwWLER', 'emptyFlags': ['', ''], 'emptyPattern': s:previousPatternExpr, 'emptyReplacement': s:previousReplacementExpr, 'defaultReplacement': s:previousReplacementExpr})
     if empty(l:patternExpr)
 	let l:patternExpr = s:previousPatternExpr
     endif
@@ -152,13 +131,38 @@ endfunction
 
 
 function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
-    let l:pattern = PatternsOnText#JoinPatterns(a:patterns)
+    let l:patterns = a:patterns
+    let l:replacements = a:replacements
+    let l:flags = a:flags
+
+    " Handle custom substitution flags.
+    if l:flags =~# 'P'
+	let l:flags = ingo#str#trd(l:flags, 'P')
+	let l:patterns = map(l:patterns, 'ingo#regexp#EscapeLiteralText(v:val)')
+    elseif l:flags =~# 'w'
+	let l:flags = ingo#str#trd(l:flags, 'w')
+	let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWordSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
+    elseif l:flags =~# 'W'
+	let l:flags = ingo#str#trd(l:flags, 'W')
+	let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWORDSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
+    elseif l:flags =~# 'L'
+	let l:flags = ingo#str#trd(l:flags, 'L')
+	let l:patterns = map(l:patterns, '"^\\s*" . ingo#regexp#EscapeLiteralText(v:val) . "\\s*$"')
+    elseif l:flags =~# 'E'
+	let l:flags = ingo#str#trd(l:flags, 'E')
+	let l:patterns = map(l:patterns, '"^" . ingo#regexp#EscapeLiteralText(v:val) . "$"')
+    elseif l:flags =~# 'R'
+	let l:flags = ingo#str#trd(l:flags, 'R')
+	let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
+    endif
+
+    let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
     if empty(l:pattern) | return 0 | endif
 
     try
-	let s:replacementExpressions = a:replacements
+	let s:replacementExpressions = l:replacements
 	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
-	\	    a:mods, a:range, l:pattern, len(a:patterns), a:flags, a:count
+	\	    a:mods, a:range, l:pattern, len(l:patterns), l:flags, a:count
 	\)
 	return 1
     finally
