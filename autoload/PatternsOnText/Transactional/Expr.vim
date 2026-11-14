@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2019-2022 Ingo Karkat
+" Copyright: (C) 2019-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -28,7 +28,7 @@ endfunction
 function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
 
-    let l:pattern = PatternsOnText#JoinPatterns(a:patterns)
+    let l:pattern = PatternsOnText#JoinPatterns(a:patterns, '/')
     if empty(l:pattern) | return 0 | endif
 
     let l:matches = []
@@ -37,7 +37,7 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range
 
     try
 	execute printf('%s %ssubstitute/%s/\=s:RecordExpression(l:matches, %d, a:testExpr, %d)/%s',
-	\   a:mods, a:range, escape(l:pattern, '/'), len(a:patterns), l:hasValReferenceInExpr, a:flags
+	\   a:mods, a:range, l:pattern, len(a:patterns), l:hasValReferenceInExpr, a:flags
 	\)
 
 	if has_key(s:SubstituteTransactional, 'error')

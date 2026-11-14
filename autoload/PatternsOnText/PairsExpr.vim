@@ -130,12 +130,11 @@ endfunction
 
 
 
-function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
+function! s:HandleCustomSubstitutionFlags( patterns, replacements, flags, startOfLineAssertion, endOfLineAssertion ) abort
     let l:patterns = a:patterns
     let l:replacements = a:replacements
     let l:flags = a:flags
 
-    " Handle custom substitution flags.
     if l:flags =~# 'P'
 	let l:flags = ingo#str#trd(l:flags, 'P')
 	let l:patterns = map(l:patterns, 'ingo#regexp#EscapeLiteralText(v:val)')
@@ -147,16 +146,20 @@ function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacem
 	let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWORDSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
     elseif l:flags =~# 'L'
 	let l:flags = ingo#str#trd(l:flags, 'L')
-	let l:patterns = map(l:patterns, '"^\\s*" . ingo#regexp#EscapeLiteralText(v:val) . "\\s*$"')
+	let l:patterns = map(l:patterns, 'a:startOfLineAssertion . "\\s*" . ingo#regexp#EscapeLiteralText(v:val) . "\\s*" . a:endOfLineAssertion')
     elseif l:flags =~# 'E'
 	let l:flags = ingo#str#trd(l:flags, 'E')
-	let l:patterns = map(l:patterns, '"^" . ingo#regexp#EscapeLiteralText(v:val) . "$"')
+	let l:patterns = map(l:patterns, 'a:startOfLineAssertion . ingo#regexp#EscapeLiteralText(v:val) . a:endOfLineAssertion')
     elseif l:flags =~# 'R'
 	let l:flags = ingo#str#trd(l:flags, 'R')
 	let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
     endif
 
-    let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
+    return [l:patterns, l:replacements, l:flags]
+endfunction
+function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
+    let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '^', '$')
+    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '/')
     if empty(l:pattern) | return 0 | endif
 
     try
@@ -165,6 +168,25 @@ function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacem
 	\	    a:mods, a:range, l:pattern, len(l:patterns), l:flags, a:count
 	\)
 	return 1
+    finally
+	let s:replacementExpressions = []
+    endtry
+endfunction
+function! PatternsOnText#PairsExpr#SubstituteText( text, patterns, replacements, flags ) abort
+    " In substitute(), the /^/ and /%/ assertions only match at the very start / and
+    " end of the string, but we want anchoring to line breaks within the string.
+    " The start-of-line pattern uses a look-behind assertion for the newline; /\zs/
+    " cannot be used because it would prevent successive matches in consecutive
+    " lines.
+    " The end-of-line pattern includes the trailing newline in the match, so that
+    " the full line is replaced.
+    let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '\%(^\|\n\@<=\)', '\%(\n\|$\)')
+    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '')
+    if empty(l:pattern) | return a:text | endif
+
+    try
+	let s:replacementExpressions = l:replacements
+	return substitute(a:text, l:pattern, printf('\=s:ReplaceExpression(%d)', len(l:patterns)), l:flags)
     finally
 	let s:replacementExpressions = []
     endtry
