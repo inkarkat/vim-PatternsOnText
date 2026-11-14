@@ -255,7 +255,7 @@ USAGE
                             whole WORD occurrences of {pattern}, pass the special
                             flag [W].
                             To interpret pattern as literal text and only match
-                            entire lines (excluding indent and trailing
+                            entire lines (ignoring indent and trailing
                             whitespace), pass the special flag [L].
                             To interpret pattern as literal text and only match
                             exact full lines, pass the special flag [E].
@@ -280,7 +280,7 @@ USAGE
                             whole WORD occurrences of {pattern}, pass the special
                             flag [W].
                             To interpret pattern as literal text and only match
-                            entire lines (excluding indent and trailing
+                            entire lines (ignoring indent and trailing
                             whitespace), pass the special flag [L].
                             To interpret pattern as literal text and only match
                             exact full lines, pass the special flag [E].
@@ -307,7 +307,7 @@ USAGE
                             whole WORD occurrences of {pattern}, pass the special
                             flag [W].
                             To interpret pattern as literal text and only match
-                            entire lines (excluding indent and trailing
+                            entire lines (ignoring indent and trailing
                             whitespace), pass the special flag [L].
                             To interpret pattern as literal text and only match
                             exact full lines, pass the special flag [E].
