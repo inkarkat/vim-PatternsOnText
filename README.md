@@ -229,10 +229,38 @@ USAGE
                             Whitespace in the substitution pairs must be escaped;
                             for a literal backslash search / replace, use \\:
                                 C:\\=my\ drive
+                            To only match whole word occurrences of {wildcard},
+                            pass the special flag [w].
+                            To only match whole WORD occurrences of {wildcard},
+                            pass the special flag [W].
     :[range]SubstituteWildcard [flags] [count]
                             Repeat the last substitution with the last used search
                             pattern, last used wildcard replacements, last used
                             :s_flags and count.
+
+    :[range]SubstituteExpr {expr} [flags] [count]
+                            Evaluate {expr}, either as:
+                            - a Dict {pattern: replacement, ...} mapping patterns
+                              to replacements
+                            - a single [pattern, replacement] pair
+                            - a List of such [[pattern, replacement], ...] pairs
+                            Note: You cannot use capturing groups /\( here!
+                            Each replacement handles & and \=.
+                            To interpret pattern as literal text (not a regular
+                            expression), pass the special flag [P].
+                            To interpret pattern as literal text and only match
+                            whole word occurrences of {pattern}, pass the special
+                            flag [w].
+                            To interpret pattern as literal text and only match
+                            whole WORD occurrences of {pattern}, pass the special
+                            flag [W].
+                            To interpret pattern as literal text and only match
+                            entire lines (excluding indent and trailing
+                            whitespace), pass the special flag [L].
+                            To interpret pattern as literal text and only match
+                            exact full lines, pass the special flag [E].
+                            To interpret replacement as literal text (no & and
+                            \=), pass the special flag [R].
 
     :[range]SubstituteMultipleExpr /{pattern-expr}/{replacement-expr}/ [flags] [count]
                             Evaluate {pattern-expr}, either as a List of patterns,
@@ -243,6 +271,21 @@ USAGE
                             available) List element of {replacement-expr}.
                             Note: You cannot use capturing groups /\( here!
                             Each replacement handles & and \=.
+                            To interpret pattern as literal text (not a regular
+                            expression), pass the special flag [P].
+                            To interpret pattern as literal text and only match
+                            whole word occurrences of {pattern}, pass the special
+                            flag [w].
+                            To interpret pattern as literal text and only match
+                            whole WORD occurrences of {pattern}, pass the special
+                            flag [W].
+                            To interpret pattern as literal text and only match
+                            entire lines (excluding indent and trailing
+                            whitespace), pass the special flag [L].
+                            To interpret pattern as literal text and only match
+                            exact full lines, pass the special flag [E].
+                            To interpret replacement as literal text (no & and
+                            \=), pass the special flag [R].
     :[range]SubstituteMultipleExpr [flags] [count]
                             Repeat the last substitution with the last used search
                             and replacement expressions, last used :s_flags and
@@ -599,7 +642,7 @@ To uninstall, use the :RmVimball command.
 ### DEPENDENCIES
 
 - Requires Vim 7.0 or higher.
-- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.045 or
+- Requires the ingo-library.vim plugin ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)), version 1.050 or
   higher.
 
 KNOWN PROBLEMS
@@ -617,6 +660,15 @@ https://github.com/inkarkat/vim-PatternsOnText/issues or email (address below).
 
 HISTORY
 ------------------------------------------------------------------------------
+
+##### 2.22    RELEASEME
+- :SubstituteWildcard: ENH: Support whole-word/WORD matching of {wildcard} via
+  [wW] flags.
+- :SubstituteMultipleExpr: ENH: Support literal / whole-word/WORD / entire
+  line / exact line / literal replacement matching via [PwWLER] flags.
+- ENH: Add :SubstituteExpr variant of :SubstituteMultipleExpr.
+
+__You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.050!__
 
 ##### 2.21    12-Nov-2024
 - :SubstituteChoices: CHG: Beep and continue querying on invalid accelerator
@@ -818,7 +870,7 @@ __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scrip
 - Started development as part of my custom ingocommands.
 
 ------------------------------------------------------------------------------
-Copyright: (C) 2011-2024 Ingo Karkat -
+Copyright: (C) 2011-2026 Ingo Karkat -
 The [VIM LICENSE](http://vimdoc.sourceforge.net/htmldoc/uganda.html#license) applies to this plugin.
 
 Maintainer:     Ingo Karkat &lt;ingo@karkat.de&gt;
