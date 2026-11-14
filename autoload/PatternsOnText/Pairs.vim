@@ -171,6 +171,55 @@ function! s:Replace()
     return ''
 endfunction
 
+
+
+function! s:GetRegisters( regList ) abort
+    return map(copy(a:regList), 'getreg(v:val)')
+endfunction
+let [s:previousRegisterPatterns, s:previousRegisterReplacements, s:previousRegisterExprFlags, s:previousRegisterExprCount] = [[], [], '', '']
+function! PatternsOnText#Pairs#SubstituteRegister( mods, range, ... )
+    let l:pairs = copy(a:000)
+    let [l:flags, l:count] = s:ParseFlagsAndCountOffOfArguments(l:pairs, 'PwWLER')
+    if empty(l:pairs)
+	let l:patterns = s:previousRegisterPatterns
+	let l:replacements = s:previousRegisterReplacements
+	if empty(l:flags)
+	    let l:flags = s:previousRegisterExprFlags
+	endif
+	if empty(l:flags)
+	    let l:flags = '&'
+	endif
+	if empty(l:count)
+	    let l:count = s:previousRegisterExprCount
+	endif
+    else
+	let l:registerPairPattern = printf('^\(%s\)=\(%s\)$', ingo#register#All(), ingo#register#All())
+	let l:patterns = []
+	let l:replacements = []
+	for l:pair in l:pairs
+	    let l:parse = matchlist(l:pair, l:registerPairPattern)
+	    if empty(l:parse)
+		call ingo#err#Set('Not a {pattern-register}={replacement-register} pair: ' . l:pair)
+		return 0
+	    endif
+	    call add(l:patterns, l:parse[1])
+	    call add(l:replacements, l:parse[2])
+	endfor
+
+	let s:previousRegisterPatterns = l:patterns
+	let s:previousRegisterReplacements = l:replacements
+	let s:previousRegisterExprFlags = l:flags
+	let s:previousRegisterExprCount = l:count
+    endif
+
+    try
+	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, s:GetRegisters(l:patterns), s:GetRegisters(l:replacements), l:flags, l:count)
+    catch /^Vim\%((\a\+)\)\=:/
+	call ingo#err#SetVimException()
+	return 0
+    endtry
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 " vim: set ts=8 sts=4 sw=4 noexpandtab ff=unix fdm=syntax :

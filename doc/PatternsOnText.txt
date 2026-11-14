@@ -305,6 +305,38 @@ USAGE							*PatternsOnText-usage*
 			Repeat the last substitution with the last used search
 			and replacement expressions, last used |:s_flags| and
 			count.
+							 *:SubstituteRegister*
+:[range]SubstituteRegister {pattern-register}={replacement-register} [...] [flags] [count]
+			Replace the contents of each {pattern-register} with
+			the contents of the {replacement-register}. You can
+			use the black-hole register (|quote_|) to delete
+			matches.
+			Note: You cannot use capturing groups |/\(| here!
+			Each replacement handles & and \=.
+			To interpret pattern as literal text (not a regular
+			expression), pass the special flag [P].
+			To interpret pattern as literal text and only match
+			whole word occurrences of {pattern}, pass the special
+			flag [w].
+			To interpret pattern as literal text and only match
+			whole WORD occurrences of {pattern}, pass the special
+			flag [W].
+			To interpret pattern as literal text and only match
+			entire lines (excluding indent and trailing
+			whitespace), pass the special flag [L].
+			To interpret pattern as literal text and only match
+			exact full lines, pass the special flag [E].
+			To interpret replacement as literal text (no & and
+			\=), pass the special flag [R].
+			Note: If you have multiple patterns and replacements
+			as individual lines in two registers (e.g. a and b),
+			you can use this command for substitution: >
+			:[range]SubstituteMultipleExpr /@a/@b/ [flags] [count]
+:[range]SubstituteRegister [flags] [count]
+			Repeat the last substitution with the last used search
+			and replacement registers, last used |:s_flags| and
+			count.
+
 						    *:SubstituteTransactional*
 :[range]SubstituteTransactional /{pattern}/{string}/
 				[flags][t/{test-expr}/][u/{update-predicate}/]
@@ -694,6 +726,8 @@ HISTORY						      *PatternsOnText-history*
 - :SubstituteMultipleExpr: ENH: Support literal / whole-word/WORD / entire
   line / exact line / literal replacement matching via [PwWLER] flags.
 - ENH: Add :SubstituteExpr variant of :SubstituteMultipleExpr.
+- ENH: Add :SubstituteRegister variant of :SubstituteWildcard and
+  :SubstituteMultipleExpr
   *** You need to update to ingo-library (vimscript #4433) version 1.050! ***
 
 2.21	12-Nov-2024
