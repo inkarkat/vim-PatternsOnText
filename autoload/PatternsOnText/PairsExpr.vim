@@ -79,7 +79,7 @@ function! PatternsOnText#PairsExpr#SubstituteExpr( mods, range, arguments )
 
 	let s:previousExpr = l:expr
 	let l:patterns = map(copy(l:exprItems), 'v:val[0]')
-	let s:replacementExpressions = map(copy(l:exprItems), 'v:val[1]')
+	let l:replacements = map(copy(l:exprItems), 'v:val[1]')
 	let s:previousExprFlags = l:flags
 	let s:previousExprCount = l:count
 
@@ -101,21 +101,13 @@ function! PatternsOnText#PairsExpr#SubstituteExpr( mods, range, arguments )
 	    let l:patterns = map(l:patterns, '"^" . ingo#regexp#EscapeLiteralText(v:val) . "$"')
 	elseif l:flags =~# 'R'
 	    let l:flags = ingo#str#trd(l:flags, 'R')
-	    let s:replacementExpressions = map(s:replacementExpressions, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
+	    let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
 	endif
 
-	let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
-	if empty(l:pattern) | return 0 | endif
-
-	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
-	\   a:mods, a:range, l:pattern, len(l:patterns), l:flags, l:count
-	\)
-	return 1
+	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, l:patterns, l:replacements, l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
-    finally
-	let s:replacementExpressions = []
     endtry
 endfunction
 
@@ -143,30 +135,36 @@ function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( mods, range, argument
 
     try
 	let l:patterns = PatternsOnText#EvalIntoList(l:patternExpr)
-	let s:replacementExpressions = PatternsOnText#EvalIntoList(l:replacementExpr)
-
-	let l:pattern = PatternsOnText#JoinPatterns(l:patterns)
-	if empty(l:pattern) | return 0 | endif
+	let l:replacements = PatternsOnText#EvalIntoList(l:replacementExpr)
 
 	let s:previousPatternExpr = l:patternExpr
 	let s:previousReplacementExpr = l:replacementExpr
 	let s:previousMultipleExprFlags = l:flags
 	let s:previousMultipleExprCount = l:count
 
-	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
-	\   a:mods, a:range, l:pattern, len(l:patterns), l:flags, l:count
-	\)
-	return 1
+	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, l:patterns, l:replacements, l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
-    finally
-	let s:replacementExpressions = []
     endtry
 endfunction
 
 
 
+function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
+    let l:pattern = PatternsOnText#JoinPatterns(a:patterns)
+    if empty(l:pattern) | return 0 | endif
+
+    try
+	let s:replacementExpressions = a:replacements
+	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
+	\	    a:mods, a:range, l:pattern, len(a:patterns), a:flags, a:count
+	\)
+	return 1
+    finally
+	let s:replacementExpressions = []
+    endtry
+endfunction
 function! s:ReplaceExpression( patternNum )
     for l:i in range(a:patternNum)
 	if ! empty(submatch(l:i + 1))
