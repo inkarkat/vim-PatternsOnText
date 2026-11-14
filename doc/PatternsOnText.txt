@@ -328,6 +328,10 @@ USAGE							*PatternsOnText-usage*
 			exact full lines, pass the special flag [E].
 			To interpret replacement as literal text (no & and
 			\=), pass the special flag [R].
+			Note: If you have multiple patterns and replacements
+			as individual lines in two registers (e.g. a and b),
+			you can use this command for substitution: >
+			:[range]SubstituteMultipleExpr /@a/@b/ [flags] [count]
 :[range]SubstituteRegister [flags] [count]
 			Repeat the last substitution with the last used search
 			and replacement registers, last used |:s_flags| and
