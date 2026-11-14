@@ -10,7 +10,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:ParseArguments( arguments, ... )
+function! s:ParseFlagsAndCountOffOfArguments( arguments, ... )
     let l:count = ''
     let l:flags = ''
     if get(a:arguments, -1, '') =~# '^\d\+$'
@@ -25,7 +25,7 @@ endfunction
 let [s:previousPairs, s:previousWildcardFlags, s:previousWildcardCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
     let l:pairs = copy(a:000)
-    let [l:flags, l:count] = s:ParseArguments(l:pairs, 'wW')
+    let [l:flags, l:count] = s:ParseFlagsAndCountOffOfArguments(l:pairs, 'wW')
     try
 	let l:splitPairs = ingo#subst#pairs#Split(copy(l:pairs))
 	if empty(l:splitPairs)
@@ -89,7 +89,7 @@ endfunction
 let [s:previousSplitSubstitutions, s:previousMultipleFlags, s:previousMultipleCount] = [[], '', '']
 function! PatternsOnText#Pairs#SubstituteMultiple( mods, range, arguments )
     let l:argumentsWordSplit = split(a:arguments, '\s\+')
-    let [l:flags, l:count] = s:ParseArguments(l:argumentsWordSplit)
+    let [l:flags, l:count] = s:ParseFlagsAndCountOffOfArguments(l:argumentsWordSplit)
     let l:substitutions = (empty(l:flags) && empty(l:count) ?
     \   a:arguments :
     \   matchstr(a:arguments, '^.*\ze\V\C' . (empty(l:flags) ? '' : '\s\+' . l:flags) . (empty(l:count) ? '' : '\s\+' . l:count) . '\$')

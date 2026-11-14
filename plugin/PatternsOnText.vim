@@ -3,7 +3,7 @@
 " DEPENDENCIES:
 "   - ingo-library.vim plugin
 "
-" Copyright: (C) 2011-2022 Ingo Karkat
+" Copyright: (C) 2011-2026 Ingo Karkat
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:	Ingo Karkat <ingo@karkat.de>
@@ -85,6 +85,9 @@ command! -range -nargs=* SubstituteMultiple
 command! -range -nargs=* SubstituteWildcard
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#Pairs#SubstituteWildcard(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <f-args>) | echoerr ingo#err#Get() | endif
+command! -range -nargs=* -complete=expression SubstituteExpr
+\   call setline(<line1>, getline(<line1>)) |
+\   if ! PatternsOnText#PairsExpr#SubstituteExpr(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
 command! -range -nargs=* SubstituteMultipleExpr
 \   call setline(<line1>, getline(<line1>)) |
 \   if ! PatternsOnText#PairsExpr#SubstituteMultipleExpr(ingo#compat#command#Mods('<mods>'), '<line1>,<line2>', <q-args>) | echoerr ingo#err#Get() | endif
