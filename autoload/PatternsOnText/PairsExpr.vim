@@ -172,6 +172,18 @@ function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacem
 	let s:replacementExpressions = []
     endtry
 endfunction
+function! PatternsOnText#PairsExpr#SubstituteText( text, patterns, replacements, flags ) abort
+    let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags)
+    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '')
+    if empty(l:pattern) | return a:text | endif
+
+    try
+	let s:replacementExpressions = l:replacements
+	return substitute(a:text, l:pattern, printf('\=s:ReplaceExpression(%d)', len(l:patterns)), l:flags)
+    finally
+	let s:replacementExpressions = []
+    endtry
+endfunction
 function! s:ReplaceExpression( patternNum )
     for l:i in range(a:patternNum)
 	if ! empty(submatch(l:i + 1))
