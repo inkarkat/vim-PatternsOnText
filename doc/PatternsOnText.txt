@@ -728,6 +728,9 @@ HISTORY						      *PatternsOnText-history*
 - ENH: Add :SubstituteExpr variant of :SubstituteMultipleExpr.
 - ENH: Add :SubstituteRegister variant of :SubstituteWildcard and
   :SubstituteMultipleExpr
+- ENH: :Substitute{Multiple,Wildcard,[Multiple]Expr,Register} now support more
+  than 9 pattern - replacement pairs. This was previously limited by the
+  number of available |submatch()|es.
   *** You need to update to ingo-library (vimscript #4433) version 1.050! ***
 
 2.21	12-Nov-2024

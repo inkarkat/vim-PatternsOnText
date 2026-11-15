@@ -94,26 +94,56 @@ function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters, ...
 	endif
     endfor
 
-    " Surround each individual match with a capturing group, so that we can
-    " determine which branch matched (and use the corresponding replacement).
-    let l:substitutor = {
-    \   'patternNum': len(a:patterns),
-    \   'pattern': join(
-    \       map(
-    \           copy(a:patterns),
-    \           printf('"\\(" . escape(%s, a:additionalEscapeCharacters) . "\\)"', (a:0 ? a:1 : 'v:val'))
-    \       ),
-    \       '\|'
-    \   ),
-    \}
-    function l:substitutor.getPatternIndexAndMatch()
-	for l:i in range(self.patternNum)
-	    if ! empty(submatch(l:i + 1))
-		return [l:i, submatch(l:i + 1)]
-	    endif
-	endfor
-	throw 'PatternsOnText: No match found'
-    endfunction
+    if len(a:patterns) <= 9
+	" Surround each individual match with a capturing group, so that we can
+	" determine which branch matched (and use the corresponding replacement) by
+	" checking for non-empty submatch.
+	" This unfortunately only works for up to 9 patterns.
+	let l:substitutor = {
+	\   'patternNum': len(a:patterns),
+	\   'pattern': join(
+	\       map(
+	\           copy(a:patterns),
+	\           printf('"\\(" . escape(%s, a:additionalEscapeCharacters) . "\\)"', (a:0 ? a:1 : 'v:val'))
+	\       ),
+	\       '\|'
+	\   ),
+	\}
+	function l:substitutor.getPatternIndexAndMatch()
+	    for l:i in range(self.patternNum)
+		if ! empty(submatch(l:i + 1))
+		    return [l:i, submatch(l:i + 1)]
+		endif
+	    endfor
+	    throw 'PatternsOnText: No match found'
+	endfunction
+    else
+	" Surround each individual match just with a non-capturing group to avoid any
+	" influences across the regexp branches.
+	let l:substitutor = {
+	\   'patterns': a:patterns,
+	\   'pattern': join(
+	\       map(
+	\           copy(a:patterns),
+	\           printf('"\\%%(" . escape(%s, a:additionalEscapeCharacters) . "\\)"', (a:0 ? a:1 : 'v:val'))
+	\       ),
+	\       '\|'
+	\   ),
+	\}
+	" We cannot use capturing groups for more than 9 patterns.
+	" Re-attempt the match for each pattern.
+	" XXX: This could fail if advanced atoms like \ze or \%l are used, but I don't
+	" see any other way to achieve this; doing the substitution in multiple passes
+	" would be unexpected and lead to undesired interactions between substitutions.
+	function l:substitutor.getPatternIndexAndMatch()
+	    for l:i in range(len(self.patterns))
+		if submatch(0) =~ self.patterns[l:i]    " Note: Default =~ match so that 'ignorecase' is respected, just like :substitute does.
+		    return [l:i, submatch(0)]
+		endif
+	    endfor
+	    throw 'PatternsOnText: No match found'
+	endfunction
+    endif
 
     return l:substitutor
 endfunction

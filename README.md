@@ -700,6 +700,9 @@ HISTORY
 - ENH: Add :SubstituteExpr variant of :SubstituteMultipleExpr.
 - ENH: Add :SubstituteRegister variant of :SubstituteWildcard and
   :SubstituteMultipleExpr
+- ENH: :Substitute{Multiple,Wildcard,[Multiple]Expr,Register} now support more
+  than 9 pattern - replacement pairs. This was previously limited by the
+  number of available |submatch()|es.
 
 __You need to update to ingo-library ([vimscript #4433](http://www.vim.org/scripts/script.php?script_id=4433)) version 1.050!__
 
