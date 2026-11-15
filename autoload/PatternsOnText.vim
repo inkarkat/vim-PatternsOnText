@@ -83,27 +83,40 @@ endfunction
 function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters ) abort
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
-	return ''
+	return {}
     endif
 
     " Check for forbidden capture groups.
     for l:i in range(len(a:patterns))
 	if PatternsOnText#IsContainsCaptureGroup(a:patterns[l:i])
 	    call ingo#err#Set(printf('Capture groups not allowed in pattern #%d: %s', l:i + 1, a:patterns[l:i]))
-	    return ''
+	    return {}
 	endif
     endfor
 
     " Remove any atoms changing the magicness, then surround each individual
     " match with a capturing group, so that we can determine which branch
     " matched (and use the corresponding replacement).
-    return join(
-    \  map(
-    \      copy(a:patterns),
-    \      '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), a:additionalEscapeCharacters) . "\\)"'
-    \  ),
-    \  '\|'
-    \)
+    let l:substitutor = {
+    \   'patternNum': len(a:patterns),
+    \   'pattern': join(
+    \       map(
+    \           copy(a:patterns),
+    \           '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), a:additionalEscapeCharacters) . "\\)"'
+    \       ),
+    \       '\|'
+    \   ),
+    \}
+    function l:substitutor.getPatternIndexAndMatch()
+	for l:i in range(self.patternNum)
+	    if ! empty(submatch(l:i + 1))
+		return [l:i, submatch(l:i + 1)]
+	    endif
+	endfor
+	throw 'PatternsOnText: No match found'
+    endfunction
+
+    return l:substitutor
 endfunction
 
 let &cpo = s:save_cpo

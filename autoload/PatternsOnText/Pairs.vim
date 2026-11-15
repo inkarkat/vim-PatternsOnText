@@ -222,6 +222,9 @@ function! PatternsOnText#Pairs#SubstituteRegister( mods, range, ... )
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
+	return 0
     endtry
 endfunction
 

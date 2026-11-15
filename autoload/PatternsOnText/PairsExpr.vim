@@ -87,6 +87,9 @@ function! PatternsOnText#PairsExpr#SubstituteExpr( mods, range, arguments )
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
+	return 0
     endtry
 endfunction
 
@@ -124,6 +127,9 @@ function! PatternsOnText#PairsExpr#SubstituteMultipleExpr( mods, range, argument
 	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, l:patterns, l:replacements, l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
+	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
 	return 0
     endtry
 endfunction
@@ -190,13 +196,13 @@ function! s:HandleCustomSubstitutionFlags( patterns, replacements, flags, startO
 endfunction
 function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
     let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '^', '$')
-    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '/')
-    if empty(l:pattern) | return 0 | endif
+    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '/')
+    if empty(l:substitutor) | return 0 | endif
 
     try
 	let s:replacementExpressions = l:replacements
-	execute printf('%s %ssubstitute/%s/\=s:ReplaceExpression(%d)/%s %s',
-	\	    a:mods, a:range, l:pattern, len(l:patterns), l:flags, a:count
+	execute printf('%s %ssubstitute/%s/\=call(function("s:ReplaceExpression"), l:substitutor.getPatternIndexAndMatch())/%s %s',
+	\	    a:mods, a:range, l:substitutor.pattern, l:flags, a:count
 	\)
 	return 1
     finally
@@ -212,26 +218,18 @@ function! PatternsOnText#PairsExpr#SubstituteText( text, patterns, replacements,
     " The end-of-line pattern includes the trailing newline in the match, so that
     " the full line is replaced.
     let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '\%(^\|\n\@<=\)', '\%(\n\|$\)')
-    let l:pattern = PatternsOnText#JoinPatterns(l:patterns, '')
-    if empty(l:pattern) | return a:text | endif
+    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '')
+    if empty(l:substitutor) | return a:text | endif
 
     try
 	let s:replacementExpressions = l:replacements
-	return substitute(a:text, l:pattern, printf('\=s:ReplaceExpression(%d)', len(l:patterns)), l:flags)
+	return substitute(a:text, l:substitutor.pattern, '\=call(function("s:ReplaceExpression"), l:substitutor.getPatternIndexAndMatch())', l:flags)
     finally
 	let s:replacementExpressions = []
     endtry
 endfunction
-function! s:ReplaceExpression( patternNum )
-    for l:i in range(a:patternNum)
-	if ! empty(submatch(l:i + 1))
-	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), get(s:replacementExpressions, l:i, get(s:replacementExpressions, -1, '')), '&', function('PatternsOnText#ReplaceSpecial'))
-	endif
-    endfor
-
-    " Should never happen; one branch always matches, and branches shouldn't be
-    " empty.
-    return ''
+function! s:ReplaceExpression( patternIndex, patternMatch )
+    return ingo#subst#replacement#ReplaceSpecial(a:patternMatch, get(s:replacementExpressions, a:patternIndex, get(s:replacementExpressions, -1, '')), '&', function('PatternsOnText#ReplaceSpecial'))
 endfunction
 
 let &cpo = s:save_cpo
