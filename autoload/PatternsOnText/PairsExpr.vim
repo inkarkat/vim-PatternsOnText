@@ -196,7 +196,7 @@ function! s:HandleCustomSubstitutionFlags( patterns, replacements, flags, startO
 endfunction
 function! PatternsOnText#PairsExpr#DoSubstitute( mods, range, patterns, replacements, flags, count ) abort
     let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '^', '$')
-    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '/')
+    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '/', 'ingo#regexp#magic#Normalize(v:val)')
     if empty(l:substitutor) | return 0 | endif
 
     try
@@ -218,7 +218,7 @@ function! PatternsOnText#PairsExpr#SubstituteText( text, patterns, replacements,
     " The end-of-line pattern includes the trailing newline in the match, so that
     " the full line is replaced.
     let [l:patterns, l:replacements, l:flags] = s:HandleCustomSubstitutionFlags(a:patterns, a:replacements, a:flags, '\%(^\|\n\@<=\)', '\%(\n\|$\)')
-    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '')
+    let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '', 'ingo#regexp#magic#Normalize(v:val)')
     if empty(l:substitutor) | return a:text | endif
 
     try

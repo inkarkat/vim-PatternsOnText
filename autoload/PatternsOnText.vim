@@ -80,7 +80,7 @@ function! PatternsOnText#EvalIntoList( expr ) abort
     \)
 endfunction
 
-function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters ) abort
+function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters, ... ) abort
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
 	return {}
@@ -94,15 +94,14 @@ function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters ) ab
 	endif
     endfor
 
-    " Remove any atoms changing the magicness, then surround each individual
-    " match with a capturing group, so that we can determine which branch
-    " matched (and use the corresponding replacement).
+    " Surround each individual match with a capturing group, so that we can
+    " determine which branch matched (and use the corresponding replacement).
     let l:substitutor = {
     \   'patternNum': len(a:patterns),
     \   'pattern': join(
     \       map(
     \           copy(a:patterns),
-    \           '"\\(" . escape(ingo#regexp#magic#Normalize(v:val), a:additionalEscapeCharacters) . "\\)"'
+    \           printf('"\\(" . escape(%s, a:additionalEscapeCharacters) . "\\)"', (a:0 ? a:1 : 'v:val'))
     \       ),
     \       '\|'
     \   ),
