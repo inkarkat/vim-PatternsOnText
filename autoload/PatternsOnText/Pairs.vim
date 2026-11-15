@@ -63,14 +63,12 @@ function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
 	    let l:splitPairs = ingo#subst#pairs#Split(copy(l:pairs), {'PatternTransformer': l:Transformer})
 	endif
 
-	" Surround each individual match with a capturing group, so that we can
-	" determine which branch matched (and use the corresponding
-	" replacement).
-	let l:pattern = join(map(copy(l:splitPairs), '"\\(" . escape(v:val[0], "/") . "\\)"'), '\|')
+	let l:patterns = map(copy(l:splitPairs), 'v:val[0]')
 	let s:replacements = map(copy(l:splitPairs), 'v:val[1]')    " No escaping, returned by sub-replace-expression.
+	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, l:flags, '/')    " No need to normalize here; the patterns returned by ingo#subst#pairs#Split() are neutral.
 
-	execute printf('%s %ssubstitute/%s/\=s:Replace()/%s %s',
-	\   a:mods, a:range, l:pattern, l:flags, l:count
+	execute printf('%s %ssubstitute/%s/\=call(function("s:Replace"), l:substitutor.getPatternIndexAndMatch())/%s %s',
+	\   a:mods, a:range, l:substitutor.pattern, l:flags, l:count
 	\)
 	return 1
     catch /^Substitute:/
@@ -132,23 +130,19 @@ function! PatternsOnText#Pairs#SubstituteMultiple( mods, range, arguments )
 	let s:previousMultipleCount = l:count
 
 	" Unescape as we need to use a common separator and remove any atoms
-	" changing the magicness, then surround each individual match with a
-	" capturing group, so that we can determine which branch matched (and
-	" use the corresponding replacement).
-	let l:pattern = join(
-	\   map(
-	\       copy(l:splitSubstitutions),
-	\       '"\\(" . escape(ingo#regexp#magic#Normalize(ingo#escape#Unescape(v:val[1], v:val[0])), "/") . "\\)"'
-	\   ),
-	\   '\|'
+	" changing the magicness.
+	let l:patterns = map(
+	\   copy(l:splitSubstitutions),
+	\   'ingo#regexp#magic#Normalize(ingo#escape#Unescape(v:val[1], v:val[0]))'
 	\)
 	let s:replacements = map(
 	\   copy(l:splitSubstitutions),
 	\   'ingo#escape#Unescape(v:val[2], v:val[0])'
 	\)  " No escaping, returned by sub-replace-expression.
+	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, l:flags, '/')
 
-	execute printf('%s %ssubstitute/%s/\=s:Replace()/%s %s',
-	\   a:mods, a:range, l:pattern, l:flags, l:count
+	execute printf('%s %ssubstitute/%s/\=call(function("s:Replace"), l:substitutor.getPatternIndexAndMatch())/%s %s',
+	\   a:mods, a:range, l:substitutor.pattern, l:flags, l:count
 	\)
 	return 1
     catch /^Vim\%((\a\+)\)\=:/
@@ -159,16 +153,8 @@ function! PatternsOnText#Pairs#SubstituteMultiple( mods, range, arguments )
     endtry
 endfunction
 
-function! s:Replace()
-    for l:i in range(len(s:replacements))
-	if ! empty(submatch(l:i + 1))
-	    return ingo#subst#replacement#ReplaceSpecial(submatch(l:i + 1), s:replacements[l:i], '&', function('PatternsOnText#ReplaceSpecial'))
-	endif
-    endfor
-
-    " Should never happen; one branch always matches, and branches shouldn't be
-    " empty.
-    return ''
+function! s:Replace( patternIndex, patternMatch )
+    return ingo#subst#replacement#ReplaceSpecial(a:patternMatch, s:replacements[a:patternIndex], '&', function('PatternsOnText#ReplaceSpecial'))
 endfunction
 
 
@@ -212,10 +198,18 @@ function! PatternsOnText#Pairs#SubstituteRegister( mods, range, ... )
 	let s:previousRegisterExprCount = l:count
     endif
 
+    if empty(l:patterns)
+	call ingo#err#Set('No registers')
+	return 0
+    endif
+
     try
 	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, s:GetRegisters(l:patterns), s:GetRegisters(l:replacements), l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
+	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
 	return 0
     endtry
 endfunction

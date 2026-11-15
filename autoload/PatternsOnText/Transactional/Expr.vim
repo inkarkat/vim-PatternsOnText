@@ -28,22 +28,18 @@ endfunction
 function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
 
-    let l:pattern = PatternsOnText#JoinPatterns(a:patterns, '/')
-    if empty(l:pattern) | return 0 | endif
+    let l:substitutor = PatternsOnText#JoinPatterns(a:patterns, a:flags, '/', 'ingo#regexp#magic#Normalize(v:val)')
+    if empty(l:substitutor) | return 0 | endif
 
     let l:matches = []
     let s:SubstituteTransactional = PatternsOnText#Transactional#Common#InitialContext()
     let l:hasValReferenceInExpr = (a:testExpr =~# ingo#actions#GetValExpr())
 
     try
-	execute printf('%s %ssubstitute/%s/\=s:RecordExpression(l:matches, %d, a:testExpr, %d)/%s',
-	\   a:mods, a:range, l:pattern, len(a:patterns), l:hasValReferenceInExpr, a:flags
+	execute printf('%s %ssubstitute/%s/\=s:RecordExpression(l:substitutor.getPatternIndexAndMatch()[0], l:matches, a:testExpr, %d)/%s',
+	\   a:mods, a:range, l:substitutor.pattern, l:hasValReferenceInExpr, a:flags
 	\)
 
-	if has_key(s:SubstituteTransactional, 'error')
-	    call ingo#err#Set(s:SubstituteTransactional.error)
-	    return 0
-	endif
 	let s:SubstituteTransactional.matchNum = s:SubstituteTransactional.matchCount
 
 	if ! empty(a:updatePredicate) && ! ingo#actions#EvaluateWithVal(a:updatePredicate, s:SubstituteTransactional)
@@ -72,6 +68,9 @@ function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range
     catch /^Vim\%((\a\+)\)\=:/
 	call ingo#err#SetVimException()
 	return 0
+    catch /^PatternsOnText:/
+	call ingo#err#SetCustomException('PatternsOnText')
+	return 0
     finally
 	unlet! s:SubstituteTransactional
     endtry
@@ -79,18 +78,9 @@ endfunction
 function! PatternsOnText#Transactional#Expr#GetContext() abort
     return s:SubstituteTransactional
 endfunction
-function! s:RecordExpression( matches, patternNum, testExpr, hasValReferenceInExpr ) abort
-    for l:i in range(a:patternNum)
-	if ! empty(submatch(l:i + 1))
-	    let s:SubstituteTransactional.patternIndex = l:i
-	    return PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, a:matches, a:testExpr, a:hasValReferenceInExpr, l:i)
-	endif
-    endfor
-
-    " Should never happen; one branch always matches, and branches shouldn't be
-    " empty.
-    let s:SubstituteTransactional.error = 'Could not locate matching pattern'
-    return submatch(0)
+function! s:RecordExpression( patternIndex, matches, testExpr, hasValReferenceInExpr ) abort
+    let s:SubstituteTransactional.patternIndex = a:patternIndex
+    return PatternsOnText#Transactional#Common#Record(s:SubstituteTransactional, a:matches, a:testExpr, a:hasValReferenceInExpr, a:patternIndex)
 endfunction
 
 let &cpo = s:save_cpo
