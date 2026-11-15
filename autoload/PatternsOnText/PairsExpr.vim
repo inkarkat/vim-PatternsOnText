@@ -135,22 +135,53 @@ function! s:HandleCustomSubstitutionFlags( patterns, replacements, flags, startO
     let l:replacements = a:replacements
     let l:flags = a:flags
 
+    let l:appliedPatternFlag = ''
     if l:flags =~# 'P'
+	if ! empty(l:appliedPatternFlag)
+	    throw printf('Cannot combine flag %s with flag %s', l:appliedPatternFlag, 'P')
+	endif
+	let l:appliedPatternFlag = 'P'
+
 	let l:flags = ingo#str#trd(l:flags, 'P')
 	let l:patterns = map(l:patterns, 'ingo#regexp#EscapeLiteralText(v:val)')
-    elseif l:flags =~# 'w'
+    endif
+    if l:flags =~# 'w'
+	if ! empty(l:appliedPatternFlag)
+	    throw printf('Cannot combine flag %s with flag %s', l:appliedPatternFlag, 'w')
+	endif
+	let l:appliedPatternFlag = 'w'
+
 	let l:flags = ingo#str#trd(l:flags, 'w')
 	let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWordSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
-    elseif l:flags =~# 'W'
+    endif
+    if l:flags =~# 'W'
+	if ! empty(l:appliedPatternFlag)
+	    throw printf('Cannot combine flag %s with flag %s', l:appliedPatternFlag, 'W')
+	endif
+	let l:appliedPatternFlag = 'W'
+
 	let l:flags = ingo#str#trd(l:flags, 'W')
 	let l:patterns = map(l:patterns, 'ingo#regexp#MakeWholeWORDSearch(v:val, ingo#regexp#EscapeLiteralText(v:val))')
-    elseif l:flags =~# 'L'
+    endif
+    if l:flags =~# 'L'
+	if ! empty(l:appliedPatternFlag)
+	    throw printf('Cannot combine flag %s with flag %s', l:appliedPatternFlag, 'L')
+	endif
+	let l:appliedPatternFlag = 'L'
+
 	let l:flags = ingo#str#trd(l:flags, 'L')
 	let l:patterns = map(l:patterns, 'a:startOfLineAssertion . "\\s*" . ingo#regexp#EscapeLiteralText(v:val) . "\\s*" . a:endOfLineAssertion')
-    elseif l:flags =~# 'E'
+    endif
+    if l:flags =~# 'E'
+	if ! empty(l:appliedPatternFlag)
+	    throw printf('Cannot combine flag %s with flag %s', l:appliedPatternFlag, 'E')
+	endif
+	let l:appliedPatternFlag = 'E'
+
 	let l:flags = ingo#str#trd(l:flags, 'E')
 	let l:patterns = map(l:patterns, 'a:startOfLineAssertion . ingo#regexp#EscapeLiteralText(v:val) . a:endOfLineAssertion')
-    elseif l:flags =~# 'R'
+    endif
+    if l:flags =~# 'R'
 	let l:flags = ingo#str#trd(l:flags, 'R')
 	let l:replacements = map(l:replacements, 'ingo#regexp#EscapeLiteralReplacement(v:val)')
     endif
