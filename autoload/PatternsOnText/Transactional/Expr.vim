@@ -28,7 +28,7 @@ endfunction
 function! PatternsOnText#Transactional#Expr#TransactionalSubstitute( mods, range, patterns, replacementExpressions, flags, testExpr, updatePredicate ) abort
     call ingo#err#Clear()
 
-    let l:substitutor = PatternsOnText#JoinPatterns(a:patterns, '/', 'ingo#regexp#magic#Normalize(v:val)')
+    let l:substitutor = PatternsOnText#JoinPatterns(a:patterns, a:flags, '/', 'ingo#regexp#magic#Normalize(v:val)')
     if empty(l:substitutor) | return 0 | endif
 
     let l:matches = []

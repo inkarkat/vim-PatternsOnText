@@ -80,7 +80,7 @@ function! PatternsOnText#EvalIntoList( expr ) abort
     \)
 endfunction
 
-function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters, ... ) abort
+function! PatternsOnText#JoinPatterns( patterns, substituteFlags, additionalEscapeCharacters, ... ) abort
     if empty(a:patterns)
 	call ingo#err#Set('No patterns')
 	return {}
@@ -122,6 +122,12 @@ function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters, ...
 	" influences across the regexp branches.
 	let l:substitutor = {
 	\   'patterns': a:patterns,
+	\   'ignorecaseAtom': (a:substituteFlags =~# 'i'
+	\       ? '\c'
+	\       : a:substituteFlags =~# 'I'
+	\           ? '\C'
+	\           : ''
+	\   ),
 	\   'pattern': join(
 	\       map(
 	\           copy(a:patterns),
@@ -137,7 +143,7 @@ function! PatternsOnText#JoinPatterns( patterns, additionalEscapeCharacters, ...
 	" would be unexpected and lead to undesired interactions between substitutions.
 	function l:substitutor.getPatternIndexAndMatch()
 	    for l:i in range(len(self.patterns))
-		if submatch(0) =~ self.patterns[l:i]    " Note: Default =~ match so that 'ignorecase' is respected, just like :substitute does.
+		if submatch(0) =~ self.ignorecaseAtom . self.patterns[l:i]    " Note: Default =~ match so that 'ignorecase' is respected, just like :substitute does.
 		    return [l:i, submatch(0)]
 		endif
 	    endfor

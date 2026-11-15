@@ -65,7 +65,7 @@ function! PatternsOnText#Pairs#SubstituteWildcard( mods, range, ... )
 
 	let l:patterns = map(copy(l:splitPairs), 'v:val[0]')
 	let s:replacements = map(copy(l:splitPairs), 'v:val[1]')    " No escaping, returned by sub-replace-expression.
-	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '/')    " No need to normalize here; the patterns returned by ingo#subst#pairs#Split() are neutral.
+	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, l:flags, '/')    " No need to normalize here; the patterns returned by ingo#subst#pairs#Split() are neutral.
 
 	execute printf('%s %ssubstitute/%s/\=call(function("s:Replace"), l:substitutor.getPatternIndexAndMatch())/%s %s',
 	\   a:mods, a:range, l:substitutor.pattern, l:flags, l:count
@@ -139,7 +139,7 @@ function! PatternsOnText#Pairs#SubstituteMultiple( mods, range, arguments )
 	\   copy(l:splitSubstitutions),
 	\   'ingo#escape#Unescape(v:val[2], v:val[0])'
 	\)  " No escaping, returned by sub-replace-expression.
-	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, '/')
+	let l:substitutor = PatternsOnText#JoinPatterns(l:patterns, l:flags, '/')
 
 	execute printf('%s %ssubstitute/%s/\=call(function("s:Replace"), l:substitutor.getPatternIndexAndMatch())/%s %s',
 	\   a:mods, a:range, l:substitutor.pattern, l:flags, l:count
