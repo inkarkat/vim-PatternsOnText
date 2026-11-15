@@ -212,6 +212,11 @@ function! PatternsOnText#Pairs#SubstituteRegister( mods, range, ... )
 	let s:previousRegisterExprCount = l:count
     endif
 
+    if empty(l:patterns)
+	call ingo#err#Set('No registers')
+	return 0
+    endif
+
     try
 	return PatternsOnText#PairsExpr#DoSubstitute(a:mods, a:range, s:GetRegisters(l:patterns), s:GetRegisters(l:replacements), l:flags, l:count)
     catch /^Vim\%((\a\+)\)\=:/
